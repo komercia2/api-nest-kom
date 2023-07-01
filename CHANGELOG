@@ -1,1 +1,6 @@
+##  (2023-06-29)
 
+* Add CHANGELOG ([69b8733](https://gitlab.com/komercia/api-komercia-nest/commit/69b8733))
+* Configure SAST in `.gitlab-ci.yml`, creating this file if it does not already exist ([8ea6a1b](https://gitlab.com/komercia/api-komercia-nest/commit/8ea6a1b))
+* Initial commit ([6376e7e](https://gitlab.com/komercia/api-komercia-nest/commit/6376e7e))
+* chore: :closed_lock_with_key: add .env.example file for environment variables ([f6fee59](https://gitlab.com/komercia/api-komercia-nest/commit/f6fee59))
