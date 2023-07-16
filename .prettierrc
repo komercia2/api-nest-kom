@@ -3,6 +3,6 @@
 	"trailingComma": "none",
 	"semi": false,
 	"useTabs": true,
-	"printWidth": 120,
-	"endOfLine": "crlf"
+	"printWidth": 100,
+	"endOfLine": "auto"
 }

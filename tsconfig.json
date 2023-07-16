@@ -14,8 +14,15 @@
 		"skipLibCheck": true,
 		"strictNullChecks": true,
 		"strictBindCallApply": false,
+		"strictPropertyInitialization": false,
+		"noImplicitAny": true,
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false,
+		"paths": {
+			"@stores/*": ["src/modules/stores/*"],
+			"@global/*": ["src/modules/global/*"],
+			"@shared/*": ["src/modules/shared/*"]
+		}
 	},
 	"include": ["src/**/*"]
 }
