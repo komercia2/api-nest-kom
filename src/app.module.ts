@@ -1,5 +1,3 @@
-import { classes } from "@automapper/classes"
-import { AutomapperModule } from "@automapper/nestjs"
 import { GlobalModule } from "@global/global.module"
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
