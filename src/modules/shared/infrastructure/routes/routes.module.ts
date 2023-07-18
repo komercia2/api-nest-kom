@@ -4,7 +4,6 @@ import { RouterModule, RouteTree } from "@nestjs/core"
 import { AppModule } from "src/app.module"
 
 const apiVersions = { v1: "v1" }
-const prefix = "api"
 
 /**
  * @name routes
@@ -17,7 +16,7 @@ const routes: RouteTree[] = [
 		module: AppModule
 	},
 	{
-		path: `${prefix}/${apiVersions.v1}/common`,
+		path: `${apiVersions.v1}/common`,
 		module: GlobalModule
 	}
 ]
