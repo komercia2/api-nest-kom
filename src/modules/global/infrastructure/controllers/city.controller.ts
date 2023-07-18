@@ -11,7 +11,7 @@ import { InfrastructureInjectionTokens } from "../infrastructure-injection.token
  *
  */
 @ApiTags("Cities")
-@Controller("/city")
+@Controller("/cities")
 export class CityController {
 	constructor(
 		@Inject(InfrastructureInjectionTokens.GetCitiesWithDepartamentsQuery)
@@ -29,6 +29,8 @@ export class CityController {
 				success: true
 			})
 		} catch (error) {
+			console.log(error)
+
 			handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting cities with departaments",
