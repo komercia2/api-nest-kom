@@ -1,0 +1,14 @@
+# BUILD FOR DEVELOPMENT ENVIRONMENT
+
+FROM node:18.12.1-alpine AS development
+
+RUN npm install -g pnpm@8.6.5
+
+WORKDIR /app
+
+COPY . .
+
+RUN pnpm install --save
+
+
+CMD ["pnpm", "run", "start:dev"]
