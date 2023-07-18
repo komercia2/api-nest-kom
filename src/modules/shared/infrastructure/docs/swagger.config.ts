@@ -10,7 +10,7 @@ export const getSwaggerConfig = () => {
 	const swaggerConfig = new DocumentBuilder()
 		.setTitle("Komercia NestJS API")
 		.setDescription("This is the API documentation for the Komercia NestJS API")
-		.setVersion("1.0")
+		.setVersion("1.0.0")
 		.build()
 	return {
 		path: path,
