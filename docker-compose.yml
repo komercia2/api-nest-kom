@@ -1,0 +1,39 @@
+version: "3.8"
+services:
+  dev:
+    image: api-komercia-nest-dev
+    container_name: api-komercia-nest-dev
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: development
+    volumes:
+      - .:/app
+      - /app/node_modules
+    environment:
+      - NODE_ENV=development
+    ports:
+      - 8390:8390
+    command: pnpm run start:dev
+  prod:
+    image: api-komercia-nest-prod
+    container_name: api-komercia-prod
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: production
+    restart: always
+    ports:
+      - ${PORT}:${PORT}
+    environment:
+      - DB_HOST=${DB_HOST}
+      - DB_PORT=${DB_PORT}
+      - DB_USER=${DB_USER}
+      - DB_NAME=${DB_NAME}
+      - DB_PASSWORD=${DB_PASSWORD}
+      - API_KOMERCIA=${API_KOMERCIA}
+      - SWAGGER_PATH=${SWAGGER_PATH}
+      - OPENAI_API_KEY={OPENAI_API_KEY}
+      - MONGODB_URI=${MONGODB_URI}
+      - DB_LOGGING={DB_LOGGING}
+    command: pnpm run start:prod
