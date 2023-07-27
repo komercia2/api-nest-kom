@@ -14,6 +14,7 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
 		username: this.configService.get<string>("DB_USER"),
 		database: this.configService.get<string>("DB_NAME"),
 		password: this.configService.get<string>("DB_PASSWORD"),
+		logging: this.configService.get<boolean>("DB_LOGGING"),
 		entities: [City, Departament, Country]
 	})
 }
