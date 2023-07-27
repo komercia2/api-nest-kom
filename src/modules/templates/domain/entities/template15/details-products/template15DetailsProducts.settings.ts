@@ -1,0 +1,20 @@
+export const detailsProductsSettings = {
+	"--background_color_1": "#FFFFFF",
+	"--background_color_2": "#accdd2",
+	color_breadCrumbs: "#FFFFFF",
+	color_border: "#868686",
+	color_title: "#1f2021",
+	color_price: "#ed6436",
+	color_priceDescount: "#ed6436",
+	color_text: "#1f2021",
+	color_subText: "#646464",
+	color_btn: "#FFFFFF",
+	color_text_btn: "#000000",
+	color_icon: "#ed6436",
+	fontWeightTitle: 600,
+	fontWeightPrice: 600,
+	fontWeightPriceDescount: 500,
+	fontSizeTitle: "28px",
+	fontSizePrice: "18px",
+	fontSizePriceDescount: "15px"
+}
