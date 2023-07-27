@@ -1,0 +1,4 @@
+export enum InfrastructureInjectionTokens {
+	OpenAIProducSuggetionsServices = "OpenAIProducSuggetionsServices",
+	getProductDescriptionSuggestionsFromKeywordsQuery = "getProductDescriptionSuggestionsFromKeywordsQuery"
+}
