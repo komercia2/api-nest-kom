@@ -1,7 +1,9 @@
 import { GlobalModule } from "@global/global.module"
 import { Module } from "@nestjs/common"
 import { RouterModule, RouteTree } from "@nestjs/core"
+import { TemplatesModule } from "@templates/templates.module"
 import { AppModule } from "src/app.module"
+import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.module"
 
 const apiVersions = { v1: "v1" }
 
@@ -18,6 +20,14 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/common`,
 		module: GlobalModule
+	},
+	{
+		path: `${apiVersions.v1}/ai-suggetions`,
+		module: AiSuggetionsModule
+	},
+	{
+		path: `${apiVersions.v1}/templates`,
+		module: TemplatesModule
 	}
 ]
 

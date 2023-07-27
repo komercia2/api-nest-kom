@@ -19,7 +19,7 @@ type HttpResponseType = {
  */
 export const handlerHttpResponse = (res: Response, data: HttpResponseType) => {
 	const { statusCode, success, message, data: responseData } = data
-	res.status(statusCode).send({
+	res.status(statusCode).json({
 		success,
 		message,
 		data: responseData
