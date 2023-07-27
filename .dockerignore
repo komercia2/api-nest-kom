@@ -1,0 +1,13 @@
+Dockerfile
+.dockerignore
+docker-compose.yml
+node_modules
+dist
+.git
+.prettierrc
+.eslintrc.js
+README.md
+entities/*
+npm-debug.log
+.env.development
+.env.example

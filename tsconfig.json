@@ -18,11 +18,17 @@
 		"noImplicitAny": true,
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false,
+		"watch": true,
 		"paths": {
-			"@stores/*": ["src/modules/stores/*"],
+			"@templates/*": ["src/modules/templates/*"],
 			"@global/*": ["src/modules/global/*"],
 			"@shared/*": ["src/modules/shared/*"]
 		}
 	},
-	"include": ["src/**/*"]
+	"include": ["src/**/*"],
+	"watchOptions": {
+		"watchFile": "dynamicPriorityPolling",
+		"watchDirectory": "dynamicPriorityPolling",
+		"excludeDirectories": ["**/node_modules", "dist"]
+	}
 }
