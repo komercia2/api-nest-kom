@@ -11,6 +11,7 @@ export const getSwaggerConfig = () => {
 		.setTitle("Komercia NestJS API")
 		.setDescription("This is the API documentation for the Komercia NestJS API")
 		.setVersion("1.0.0")
+		.addBearerAuth({ in: "authorization", type: "http" })
 		.build()
 	return {
 		path: path,
