@@ -9,5 +9,4 @@ dist
 README.md
 entities/*
 npm-debug.log
-.env.development
 .env.example

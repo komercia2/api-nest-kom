@@ -17,7 +17,7 @@ import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module
 	imports: [
 		LoggerModule.forRoot(pinoConfig),
 		ConfigModule.forRoot({
-			envFilePath: [".env.development", ".env.production"],
+			envFilePath: `.env.${process.env.NODE_ENV}`,
 			isGlobal: true
 		}),
 		TypeOrmModule.forRootAsync({ useClass: TypeOrmService, inject: [ConfigModule] }),
