@@ -1,4 +1,14 @@
-import { ArrayMinSize, ArrayNotEmpty, IsArray, IsNotEmpty, IsString } from "class-validator"
+import {
+	ArrayMinSize,
+	ArrayNotEmpty,
+	IsArray,
+	IsInt,
+	IsNotEmpty,
+	IsOptional,
+	IsString,
+	Max,
+	Min
+} from "class-validator"
 
 export class GetDescriptionSuggetionDto {
 	@IsNotEmpty()
@@ -13,4 +23,10 @@ export class GetDescriptionSuggetionDto {
 	@ArrayNotEmpty()
 	@ArrayMinSize(1)
 	keyWords: string[]
+
+	@IsInt()
+	@Min(20)
+	@Max(120)
+	@IsOptional()
+	nWords = 50
 }
