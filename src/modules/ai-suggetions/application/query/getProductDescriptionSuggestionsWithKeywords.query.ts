@@ -6,15 +6,13 @@ import { GetDescriptionSuggetionDto } from "./dtos"
 
 @Injectable()
 export class getProductDescriptionSuggestionsFromKeywordsQuery {
-	private readonly nWords = 90
-
 	constructor(
 		@Inject(ApplicationInjectionTokens.IProductDescriptionSuggetionRepository)
 		private readonly IProductSuggetionRepository: IProductSuggetionsRepository
 	) {}
 
 	async execute({ payload }: { payload: GetDescriptionSuggetionDto }) {
-		const { keyWords, language, productName } = payload
+		const { keyWords, language, productName, nWords } = payload
 
 		const cleanedKeyWords = keyWords.map((keyWord) => this.cleanInput(keyWord))
 		const keyWordsSet = new Set(cleanedKeyWords)
@@ -24,7 +22,7 @@ export class getProductDescriptionSuggestionsFromKeywordsQuery {
 				productName,
 				[...keyWordsSet],
 				language,
-				this.nWords
+				nWords
 			)
 
 		return this.cleanOutput(suggetion.getDescrptionSuggetion())
