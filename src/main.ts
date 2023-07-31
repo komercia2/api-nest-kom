@@ -5,6 +5,7 @@ import { SwaggerModule } from "@nestjs/swagger"
 import { getSwaggerConfig } from "@shared/infrastructure/docs"
 import * as compression from "compression"
 import { Logger } from "nestjs-pino"
+import { useNestTreblle } from "treblle"
 
 import { AppModule } from "./app.module"
 
@@ -24,11 +25,18 @@ async function bootstrap() {
 		useGlobalPrefix: true
 	})
 
+	const expressInstance = app.getHttpAdapter().getInstance()
+
+	useNestTreblle(expressInstance, {
+		apiKey: configService.get<string>("TREBLLE_API_KEY") || "",
+		projectId: configService.get<string>("TREBLLE_PROJECT_ID") || ""
+	})
+
 	app.useGlobalPipes(new ValidationPipe())
 	app.useLogger(app.get(Logger))
 	app.use(compression())
 
-	await app.listen(configService.get("PORT") || 3000)
+	await app.listen(configService.get<number>("PORT") || 3000)
 }
 
 bootstrap()
