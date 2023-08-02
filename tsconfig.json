@@ -19,13 +19,14 @@
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false,
 		"watch": true,
+		"typeRoots": ["src/@types", "node_modules/@types"],
 		"paths": {
 			"@templates/*": ["src/modules/templates/*"],
 			"@global/*": ["src/modules/global/*"],
 			"@shared/*": ["src/modules/shared/*"]
 		}
 	},
-	"include": ["src/**/*"],
+	"include": ["src/**/*", "src/@types"],
 	"watchOptions": {
 		"watchFile": "dynamicPriorityPolling",
 		"watchDirectory": "dynamicPriorityPolling",
