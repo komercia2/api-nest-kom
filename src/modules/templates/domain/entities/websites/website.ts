@@ -1,30 +1,30 @@
 import { checkSpecialCharacters } from "@shared/domain/utils"
-import {
-	SpecialCharactersFoundException,
-	TemplateNotValidException
-} from "@templates/domain/exceptions"
+import { SpecialCharactersFoundException } from "@templates/domain/exceptions"
 
-import { allowedTemplates } from "./allowedTemplates"
 import { WebSiteTemplate } from "./webSiteTemplate"
 
-interface WebSiteEntityProps {
-	idPage: number
+export interface WebSiteEntityProps {
+	_id?: string
 	storeId: number
 	subdomain: string
-	templateId: number
+	templateNumber: number
+	templateId?: string | null
 	domain: string
 	isMain: boolean
 	active: boolean
+	webSiteTemplate?: WebSiteTemplate
 	createdAt?: Date
 	updatedAt?: Date | null
 	deletedAt?: Date | null
 }
 
 export class WebSiteEntity {
-	readonly idPage: number
+	// TODO: template cant be changed
+	readonly _id?: string
 	readonly storeId: number
 	readonly subdomain: string
-	readonly templateId: number
+	readonly templateNumber: number
+	readonly templateId: string | null
 	readonly domain: string | null
 	readonly isMain: boolean
 	readonly active: boolean
@@ -34,10 +34,11 @@ export class WebSiteEntity {
 	readonly webSiteTemplate?: WebSiteTemplate
 
 	constructor(props: WebSiteEntityProps) {
-		this.idPage = props.idPage
+		this._id = props._id
 		this.storeId = props.storeId
 		this.subdomain = this.validateAndClean(props.subdomain)
-		this.templateId = this.isValidTemplate(props.templateId)
+		this.templateNumber = props.templateNumber
+		this.templateId = props.templateId ?? null
 		this.domain = this.validateAndClean(props.domain) ?? null
 		this.isMain = props.isMain
 		this.active = props.active
@@ -46,19 +47,12 @@ export class WebSiteEntity {
 		this.deletedAt = props.deletedAt ?? null
 	}
 
-	private isValidTemplate(templateId: number): number {
-		if (!allowedTemplates.includes(templateId))
-			throw new TemplateNotValidException("Template provided is not valid")
-
-		return templateId
-	}
-
 	private validateAndClean(target: string): string {
 		const containsSpecialCharacters = checkSpecialCharacters(target)
 
 		if (containsSpecialCharacters)
 			throw new SpecialCharactersFoundException("Special characters found")
 
-		return target
+		return target.trim()
 	}
 }
