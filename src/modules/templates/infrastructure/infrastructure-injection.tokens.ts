@@ -7,5 +7,6 @@ export enum InfrastructureInjectionTokens {
 	WebsiteMongooseService = "WebsiteMongooseService",
 	CreateWebsiteCommand = "CreateWebsiteCommand",
 	CheckDomainAvailabilityQuery = "CheckDomainAvailabilityQuery",
-	CheckSubDomainAvailabilityQuery = "CheckSubDomainAvailabilityQuery"
+	CheckSubDomainAvailabilityQuery = "CheckSubDomainAvailabilityQuery",
+	GetWebsitesByIdQuery = "GetWebsitesByIdQuery"
 }
