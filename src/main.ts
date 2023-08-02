@@ -27,10 +27,12 @@ async function bootstrap() {
 
 	const expressInstance = app.getHttpAdapter().getInstance()
 
-	useNestTreblle(expressInstance, {
-		apiKey: configService.get<string>("TREBLLE_API_KEY") || "",
-		projectId: configService.get<string>("TREBLLE_PROJECT_ID") || ""
-	})
+	if (configService.get<string>("NODE_ENV") === "production") {
+		useNestTreblle(expressInstance, {
+			apiKey: configService.get<string>("TREBLLE_API_KEY") || "",
+			projectId: configService.get<string>("TREBLLE_PROJECT_ID") || ""
+		})
+	}
 
 	app.useGlobalPipes(new ValidationPipe())
 	app.useLogger(app.get(Logger))
