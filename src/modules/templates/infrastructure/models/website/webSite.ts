@@ -21,7 +21,7 @@ export class WebSiteModel {
 	@Prop({ required: false, type: String, unique: true })
 	domain: string
 
-	@Prop({ required: true, type: Boolean, unique: true })
+	@Prop({ required: true, type: Boolean })
 	isMain: boolean
 
 	@Prop({ required: true, type: Boolean })
