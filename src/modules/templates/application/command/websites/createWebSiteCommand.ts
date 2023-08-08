@@ -1,12 +1,16 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { ApplicationInjectionTokens } from "@templates/application/application-injection.tokens"
 import { WebSiteEntityProps } from "@templates/domain/entities/websites"
+import { StoreAlreadyHasMainWebSiteException } from "@templates/domain/exceptions"
 import { ITemplate15Repository, IWebSitesRepository } from "@templates/domain/repositories"
 
 import { CreateWebSiteDto } from "../dtos"
 
 @Injectable()
 export class CreateWebSiteCommand {
+	/**
+	 * @description Map of allowed templates repositories
+	 */
 	private readonly allowedTemplatesRepositories = new Map<number, ITemplate15Repository>([
 		[15, this.template15Repository]
 	])
@@ -19,9 +23,17 @@ export class CreateWebSiteCommand {
 		private readonly template15Repository: ITemplate15Repository
 	) {}
 
+	/**
+	 * @description Create a website for a store
+	 * @param storeId Store id
+	 * @param createWebSiteDto WebSite data
+	 * @returns True if website was created, false otherwise
+	 */
 	async execute(storeId: number, createWebSiteDto: CreateWebSiteDto) {
 		const data = { ...createWebSiteDto, storeId }
-		const { templateNumber } = data
+		const { templateNumber, isMain } = data
+
+		if (isMain) await this.validateIfStoreHasMainWebSite(storeId)
 
 		const templateRepository = this.getTemplateRepository(templateNumber)
 
@@ -40,6 +52,22 @@ export class CreateWebSiteCommand {
 		return true
 	}
 
+	/**
+	 * @description Validate if store has main website
+	 * @param storeId Store id
+	 */
+	private async validateIfStoreHasMainWebSite(storeId: number) {
+		const hasMainWebSite = await this.webSiteRepoitory.checkIfStoreHasMainWebSite(storeId)
+
+		if (hasMainWebSite)
+			throw new StoreAlreadyHasMainWebSiteException("Store already has main website")
+	}
+
+	/**
+	 * @description Get template repository
+	 * @param templateNumber Template number
+	 * @returns Template repository
+	 */
 	private getTemplateRepository(templateNumber: number) {
 		return this.allowedTemplatesRepositories.get(templateNumber)
 	}
