@@ -3,13 +3,13 @@ import { ApplicationInjectionTokens } from "@templates/application/application-i
 import { IWebSitesRepository } from "@templates/domain/repositories"
 
 @Injectable()
-export class GetWebsitesByIdQuery {
+export class GetWebsiteQuery {
 	constructor(
 		@Inject(ApplicationInjectionTokens.IWebSiteRepository)
 		private readonly websiteRepository: IWebSitesRepository
 	) {}
 
-	async execute(storeId: number) {
-		return await this.websiteRepository.getWebSiteListByStoreId(storeId)
+	async getWebSiteByDomain(domain: string) {
+		return await this.websiteRepository.getWebSiteByDomain(domain)
 	}
 }
