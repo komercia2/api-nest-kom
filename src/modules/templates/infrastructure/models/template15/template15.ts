@@ -7,7 +7,8 @@ import { Template15Information2 } from "@templates/domain/entities/template15/in
 import { Template15ListProductHome } from "@templates/domain/entities/template15/list-products-home"
 import { Template15Logos } from "@templates/domain/entities/template15/logos/template15Logos"
 import { Template15NewsLetter } from "@templates/domain/entities/template15/news-letter"
-import { Types } from "mongoose"
+import { Transform } from "class-transformer"
+import { ObjectId, Types } from "mongoose"
 
 import { Template15Banner } from "./banner"
 import { Template15Content } from "./content/template15Content"
@@ -25,8 +26,8 @@ import { Template15PageHeader } from "./template15PageHeader"
 
 @Schema({ collection: "template15" })
 export class Template15Model {
-	@Prop({ required: true, type: Number, unique: true })
-	storeId: number
+	@Transform(({ value }) => value.toString())
+	_id: ObjectId
 
 	@Prop({ required: true, type: Template15Header, ref: Template15Header.name })
 	header: Template15Header

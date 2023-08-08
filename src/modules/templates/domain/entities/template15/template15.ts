@@ -21,6 +21,7 @@ import { Template15PageHeader } from "./page-header"
 import { Template15SettingsGeneral } from "./settings-general"
 
 export class Template15 {
+	_id: string
 	header: Template15Header
 	pageHeader: Template15PageHeader
 	banner: Template15Banner
@@ -66,72 +67,4 @@ export class Template15 {
 		this.newsLetter = new Template15NewsLetter()
 		this.settingGeneral = new Template15SettingsGeneral()
 	}
-
-	fromPrimitives(
-		header: Template15Header,
-		pageHeader: Template15PageHeader,
-		banner: Template15Banner,
-		categories: Template15Categories,
-		content: Template15Content,
-		listProductsHome: Template15ListProductHome,
-		listProductsOffers: Template15ListProductsOffers,
-		cardProducts: Template15CardProducts,
-		information: Template15Information,
-		informationLogos: Tempalte15InformationLogos,
-		information2: Template15Information2,
-		banner2: Template15Banner2,
-		logos: Template15Logos,
-		listBlogHome: Template15ListBlogHome,
-		cardBlogs: Template15CardBlogs,
-		listProductsFilter: Template15ListProductsFilter,
-		detailsProducts: Template15DetailsProducts,
-		contact: Template15Contact,
-		footer: Template15Footer,
-		newsLetter: Template15NewsLetter,
-		settingGeneral: Template15SettingsGeneral
-	) {
-		this.header = header
-		this.pageHeader = pageHeader
-		this.banner = banner
-		this.categories = categories
-		this.content = content
-		this.listProductsHome = listProductsHome
-		this.listProductsOffers = listProductsOffers
-		this.cardProducts = cardProducts
-		this.information = information
-		this.informationLogos = informationLogos
-		this.information2 = information2
-		this.banner2 = banner2
-		this.logos = logos
-		this.listBlogHome = listBlogHome
-		this.cardBlogs = cardBlogs
-		this.listProductsFilter = listProductsFilter
-		this.detailsProducts = detailsProducts
-		this.contact = contact
-		this.footer = footer
-		this.newsLetter = newsLetter
-		this.settingGeneral = settingGeneral
-	}
-
-	getHeader = () => this.header
-	getPageHeader = () => this.pageHeader
-	getBanner = () => this.banner
-	getCategories = () => this.categories
-	getContent = () => this.content
-	getListProductsHome = () => this.listProductsHome
-	getListProductsOffers = () => this.listProductsOffers
-	getCardProducts = () => this.cardProducts
-	getInformation = () => this.information
-	getInformationLogos = () => this.informationLogos
-	getInformation2 = () => this.information2
-	getBanner2 = () => this.banner2
-	getLogos = () => this.logos
-	getListBlogHome = () => this.listBlogHome
-	getCardBlogs = () => this.cardBlogs
-	getListProductsFilter = () => this.listProductsFilter
-	getDetailsProducts = () => this.detailsProducts
-	getContact = () => this.contact
-	getFooter = () => this.footer
-	getNewsLetter = () => this.newsLetter
-	getSettingGeneral = () => this.settingGeneral
 }

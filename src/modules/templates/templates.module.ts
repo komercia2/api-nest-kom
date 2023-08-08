@@ -8,12 +8,23 @@ import {
 	DeleteTemplate15Command,
 	UpdateTemplate15Command
 } from "./application/command"
+import { CreateWebSiteCommand } from "./application/command/websites"
 import { FindTemplate15ByIdQuery } from "./application/query"
-import { Template15Controller } from "./infrastructure/controllers"
+import {
+	CheckDomainAvailabilityQuery,
+	CheckIfStoreHasMainWebSiteQuery,
+	CheckSubDomainAvailabilityQuery,
+	GetWebsitesByIdQuery
+} from "./application/query/websites"
+import { Template15Controller, WebsitesController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
-import { Template15MongooseRepository } from "./infrastructure/repositories"
-import { Template15MongoService } from "./infrastructure/services"
+import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
+import {
+	Template15MongooseRepository,
+	WebsiteMongooseRepository
+} from "./infrastructure/repositories"
+import { Template15MongoService, WebsiteMongooseService } from "./infrastructure/services"
 
 const application = [
 	{
@@ -32,6 +43,26 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.DeleteTemplate15Command,
 		useClass: DeleteTemplate15Command
+	},
+	{
+		provide: InfrastructureInjectionTokens.CreateWebsiteCommand,
+		useClass: CreateWebSiteCommand
+	},
+	{
+		provide: InfrastructureInjectionTokens.CheckDomainAvailabilityQuery,
+		useClass: CheckDomainAvailabilityQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.CheckSubDomainAvailabilityQuery,
+		useClass: CheckSubDomainAvailabilityQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.GetWebsitesByIdQuery,
+		useClass: GetWebsitesByIdQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.CheckIfStoreHasMainWebSiteQuery,
+		useClass: CheckIfStoreHasMainWebSiteQuery
 	}
 ]
 
@@ -43,12 +74,25 @@ const infrastructure = [
 	{
 		provide: ApplicationInjectionTokens.ITemplate15Repository,
 		useClass: Template15MongooseRepository
+	},
+	{
+		provide: ApplicationInjectionTokens.IWebSiteRepository,
+		useClass: WebsiteMongooseRepository
+	},
+	{
+		provide: InfrastructureInjectionTokens.WebsiteMongooseService,
+		useClass: WebsiteMongooseService
 	}
 ]
 
 @Module({
-	imports: [MongooseModule.forFeature([{ name: Template15Model.name, schema: Template15Schema }])],
-	controllers: [Template15Controller],
+	imports: [
+		MongooseModule.forFeature([
+			{ name: Template15Model.name, schema: Template15Schema },
+			{ name: WebSiteModel.name, schema: WebsitesSchema }
+		])
+	],
+	controllers: [Template15Controller, WebsitesController],
 	providers: [...application, ...infrastructure]
 })
 export class TemplatesModule implements NestModule {
