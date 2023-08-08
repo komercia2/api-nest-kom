@@ -10,6 +10,6 @@ export class GetWebsiteQuery {
 	) {}
 
 	async getWebSiteByDomain(domain: string) {
-		return await this.websiteRepository.getWebSiteByDomain(domain)
+		return await this.websiteRepository.getWebSite(domain)
 	}
 }

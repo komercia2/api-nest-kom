@@ -15,7 +15,7 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 		return await this.websiteMongooseService.create(props)
 	}
 
-	getWebSiteByDomain(domain: string): Promise<WebSiteEntity | null> {
+	getWebSite(domain: string): Promise<WebSiteEntity | null> {
 		throw new Error("Method not implemented.")
 	}
 
