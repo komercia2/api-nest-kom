@@ -12,7 +12,9 @@ import { CreateWebSiteCommand } from "./application/command/websites"
 import { FindTemplate15ByIdQuery } from "./application/query"
 import {
 	CheckDomainAvailabilityQuery,
-	CheckSubDomainAvailabilityQuery
+	CheckIfStoreHasMainWebSiteQuery,
+	CheckSubDomainAvailabilityQuery,
+	GetWebsitesByIdQuery
 } from "./application/query/websites"
 import { Template15Controller, WebsitesController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
@@ -53,6 +55,14 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.CheckSubDomainAvailabilityQuery,
 		useClass: CheckSubDomainAvailabilityQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.GetWebsitesByIdQuery,
+		useClass: GetWebsitesByIdQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.CheckIfStoreHasMainWebSiteQuery,
+		useClass: CheckIfStoreHasMainWebSiteQuery
 	}
 ]
 
