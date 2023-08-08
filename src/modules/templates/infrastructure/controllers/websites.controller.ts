@@ -17,10 +17,12 @@ import { CreateWebSiteDto } from "@templates/application/command/dtos"
 import { CreateWebSiteCommand } from "@templates/application/command/websites"
 import {
 	CheckDomainAvailabilityQuery,
-	CheckSubDomainAvailabilityQuery
+	CheckSubDomainAvailabilityQuery,
+	GetWebsitesByIdQuery
 } from "@templates/application/query/websites"
 import {
 	DomainNotAvaibleException,
+	StoreAlreadyHasMainWebSiteException,
 	SubDomainNotAvaibleException
 } from "@templates/domain/exceptions"
 import { Request, Response } from "express"
@@ -38,7 +40,10 @@ export class WebsitesController {
 		private readonly checkDomainAvailabilityQuery: CheckDomainAvailabilityQuery,
 
 		@Inject(InfrastructureInjectionTokens.CheckSubDomainAvailabilityQuery)
-		private readonly checkSubDomainAvailabilityQuery: CheckSubDomainAvailabilityQuery
+		private readonly checkSubDomainAvailabilityQuery: CheckSubDomainAvailabilityQuery,
+
+		@Inject(InfrastructureInjectionTokens.GetWebsitesByIdQuery)
+		private readonly getWebsitesByIdQuery: GetWebsitesByIdQuery
 	) {}
 
 	@Post()
@@ -46,6 +51,20 @@ export class WebsitesController {
 	async createWebSite(@Req() req: Request, @Body() body: CreateWebSiteDto, @Res() res: Response) {
 		try {
 			const webSite = await this.createWebsiteCommand.execute(Number(req.id), body)
+			res.status(HttpStatus.CREATED).json({ data: webSite, message: "WebSite created" })
+		} catch (error) {
+			if (error instanceof StoreAlreadyHasMainWebSiteException) {
+				throw new ConflictException(error.message)
+			}
+
+			throw new InternalServerErrorException(error)
+		}
+	}
+
+	@Get()
+	async getWebsites(@Req() req: Request, @Res() res: Response) {
+		try {
+			const webSite = await this.getWebsitesByIdQuery.execute(Number(req.id))
 			res.status(HttpStatus.CREATED).json({ data: webSite, message: "WebSite created" })
 		} catch (error) {
 			throw new InternalServerErrorException(error)
