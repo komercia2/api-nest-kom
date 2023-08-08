@@ -1,4 +1,4 @@
-import { checkSpecialCharacters } from "@shared/domain/utils"
+import { checkSpecialCharacters, getUTCDate } from "@shared/domain/utils"
 import { SpecialCharactersFoundException } from "@templates/domain/exceptions"
 
 import { WebSiteTemplate } from "./webSiteTemplate"
@@ -42,7 +42,7 @@ export class WebSiteEntity {
 		this.domain = this.validateAndClean(props.domain) ?? null
 		this.isMain = props.isMain
 		this.active = props.active
-		this.createdAt = props.createdAt ?? new Date()
+		this.createdAt = props.createdAt ?? new Date(getUTCDate())
 		this.updatedAt = props.updatedAt ?? null
 		this.deletedAt = props.deletedAt ?? null
 	}
