@@ -8,5 +8,6 @@ export enum InfrastructureInjectionTokens {
 	CreateWebsiteCommand = "CreateWebsiteCommand",
 	CheckDomainAvailabilityQuery = "CheckDomainAvailabilityQuery",
 	CheckSubDomainAvailabilityQuery = "CheckSubDomainAvailabilityQuery",
-	GetWebsitesByIdQuery = "GetWebsitesByIdQuery"
+	GetWebsitesByIdQuery = "GetWebsitesByIdQuery",
+	CheckIfStoreHasMainWebSiteQuery = "CheckIfStoreHasMainWebSiteQuery"
 }
