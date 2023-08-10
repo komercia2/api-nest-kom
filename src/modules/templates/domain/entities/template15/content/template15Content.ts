@@ -3,7 +3,7 @@ import { Template15ContentValues } from "./template15ContentValues"
 
 export class Template15Content {
 	"--background_color_1": string
-	visible: string
+	visible: boolean
 	values: Template15ContentValues[]
 
 	constructor(

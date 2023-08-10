@@ -10,5 +10,5 @@ export type Template15ContentValues = {
 	color_text_btn: string
 	color_bg_btn: string
 	url_redirect: string
-	visible_btn: string
+	visible_btn: boolean
 }
