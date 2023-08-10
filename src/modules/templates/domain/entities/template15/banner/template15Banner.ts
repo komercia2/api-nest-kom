@@ -4,7 +4,7 @@ import { Template15BannerValues } from "./template15BannerValues"
 export class Template15Banner {
 	"--background_color_1": string
 	"--color_pagination": string
-	visible: string
+	visible: boolean
 	values: Template15BannerValues[]
 
 	constructor(
