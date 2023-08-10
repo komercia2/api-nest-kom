@@ -1,19 +1,19 @@
 export const pageHeaderSettings = [
 	{
 		displayName: "Inicio",
-		isExternalLink: "FALSO",
+		isExternalLink: false,
 		tipo: 3,
 		url: "/"
 	},
 	{
 		displayName: "Productos",
-		isExternalLink: "FALSO",
+		isExternalLink: false,
 		tipo: 3,
 		url: "/productos"
 	},
 	{
 		displayName: "Contacto",
-		isExternalLink: "FALSO",
+		isExternalLink: false,
 		tipo: 3,
 		url: "/contacto"
 	}
