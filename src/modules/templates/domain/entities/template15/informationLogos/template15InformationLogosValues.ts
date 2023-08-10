@@ -4,8 +4,6 @@ export type Tempalte15InformationLogosValues = {
 	text: string
 	color_title: string
 	color_text: string
-	fontSizeTitle: string
-	fontSizeText: string
 	fontWeightTitle: string
 	fontWeightText: string
 }
