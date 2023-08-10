@@ -1,6 +1,6 @@
 export const categoriesSettings = {
 	"--background_color_1": "#FFFFFF",
-	visible: "VERDADERO",
+	visible: true,
 	title: "Top categories",
 	color_title_1: "#ed6436",
 	fontWeighTitle: 600

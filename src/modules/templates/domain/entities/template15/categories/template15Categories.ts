@@ -3,7 +3,7 @@ import { Template15CategoriesValues } from "./template15CategoriesValues"
 
 export class Template15Categories {
 	"--background_color_1": string
-	visible: string
+	visible: boolean
 	title: string
 	color_title_1: string
 	fontWeighTitle: number
