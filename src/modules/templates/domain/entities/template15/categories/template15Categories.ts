@@ -6,8 +6,6 @@ export class Template15Categories {
 	visible: string
 	title: string
 	color_title_1: string
-	color_title_2: string
-	fontSizeTitle: string
 	fontWeighTitle: number
 	values: Template15CategoriesValues[]
 
@@ -16,8 +14,6 @@ export class Template15Categories {
 		visible = categoriesSettings.visible,
 		title = categoriesSettings.title,
 		color_title_1 = categoriesSettings.color_title_1,
-		color_title_2 = categoriesSettings.color_title_2,
-		fontSizeTitle = categoriesSettings.fontSizeTitle,
 		fontWeighTitle = categoriesSettings.fontWeighTitle,
 		values = categoriesValues
 	) {
@@ -25,8 +21,6 @@ export class Template15Categories {
 		this.visible = visible
 		this.title = title
 		this.color_title_1 = color_title_1
-		this.color_title_2 = color_title_2
-		this.fontSizeTitle = fontSizeTitle
 		this.fontWeighTitle = fontWeighTitle
 		this.values = values
 	}
@@ -37,8 +31,6 @@ export class Template15Categories {
 			visible: this.visible,
 			title: this.title,
 			color_title_1: this.color_title_1,
-			color_title_2: this.color_title_2,
-			fontSizeTitle: this.fontSizeTitle,
 			fontWeighTitle: this.fontWeighTitle,
 			values: this.values.map((value) => ({ ...value }))
 		}
