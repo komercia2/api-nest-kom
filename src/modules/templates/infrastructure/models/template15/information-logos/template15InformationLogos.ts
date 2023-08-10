@@ -8,8 +8,8 @@ export class Template15InformationLogos {
 	@Prop({ required: true })
 	"--background_color_1": string
 
-	@Prop({ required: true })
-	visible: string
+	@Prop({ required: true, type: Boolean })
+	visible: boolean
 
 	@Prop({ required: true })
 	img: string
@@ -19,9 +19,6 @@ export class Template15InformationLogos {
 
 	@Prop({ required: true })
 	color_title_1: string
-
-	@Prop({ required: true })
-	color_title_2: string
 
 	@Prop({ required: true })
 	fontSizeTitle: string

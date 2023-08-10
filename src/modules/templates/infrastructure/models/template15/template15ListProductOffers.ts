@@ -5,20 +5,14 @@ export class Template15ListProductsOffers {
 	@Prop({ required: true })
 	"--background_color_1": string
 
-	@Prop({ required: true, type: String })
-	visible: string
+	@Prop({ required: true, type: Boolean })
+	visible: boolean
 
 	@Prop({ required: true })
 	title: string
 
 	@Prop({ required: true })
 	color_title_1: string
-
-	@Prop({ required: true })
-	color_title_2: string
-
-	@Prop({ required: true })
-	fontSizeTitle: string
 
 	@Prop({ required: true })
 	fontWeighTitle: number

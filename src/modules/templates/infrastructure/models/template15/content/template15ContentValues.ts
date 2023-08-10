@@ -35,7 +35,7 @@ export class Template15ContentValues {
 	@Prop({ required: true, type: String })
 	url_redirect: string
 
-	@Prop({ required: true, type: String })
+	@Prop({ required: true, type: Boolean })
 	visible_btn: string
 }
 

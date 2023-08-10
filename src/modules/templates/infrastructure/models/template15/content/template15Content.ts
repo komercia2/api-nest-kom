@@ -8,7 +8,7 @@ export class Template15Content {
 	@Prop({ required: true })
 	"--background_color_1": string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	visible: string
 
 	@Prop({

@@ -9,7 +9,10 @@ export class Template15Header {
 	"--color_text": string
 
 	@Prop({ required: true, type: String })
-	"color-icon": string
+	"--color_border": string
+
+	@Prop({ required: true, type: String })
+	"--color-icon": string
 
 	@Prop({ required: true, type: String })
 	"--padding_logo": string

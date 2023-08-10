@@ -5,7 +5,7 @@ export class Template15Footer {
 	@Prop({ required: true })
 	"--background_color_1": string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	visibleImg: boolean
 
 	@Prop({ required: true })
@@ -23,7 +23,7 @@ export class Template15Footer {
 	@Prop({ required: true })
 	"--color_icon": string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	watermark: boolean
 }
 

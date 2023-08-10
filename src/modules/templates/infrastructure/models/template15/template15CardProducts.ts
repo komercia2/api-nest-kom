@@ -6,16 +6,16 @@ export class Template15CardProducts {
 	"--background_color_1": string
 
 	@Prop({ required: true })
-	color_title: string
+	"--color_title": string
 
 	@Prop({ required: true })
-	color_price: string
+	"--color_price": string
 
 	@Prop({ required: true })
-	fontWeighTitle: number
+	"--fontWeighTitle": number
 
 	@Prop({ required: true })
-	fontWeighPrice: number
+	"--fontWeighPrice": number
 
 	@Prop({ required: true })
 	color_icon: string
@@ -24,7 +24,7 @@ export class Template15CardProducts {
 	color_btn: string
 
 	@Prop({ required: true })
-	color_border: string
+	"--color_border": string
 }
 
 export const Template15CardProductsSchema = SchemaFactory.createForClass(Template15CardProducts)

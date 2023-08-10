@@ -16,9 +16,6 @@ export class Template15CategoriesValues {
 
 	@Prop({ required: true })
 	fontWeighTitle: number
-
-	@Prop({ required: true })
-	fontSizeTitle: string
 }
 
 export const Template15CategoriesValuesSchema = SchemaFactory.createForClass(
