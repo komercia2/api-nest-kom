@@ -4,7 +4,7 @@ export class Template15Header {
 	"--background_color_1": string
 	"--color_text": string
 	"--color_border": string
-	"color-icon": string
+	"--color-icon": string
 	"--padding_logo": string
 	"--with_logo": string
 
@@ -19,7 +19,7 @@ export class Template15Header {
 		this["--background_color_1"] = background_color_1
 		this["--color_text"] = color_text
 		this["--color_border"] = color_border
-		this["color-icon"] = color_icon
+		this["--color-icon"] = color_icon
 		this["--padding_logo"] = padding_logo
 		this["--with_logo"] = with_logo
 	}
