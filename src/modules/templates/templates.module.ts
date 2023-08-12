@@ -8,7 +8,7 @@ import {
 	DeleteTemplate15Command,
 	UpdateTemplate15Command
 } from "./application/command"
-import { CreateWebSiteCommand } from "./application/command/websites"
+import { CreateWebSiteCommand, UpdateWebSiteCommand } from "./application/command/websites"
 import { FindTemplate15ByIdQuery } from "./application/query"
 import {
 	CheckDomainAvailabilityQuery,
@@ -68,6 +68,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.GetWebsiteQuery,
 		useClass: GetWebsiteQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.UpdateWebsiteCommand,
+		useClass: UpdateWebSiteCommand
 	}
 ]
 
