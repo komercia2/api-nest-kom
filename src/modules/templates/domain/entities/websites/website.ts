@@ -12,7 +12,7 @@ export interface WebSiteEntityProps {
 	domain: string
 	isMain: boolean
 	active: boolean
-	webSiteTemplate?: WebSiteTemplate
+	webSiteTemplate?: WebSiteTemplate | null
 	createdAt?: Date
 	updatedAt?: Date | null
 	deletedAt?: Date | null
@@ -24,25 +24,26 @@ export class WebSiteEntity {
 	readonly storeId: number
 	readonly subdomain: string
 	readonly templateNumber: number
-	readonly templateId: string | null
+	readonly templateId?: string | null
 	readonly domain: string | null
 	readonly isMain: boolean
 	readonly active: boolean
 	readonly createdAt: Date
 	readonly updatedAt: Date | null
 	readonly deletedAt: Date | null
-	readonly webSiteTemplate?: WebSiteTemplate
+	readonly webSiteTemplate?: WebSiteTemplate | null
 
 	constructor(props: WebSiteEntityProps) {
 		this._id = props._id
 		this.storeId = props.storeId
 		this.subdomain = this.validateAndClean(props.subdomain)
 		this.templateNumber = props.templateNumber
-		this.templateId = props.templateId ?? null
+		this.templateId = props.templateId
 		this.domain = this.validateAndClean(props.domain) ?? null
 		this.isMain = props.isMain
-		this.active = props.active
-		this.createdAt = props.createdAt ?? new Date(getUTCDate())
+		;(this.active = props.active),
+			(this.webSiteTemplate = props.webSiteTemplate),
+			(this.createdAt = props.createdAt ?? new Date(getUTCDate()))
 		this.updatedAt = props.updatedAt ?? null
 		this.deletedAt = props.deletedAt ?? null
 	}
