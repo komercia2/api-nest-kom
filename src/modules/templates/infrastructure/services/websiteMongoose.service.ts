@@ -83,7 +83,7 @@ export class WebsiteMongooseService {
 
 			if (!websiteUpdated) throw new WebsiteNotAvaibleException("Website not found to update")
 
-			return websiteUpdated
+			return this.fromModelToEntity(websiteUpdated.toObject())
 		} catch (error) {
 			if (error instanceof WebsiteNotAvaibleException) throw error
 
