@@ -26,7 +26,6 @@ import { Template15PageHeader } from "./template15PageHeader"
 
 @Schema({ collection: "template15" })
 export class Template15Model {
-	@Transform(({ value }) => value.toString())
 	_id: ObjectId
 
 	@Prop({ required: true, type: Template15Header, ref: Template15Header.name })

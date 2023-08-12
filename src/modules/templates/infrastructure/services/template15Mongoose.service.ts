@@ -6,6 +6,8 @@ import { Template15Model } from "@templates/infrastructure/models/template15/tem
 import { plainToClass } from "class-transformer"
 import { Model } from "mongoose"
 
+import { createObjectIdFromHexString } from "../util"
+
 @Injectable()
 export class Template15MongoService {
 	constructor(
@@ -20,6 +22,31 @@ export class Template15MongoService {
 			return this.fromModelToEntity(template15Created.toObject())
 		} catch (error) {
 			throw new DatabaseTransactionErrorException("Has been an error creating the template15")
+		}
+	}
+
+	create2 = async () => {
+		try {
+			const defaultSettings = new Template15Entity()
+			const settings = Object.assign(defaultSettings, {})
+			const template15Created = await new this.template15Model({ ...settings }).save()
+
+			return template15Created.toObject()
+		} catch (error) {
+			throw new DatabaseTransactionErrorException("Has been an error creating the template15")
+		}
+	}
+
+	find = async (documentId: string) => {
+		try {
+			const parsedId = createObjectIdFromHexString(documentId)
+			const templateSearched = await this.template15Model.findOne({ _id: parsedId }).exec()
+
+			if (!templateSearched) return null
+
+			return this.fromModelToEntity(templateSearched.toObject())
+		} catch (error) {
+			throw new DatabaseTransactionErrorException("Has been an error getting the template15")
 		}
 	}
 

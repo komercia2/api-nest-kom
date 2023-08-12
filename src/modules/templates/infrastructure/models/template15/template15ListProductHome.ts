@@ -5,8 +5,8 @@ export class Template15ListProductsHome {
 	@Prop({ required: true })
 	"--background_color_1": string
 
-	@Prop({ required: true })
-	visible: string
+	@Prop({ required: true, type: Boolean })
+	visible: boolean
 
 	@Prop({ required: true })
 	title: string

@@ -1,12 +1,11 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import { Transform } from "class-transformer"
+import { Transform, Type } from "class-transformer"
 import { ObjectId, Types } from "mongoose"
 
 import { Template15Model } from "../template15"
 
 @Schema({ collection: "websites" })
 export class WebSiteModel {
-	@Transform(({ value }) => value.toString())
 	_id: ObjectId
 
 	@Prop({ required: true, type: Number })
@@ -36,8 +35,8 @@ export class WebSiteModel {
 	@Prop({ required: false, type: Date })
 	deletedAt: Date | null
 
-	@Prop({ required: false, type: Types.ObjectId, ref: Template15Model.name })
-	templateId: Types.ObjectId
+	@Prop({ type: Types.ObjectId, ref: Template15Model.name })
+	templateId: Template15Model
 }
 
 export const WebsitesSchema = SchemaFactory.createForClass(WebSiteModel)

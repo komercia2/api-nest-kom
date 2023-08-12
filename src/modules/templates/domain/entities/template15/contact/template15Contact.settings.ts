@@ -1,7 +1,7 @@
 export const contactSettings = {
 	"--background_color_1": "#FFFFFF",
 	visible_img: true,
-	img: "https://res.cloudinary.com/komerciaacademico/image/upload/v1689700301/template15/contact_cjqh7q.jpg",
+	img: "https://res.cloudinary.com/komerciaacademico/image/upload/v1690493567/template15/contact_cjqh7q_ljwxcm.jpg",
 	color_breadCrumbs: "#646464",
 	color_Bg: "#F2F2F2",
 	color_title: "#000000",

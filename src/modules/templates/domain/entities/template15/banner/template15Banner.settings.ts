@@ -1,7 +1,7 @@
 export const bannerSettings = {
 	"--background_color_1": "#FFFFFF",
-	"--color_pagination": "#FFFFFF",
-	visible: "VERDADERO"
+	"--color_pagination": "#323232",
+	visible: true
 }
 
 export const bannerValues = [
@@ -16,16 +16,13 @@ export const bannerValues = [
 		color_title: "#FFFFFF",
 		color_subTitle: "#FFFFFF",
 		color_text: "#FFFFFF",
-		fontSizeTitle: "66px",
-		fontSizeSubTitle: "150px",
-		fontSizeText: "16px",
 		fontWeighTitle: 600,
 		fontWeighSubTitle: 600,
 		fontWeighText: 400,
 		color_text_btn: "#FFFFFF",
 		color_bg_btn: "#000000",
 		url_redirect: "/productos",
-		visible_btn: "VERDADERO"
+		visible_btn: true
 	},
 	{
 		img: "https://res.cloudinary.com/komerciaacademico/image/upload/v1689700300/template15/banner2_ma1vak.webp",
@@ -38,16 +35,13 @@ export const bannerValues = [
 		color_title: "#FFFFFF",
 		color_subTitle: "#FFFFFF",
 		color_text: "#FFFFFF",
-		fontSizeTitle: "66px",
-		fontSizeSubTitle: "150px",
-		fontSizeText: "16px",
 		fontWeighTitle: 600,
 		fontWeighSubTitle: 600,
 		fontWeighText: 400,
 		color_text_btn: "#FFFFFF",
 		color_bg_btn: "#000000",
 		url_redirect: "/productos",
-		visible_btn: "VERDADERO"
+		visible_btn: true
 	},
 	{
 		img: "https://res.cloudinary.com/komerciaacademico/image/upload/v1689700300/template15/banner3_vic8qp.jpg",
@@ -60,15 +54,12 @@ export const bannerValues = [
 		color_title: "#FFFFFF",
 		color_subTitle: "#FFFFFF",
 		color_text: "#FFFFFF",
-		fontSizeTitle: "66px",
-		fontSizeSubTitle: "150px",
-		fontSizeText: "16px",
 		fontWeighTitle: 600,
 		fontWeighSubTitle: 600,
 		fontWeighText: 400,
 		color_text_btn: "#FFFFFF",
 		color_bg_btn: "#000000",
 		url_redirect: "/productos",
-		visible_btn: "VERDADERO"
+		visible_btn: true
 	}
 ]

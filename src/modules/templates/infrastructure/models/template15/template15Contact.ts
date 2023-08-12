@@ -5,7 +5,7 @@ export class Template15Contact {
 	@Prop({ required: true })
 	"--background_color_1": string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	visible_img: boolean
 
 	@Prop({ required: true })

@@ -8,14 +8,11 @@ export type Template15BannerValues = {
 	color_title: string
 	color_subTitle: string
 	color_text: string
-	fontSizeTitle: string
-	fontSizeSubTitle: string
-	fontSizeText: string
 	fontWeighTitle: number
 	fontWeighSubTitle: number
 	fontWeighText: number
 	color_text_btn: string
 	color_bg_btn: string
 	url_redirect: string
-	visible_btn: string
+	visible_btn: boolean
 }

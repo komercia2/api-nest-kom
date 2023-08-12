@@ -1,6 +1,6 @@
 export const contentSettings = {
 	"--background_color_1": "#FFFFFF",
-	visible: "VERDADERO"
+	visible: true
 }
 
 export const contentValues = [
@@ -16,7 +16,7 @@ export const contentValues = [
 		color_text_btn: "#FFFFFF",
 		color_bg_btn: "#ed6436",
 		url_redirect: "/productos",
-		visible_btn: "VERDADERO"
+		visible_btn: true
 	},
 	{
 		img: "https://res.cloudinary.com/komerciaacademico/image/upload/v1689700302/template15/offers2_cxgrhv.webp",
@@ -30,7 +30,7 @@ export const contentValues = [
 		color_text_btn: "#FFFFFF",
 		color_bg_btn: "#ed6436",
 		url_redirect: "/productos",
-		visible_btn: "VERDADERO"
+		visible_btn: true
 	},
 	{
 		img: "https://res.cloudinary.com/komerciaacademico/image/upload/v1689700302/template15/offers3_j07u5c.webp",
@@ -44,6 +44,6 @@ export const contentValues = [
 		color_text_btn: "#FFFFFF",
 		color_bg_btn: "#ed6436",
 		url_redirect: "/productos",
-		visible_btn: "VERDADERO"
+		visible_btn: true
 	}
 ]

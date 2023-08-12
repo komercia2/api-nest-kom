@@ -18,12 +18,6 @@ export class Template15InformationLogosValues {
 	color_text: string
 
 	@Prop({ required: true })
-	fontSizeTitle: string
-
-	@Prop({ required: true })
-	fontSizeText: string
-
-	@Prop({ required: true })
 	fontWeightTitle: number
 
 	@Prop({ required: true })

@@ -4,5 +4,4 @@ export type Template15CategoriesValues = {
 	color_title: string
 	url_redirect: string
 	fontWeighTitle: number
-	fontSizeTitle: string
 }

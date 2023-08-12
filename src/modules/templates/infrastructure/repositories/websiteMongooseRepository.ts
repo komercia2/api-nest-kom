@@ -15,8 +15,8 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 		return await this.websiteMongooseService.create(props)
 	}
 
-	getWebSiteByDomain(domain: string): Promise<WebSiteEntity | null> {
-		throw new Error("Method not implemented.")
+	async getWebSite(target: string): Promise<WebSiteEntity | null> {
+		return await this.websiteMongooseService.getWebSite(target)
 	}
 
 	async getWebSiteListByStoreId(storeId: number): Promise<WebSiteEntity[]> {
@@ -29,6 +29,10 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 
 	async checkSubdomainAvailability(subdomain: string): Promise<boolean> {
 		return await this.websiteMongooseService.verifySubDomainAvailability(subdomain)
+	}
+
+	async findTemplateIdByCriteria(criteria: string): Promise<string | null> {
+		return await this.websiteMongooseService.findTemplateIdByCriteria(criteria)
 	}
 
 	async checkIfStoreHasMainWebSite(storeId: number): Promise<boolean> {

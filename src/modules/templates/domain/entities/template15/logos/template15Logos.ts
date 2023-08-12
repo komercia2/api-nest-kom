@@ -6,8 +6,6 @@ export class Template15Logos {
 	visible: boolean
 	title: string
 	color_title_1: string
-	color_title_2: string
-	fontSizeTitle: string
 	fontWeightTitle: number
 	values: Template15LogosValues[]
 
@@ -16,8 +14,6 @@ export class Template15Logos {
 		visible = logosSettings.visible,
 		title = logosSettings.title,
 		color_title_1 = logosSettings.color_title_1,
-		color_title_2 = logosSettings.color_title_2,
-		fontSizeTitle = logosSettings.fontSizeTitle,
 		fontWeightTitle = logosSettings.fontWeightTitle,
 		values = logosValues
 	) {
@@ -25,8 +21,6 @@ export class Template15Logos {
 		this.visible = visible
 		this.title = title
 		this.color_title_1 = color_title_1
-		this.color_title_2 = color_title_2
-		this.fontSizeTitle = fontSizeTitle
 		this.fontWeightTitle = fontWeightTitle
 		this.values = values
 	}

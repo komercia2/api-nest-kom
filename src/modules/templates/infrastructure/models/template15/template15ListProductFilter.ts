@@ -11,7 +11,7 @@ export class Template15ListProductFilter {
 	@Prop({ required: true })
 	color_breadCrumbs: string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	visible_img: boolean
 
 	@Prop({ required: true })

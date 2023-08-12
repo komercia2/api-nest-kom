@@ -3,8 +3,6 @@ export const logosSettings = {
 	visible: true,
 	title: "Popular Brands",
 	color_title_1: "#ed6436",
-	color_title_2: "#1f2021",
-	fontSizeTitle: "40px",
 	fontWeightTitle: 600
 }
 

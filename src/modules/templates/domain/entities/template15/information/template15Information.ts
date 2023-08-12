@@ -3,6 +3,7 @@ import { informationSettings } from "./template15Information.settings"
 export class Template15Information {
 	"--background_color_1": string
 	"--background_color_2": string
+	visible: boolean
 	img: string
 	icon: string
 	text: string
@@ -12,11 +13,12 @@ export class Template15Information {
 	color_text_btn: string
 	color_bg_btn: string
 	url_redirect: string
-	visible_btn: string
+	visible_btn: boolean
 
 	constructor(
 		background_color_1 = informationSettings["--background_color_1"],
 		background_color_2 = informationSettings["--background_color_2"],
+		visible = informationSettings.visible,
 		img = informationSettings.img,
 		icon = informationSettings.icon,
 		text = informationSettings.text,
@@ -30,6 +32,7 @@ export class Template15Information {
 	) {
 		this["--background_color_1"] = background_color_1
 		this["--background_color_2"] = background_color_2
+		this.visible = visible
 		this.img = img
 		this.icon = icon
 		this.text = text

@@ -17,12 +17,6 @@ export class Template15Logos {
 	color_title_1: string
 
 	@Prop({ required: true })
-	color_title_2: string
-
-	@Prop({ required: true })
-	fontSizeTitle: string
-
-	@Prop({ required: true })
 	fontWeightTitle: number
 
 	@Prop({

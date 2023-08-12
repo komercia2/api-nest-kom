@@ -30,15 +30,6 @@ export class BannerValues {
 	color_text: string
 
 	@Prop({ required: true })
-	fontSizeTitle: string
-
-	@Prop({ required: true })
-	fontSizeSubTitle: string
-
-	@Prop({ required: true })
-	fontSizeText: string
-
-	@Prop({ required: true })
 	fontWeighTitle: number
 
 	@Prop({ required: true })

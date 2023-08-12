@@ -8,7 +8,7 @@ export class Template15Banner2 {
 	@Prop({ required: true })
 	imgBg: string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	visible: boolean
 
 	@Prop({ required: true })
@@ -22,12 +22,6 @@ export class Template15Banner2 {
 
 	@Prop({ required: true })
 	color_text: string
-
-	@Prop({ required: true })
-	fontSizeTitle: string
-
-	@Prop({ required: true })
-	fontSizeText: string
 
 	@Prop({ required: true })
 	fontWeighTitle: number
@@ -47,7 +41,7 @@ export class Template15Banner2 {
 	@Prop({ required: true })
 	url_redirect_1: string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	visible_btn_1: boolean
 
 	@Prop({ required: true })
@@ -62,7 +56,7 @@ export class Template15Banner2 {
 	@Prop({ required: true })
 	url_redirect_2: string
 
-	@Prop({ required: true })
+	@Prop({ required: true, type: Boolean })
 	visible_btn_2: boolean
 }
 
