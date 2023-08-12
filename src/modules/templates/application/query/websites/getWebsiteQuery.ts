@@ -9,7 +9,9 @@ export class GetWebsiteQuery {
 		private readonly websiteRepository: IWebSitesRepository
 	) {}
 
-	async getWebSiteByDomain(domain: string) {
-		return await this.websiteRepository.getWebSite(domain)
+	async execute(criteria: string) {
+		const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria)
+
+		return await this.websiteRepository.getWebSite(templateId)
 	}
 }

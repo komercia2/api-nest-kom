@@ -1,4 +1,5 @@
 export * from "./checkDomainAvailabilityQuery"
 export * from "./checkIfStoreHasMainWebSiteQuery"
 export * from "./checkSubDomainAvailabilityQuery"
+export * from "./findTemplateIdByCriteriaQuery"
 export * from "./getWebsitesByIdQuery"
