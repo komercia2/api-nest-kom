@@ -82,7 +82,6 @@ export class Template15Controller {
 				success: true
 			})
 		} catch (error) {
-			console.log(error)
 			if (error instanceof TemplateAlreadyExistsException) {
 				throw new ConflictException(error.message)
 			}

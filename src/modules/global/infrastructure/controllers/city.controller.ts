@@ -29,8 +29,6 @@ export class CityController {
 				success: true
 			})
 		} catch (error) {
-			console.log(error)
-
 			handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting cities with departaments",
