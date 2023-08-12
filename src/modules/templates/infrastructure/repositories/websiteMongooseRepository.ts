@@ -39,7 +39,7 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 	async checkIfStoreHasMainWebSite(storeId: number): Promise<boolean> {
 		return await this.websiteMongooseService.checkIfStoreHasMainWebSite(storeId)
 	}
-	async updateWebsiteInfo(props: UpdateWebSiteDto): Promise<WebSiteEntity> {
-		return await this.websiteMongooseService.update(props)
+	async updateWebsiteInfo(_id: string, props: UpdateWebSiteDto): Promise<WebSiteEntity> {
+		return await this.websiteMongooseService.update(_id, props)
 	}
 }

@@ -8,9 +8,8 @@ export interface IWebSitesRepository {
 	findTemplateIdByCriteria(criteria: string): Promise<string | null>
 	getWebSite(target: string | null): Promise<WebSiteEntity | null>
 	getWebSiteListByStoreId(storeId: number): Promise<WebSiteEntity[]>
-	updateWebsiteInfo(props: {
-		_id: string
-		isMain: boolean
-		active: boolean
-	}): Promise<WebSiteEntity>
+	updateWebsiteInfo(
+		_id: string,
+		props: { isMain: boolean; active: boolean }
+	): Promise<WebSiteEntity>
 }

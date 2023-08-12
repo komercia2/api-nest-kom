@@ -75,9 +75,9 @@ export class WebsiteMongooseService {
 		}
 	}
 
-	update = async (props: UpdateWebSiteDto) => {
+	update = async (_id: string, props: UpdateWebSiteDto) => {
 		try {
-			const { _id, ...data } = props
+			const { ...data } = props
 
 			const websiteUpdated = await this.websiteModel.findOneAndUpdate({ _id }, data, { new: true })
 
