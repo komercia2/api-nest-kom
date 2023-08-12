@@ -16,6 +16,7 @@ import {
 	CheckSubDomainAvailabilityQuery,
 	GetWebsitesByIdQuery
 } from "./application/query/websites"
+import { GetWebsiteQuery } from "./application/query/websites/getWebsiteQuery"
 import { Template15Controller, WebsitesController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
@@ -63,6 +64,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.CheckIfStoreHasMainWebSiteQuery,
 		useClass: CheckIfStoreHasMainWebSiteQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.GetWebsiteQuery,
+		useClass: GetWebsiteQuery
 	}
 ]
 
@@ -100,6 +105,7 @@ export class TemplatesModule implements NestModule {
 		consumer
 			.apply(LaravelAuthMiddleware)
 			.exclude({ path: "v1/templates/template15/:storeId", method: RequestMethod.GET })
+			.exclude({ path: "v1/templates/websites/template", method: RequestMethod.GET })
 			.forRoutes({ path: "v1/templates/*", method: RequestMethod.ALL })
 	}
 }
