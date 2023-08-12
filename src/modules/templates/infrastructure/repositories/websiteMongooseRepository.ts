@@ -1,4 +1,5 @@
 import { Inject } from "@nestjs/common"
+import { UpdateWebSiteDto } from "@templates/application/command/dtos"
 import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { IWebSitesRepository } from "@templates/domain/repositories"
 
@@ -37,5 +38,8 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 
 	async checkIfStoreHasMainWebSite(storeId: number): Promise<boolean> {
 		return await this.websiteMongooseService.checkIfStoreHasMainWebSite(storeId)
+	}
+	async updateWebsiteInfo(_id: string, props: UpdateWebSiteDto): Promise<WebSiteEntity> {
+		return await this.websiteMongooseService.update(_id, props)
 	}
 }

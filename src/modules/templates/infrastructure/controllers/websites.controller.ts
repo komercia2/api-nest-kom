@@ -1,11 +1,11 @@
 import {
 	Body,
-	ConflictException,
 	Controller,
 	Get,
 	HttpStatus,
 	Inject,
-	InternalServerErrorException,
+	Param,
+	Patch,
 	Post,
 	Query,
 	Req,
@@ -14,8 +14,8 @@ import {
 } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
-import { CreateWebSiteDto } from "@templates/application/command/dtos"
-import { CreateWebSiteCommand } from "@templates/application/command/websites"
+import { CreateWebSiteDto, UpdateWebSiteDto } from "@templates/application/command/dtos"
+import { CreateWebSiteCommand, UpdateWebSiteCommand } from "@templates/application/command/websites"
 import {
 	CheckDomainAvailabilityQuery,
 	CheckSubDomainAvailabilityQuery,
@@ -49,7 +49,10 @@ export class WebsitesController {
 		private readonly getWebsitesByIdQuery: GetWebsitesByIdQuery,
 
 		@Inject(InfrastructureInjectionTokens.GetWebsiteQuery)
-		private readonly getWebsiteQuery: GetWebsiteQuery
+		private readonly getWebsiteQuery: GetWebsiteQuery,
+
+		@Inject(InfrastructureInjectionTokens.UpdateWebsiteCommand)
+		private readonly updateWebsiteCommand: UpdateWebSiteCommand
 	) {}
 
 	@Post()
@@ -137,6 +140,51 @@ export class WebsitesController {
 		} catch (error) {
 			return handlerHttpResponse(res, {
 				message: "Error getting website",
+				success: false,
+				data: null,
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+			})
+		}
+	}
+
+	@Patch(":websiteId")
+	async updateWebsite(
+		@Param("websiteId") websiteId: string,
+		@Req() req: Request,
+		@Body() body: UpdateWebSiteDto,
+		@Res() res: Response
+	) {
+		try {
+			const { id } = req
+			const webSite = await this.updateWebsiteCommand.execute(websiteId, Number(id), body)
+
+			return handlerHttpResponse(res, {
+				data: webSite,
+				message: "WebSite data updated",
+				success: true,
+				statusCode: HttpStatus.OK
+			})
+		} catch (error) {
+			if (error instanceof StoreAlreadyHasMainWebSiteException) {
+				return handlerHttpResponse(res, {
+					message: error.message,
+					statusCode: HttpStatus.CONFLICT,
+					success: false,
+					data: null
+				})
+			}
+
+			if (error instanceof TemplateNotAvaibleException) {
+				return handlerHttpResponse(res, {
+					message: error.message,
+					success: false,
+					data: null,
+					statusCode: HttpStatus.NOT_FOUND
+				})
+			}
+
+			return handlerHttpResponse(res, {
+				message: "Error updating website",
 				success: false,
 				data: null,
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR

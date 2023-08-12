@@ -11,5 +11,6 @@ export enum InfrastructureInjectionTokens {
 	GetWebsitesByIdQuery = "GetWebsitesByIdQuery",
 	CheckIfStoreHasMainWebSiteQuery = "CheckIfStoreHasMainWebSiteQuery",
 	FindTemplateIdByCriteriaQuery = "FindTemplateIdByCriteriaQuery",
-	GetWebsiteQuery = "GetWebsiteQuery"
+	GetWebsiteQuery = "GetWebsiteQuery",
+	UpdateWebsiteCommand = "UpdateWebsiteCommand"
 }
