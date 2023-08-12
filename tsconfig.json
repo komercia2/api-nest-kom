@@ -18,7 +18,6 @@
 		"noImplicitAny": true,
 		"forceConsistentCasingInFileNames": false,
 		"noFallthroughCasesInSwitch": false,
-		"watch": true,
 		"typeRoots": ["src/@types", "node_modules/@types"],
 		"paths": {
 			"@templates/*": ["src/modules/templates/*"],
