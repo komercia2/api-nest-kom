@@ -12,7 +12,6 @@ export class UpdateWebSiteCommand {
 	) {}
 
 	async execute(updateWebsiteDto: UpdateWebSiteDto) {
-		const { _id } = updateWebsiteDto
-		return await this.websiteRepository.updateWebsiteInfo(_id, updateWebsiteDto)
+		return await this.websiteRepository.updateWebsiteInfo(updateWebsiteDto)
 	}
 }
