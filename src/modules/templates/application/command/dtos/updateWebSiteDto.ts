@@ -3,6 +3,10 @@ import { IsBoolean, IsNotEmpty, IsString } from "class-validator"
 export class UpdateWebSiteDto {
 	@IsString()
 	@IsNotEmpty()
+	_id: string
+
+	@IsString()
+	@IsNotEmpty()
 	subdomain: string
 
 	@IsString()
