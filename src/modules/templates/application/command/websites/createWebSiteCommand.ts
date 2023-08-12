@@ -38,13 +38,15 @@ export class CreateWebSiteCommand {
 		const templateRepository = this.getTemplateRepository(templateNumber)
 
 		if (!templateRepository) {
-			const websiteWithoutTemplate = await this.saveWebsite({ ...data })
+			const websiteWithoutTemplate = await this.saveWebsite({ ...data, templateId: null })
 			return !!websiteWithoutTemplate
 		}
 
 		try {
-			const { _id: templateId } = await this.template15Repository.create(storeId)
-			await this.saveWebsite({ ...data, templateId })
+			// const { _id: templateId } = await this.template15Repository.create(storeId)
+			// await this.saveWebsite({ ...data, templateId })
+
+			await this.saveWebsite({ ...data })
 		} catch (error) {
 			return false
 		}
