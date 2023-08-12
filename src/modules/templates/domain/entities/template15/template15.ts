@@ -45,6 +45,7 @@ export class Template15 {
 	settingGeneral: Template15SettingsGeneral
 
 	constructor() {
+		this._id = this._id
 		this.header = new Template15Header()
 		this.pageHeader = new Template15PageHeader()
 		this.banner = new Template15Banner()
