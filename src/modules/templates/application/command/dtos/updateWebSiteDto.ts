@@ -6,7 +6,6 @@ export class UpdateWebSiteDto {
 	_id: string
 
 	@IsString()
-	@IsNotEmpty()
 	subdomain: string
 
 	@IsString()
