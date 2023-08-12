@@ -28,4 +28,8 @@ export class Template15MongooseRepository implements ITemplate15Repository {
 	async remove(storeId: number): Promise<boolean> {
 		return await this.template15MongoService.remove(storeId)
 	}
+
+	async find(templateId: string): Promise<Template15Entity | null> {
+		return await this.template15MongoService.find(templateId)
+	}
 }
