@@ -9,5 +9,7 @@ export enum InfrastructureInjectionTokens {
 	CheckDomainAvailabilityQuery = "CheckDomainAvailabilityQuery",
 	CheckSubDomainAvailabilityQuery = "CheckSubDomainAvailabilityQuery",
 	GetWebsitesByIdQuery = "GetWebsitesByIdQuery",
-	CheckIfStoreHasMainWebSiteQuery = "CheckIfStoreHasMainWebSiteQuery"
+	CheckIfStoreHasMainWebSiteQuery = "CheckIfStoreHasMainWebSiteQuery",
+	FindTemplateIdByCriteriaQuery = "FindTemplateIdByCriteriaQuery",
+	GetWebsiteQuery = "GetWebsiteQuery"
 }
