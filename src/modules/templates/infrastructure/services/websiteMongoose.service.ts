@@ -1,10 +1,12 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
+import { UpdateWebSiteDto } from "@templates/application/command/dtos"
 import { TemplateNotFoundException } from "@templates/application/exceptions"
 import { Template15 } from "@templates/domain/entities/template15"
 import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
+import { WebsiteNotAvaibleException } from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
 
 import { InfrastructureInjectionTokens } from "../infrastructure-injection.tokens"
@@ -73,11 +75,31 @@ export class WebsiteMongooseService {
 		}
 	}
 
+	update = async (props: UpdateWebSiteDto) => {
+		try {
+			const { _id, ...data } = props
+
+			const websiteUpdated = await this.websiteModel.findOneAndUpdate({ _id }, data, { new: true })
+
+			if (!websiteUpdated) throw new WebsiteNotAvaibleException("Website not found to update")
+
+			return websiteUpdated
+		} catch (error) {
+			if (error instanceof WebsiteNotAvaibleException) throw error
+
+			throw new DatabaseTransactionErrorException("Has been an error updating the website")
+		}
+	}
+
 	private saveWebSite = async (data: WebSiteEntityProps, templateId: ObjectId | null) => {
-		return await new this.websiteModel({
-			...data,
-			templateId
-		}).save()
+		try {
+			return await new this.websiteModel({
+				...data,
+				templateId
+			}).save()
+		} catch (error) {
+			throw new DatabaseTransactionErrorException("Has been an error saving the website")
+		}
 	}
 
 	private getRepositoryByTemplateNumber = (templateNumber: number) => {
