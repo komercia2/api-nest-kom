@@ -12,7 +12,7 @@ export class CheckSubDomainAvailabilityQuery {
 
 	async execute(subDomain: string) {
 		const website = await this.websiteRepository.checkSubdomainAvailability(subDomain)
-		if (!website) throw new SubDomainNotAvaibleException("Subdomain is not avaible. Already in use")
+		if (website) throw new SubDomainNotAvaibleException("Subdomain is not avaible. Already in use")
 
 		return true
 	}
