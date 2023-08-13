@@ -2,25 +2,15 @@ import { Inject, Injectable } from "@nestjs/common"
 import { ApplicationInjectionTokens } from "@templates/application/application-injection.tokens"
 import { WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { StoreAlreadyHasMainWebSiteException } from "@templates/domain/exceptions"
-import { ITemplate15Repository, IWebSitesRepository } from "@templates/domain/repositories"
+import { IWebSitesRepository } from "@templates/domain/repositories"
 
 import { CreateWebSiteDto } from "../dtos"
 
 @Injectable()
 export class CreateWebSiteCommand {
-	/**
-	 * @description Map of allowed templates repositories
-	 */
-	private readonly allowedTemplatesRepositories = new Map<number, ITemplate15Repository>([
-		[15, this.template15Repository]
-	])
-
 	constructor(
 		@Inject(ApplicationInjectionTokens.IWebSiteRepository)
-		private readonly webSiteRepoitory: IWebSitesRepository,
-
-		@Inject(ApplicationInjectionTokens.ITemplate15Repository)
-		private readonly template15Repository: ITemplate15Repository
+		private readonly webSiteRepoitory: IWebSitesRepository
 	) {}
 
 	/**
@@ -35,7 +25,7 @@ export class CreateWebSiteCommand {
 
 		if (isMain) await this.validateIfStoreHasMainWebSite(storeId)
 
-		const templateRepository = this.getTemplateRepository(templateNumber)
+		const templateRepository = this.webSiteRepoitory.findTemplateRepository(templateNumber)
 
 		if (!templateRepository) {
 			const websiteWithoutTemplate = await this.saveWebsite({ ...data, templateId: null })
@@ -63,15 +53,6 @@ export class CreateWebSiteCommand {
 
 		if (hasMainWebSite)
 			throw new StoreAlreadyHasMainWebSiteException("Store already has main website")
-	}
-
-	/**
-	 * @description Get template repository
-	 * @param templateNumber Template number
-	 * @returns Template repository
-	 */
-	private getTemplateRepository(templateNumber: number) {
-		return this.allowedTemplatesRepositories.get(templateNumber)
 	}
 
 	private saveWebsite(data: WebSiteEntityProps) {

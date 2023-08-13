@@ -5,6 +5,7 @@ import { Template15 as Template15Entity } from "@templates/domain/entities/templ
 import { Template15Model } from "@templates/infrastructure/models/template15/template15"
 import { plainToClass } from "class-transformer"
 import { Model } from "mongoose"
+import { ObjectId } from "typeorm"
 
 import { createObjectIdFromHexString } from "../util"
 
@@ -67,6 +68,18 @@ export class Template15MongoService {
 			const newSettings = Object.assign(template15, {})
 
 			const templateUpdated = await this.template15Model.updateOne({ storeId }, newSettings).exec()
+
+			return templateUpdated.modifiedCount > 0
+		} catch (error) {
+			throw new DatabaseTransactionErrorException("Has been an error updating the template15")
+		}
+	}
+
+	update2 = async (_id: ObjectId, template15: Template15Entity) => {
+		try {
+			const newSettings = Object.assign(template15, {})
+
+			const templateUpdated = await this.template15Model.updateOne({ _id }, newSettings).exec()
 
 			return templateUpdated.modifiedCount > 0
 		} catch (error) {

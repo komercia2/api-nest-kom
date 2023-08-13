@@ -8,8 +8,12 @@ import {
 	DeleteTemplate15Command,
 	UpdateTemplate15Command
 } from "./application/command"
-import { CreateWebSiteCommand, UpdateWebSiteCommand } from "./application/command/websites"
-import { FindTemplate15ByIdQuery } from "./application/query"
+import {
+	CreateWebSiteCommand,
+	UpdateWebSiteCommand,
+	UpdateWebsiteSettingsCommand
+} from "./application/command/websites"
+import { FindTemplate15ByIdQuery, FindTemplateRepositoryQuery } from "./application/query"
 import {
 	CheckDomainAvailabilityQuery,
 	CheckIfStoreHasMainWebSiteQuery,
@@ -25,7 +29,11 @@ import {
 	Template15MongooseRepository,
 	WebsiteMongooseRepository
 } from "./infrastructure/repositories"
-import { Template15MongoService, WebsiteMongooseService } from "./infrastructure/services"
+import {
+	Template15MongoService,
+	WebSiteMockService,
+	WebsiteMongooseService
+} from "./infrastructure/services"
 
 const application = [
 	{
@@ -72,6 +80,14 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.UpdateWebsiteCommand,
 		useClass: UpdateWebSiteCommand
+	},
+	{
+		provide: InfrastructureInjectionTokens.FindTemplateRepoitoryQuery,
+		useClass: FindTemplateRepositoryQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.UpdateWebsiteSettingsCommand,
+		useClass: UpdateWebsiteSettingsCommand
 	}
 ]
 
@@ -91,6 +107,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.WebsiteMongooseService,
 		useClass: WebsiteMongooseService
+	},
+	{
+		provide: InfrastructureInjectionTokens.WebSiteMockService,
+		useClass: WebSiteMockService
 	}
 ]
 
