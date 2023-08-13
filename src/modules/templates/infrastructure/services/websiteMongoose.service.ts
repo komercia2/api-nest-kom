@@ -3,7 +3,6 @@ import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { UpdateWebSiteDto } from "@templates/application/command/dtos"
 import { TemplateNotFoundException } from "@templates/application/exceptions"
-import { Template15 } from "@templates/domain/entities/template15"
 import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import { WebsiteNotAvaibleException } from "@templates/domain/exceptions"
@@ -87,6 +86,23 @@ export class WebsiteMongooseService {
 		} catch (error) {
 			if (error instanceof WebsiteNotAvaibleException) throw error
 
+			throw new DatabaseTransactionErrorException("Has been an error updating the website")
+		}
+	}
+
+	updateSettings = async (_id: string, templateNumber: number, props: WebSiteTemplate) => {
+		try {
+			const repository = this.getRepositoryByTemplateNumber(templateNumber)
+
+			if (!repository) return false
+
+			const parsedId = createObjectIdFromHexString(_id)
+			const templateUpdated = await repository.update2(parsedId, props)
+
+			if (!templateUpdated) return false
+
+			return true
+		} catch (error) {
 			throw new DatabaseTransactionErrorException("Has been an error updating the website")
 		}
 	}
