@@ -1,5 +1,6 @@
 export enum InfrastructureInjectionTokens {
 	Template15MongoService = "Template15MongoService",
+	WebSiteMockService = "WebSiteMockService",
 	CreateTemplate15Command = "CreateTemplate15Command",
 	FindTemplate15ByIdQuery = "FindTemplate15ByIdQuery",
 	UpdateTemplate15Command = "UpdateTemplate15Command",
@@ -12,5 +13,7 @@ export enum InfrastructureInjectionTokens {
 	CheckIfStoreHasMainWebSiteQuery = "CheckIfStoreHasMainWebSiteQuery",
 	FindTemplateIdByCriteriaQuery = "FindTemplateIdByCriteriaQuery",
 	GetWebsiteQuery = "GetWebsiteQuery",
-	UpdateWebsiteCommand = "UpdateWebsiteCommand"
+	UpdateWebsiteCommand = "UpdateWebsiteCommand",
+	FindTemplateRepoitoryQuery = "FindTemplateRepoitoryQuery",
+	UpdateWebsiteSettingsCommand = "UpdateWebsiteSettingsCommand"
 }

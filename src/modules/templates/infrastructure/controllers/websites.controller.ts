@@ -15,18 +15,24 @@ import {
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { CreateWebSiteDto, UpdateWebSiteDto } from "@templates/application/command/dtos"
-import { CreateWebSiteCommand, UpdateWebSiteCommand } from "@templates/application/command/websites"
+import {
+	CreateWebSiteCommand,
+	UpdateWebSiteCommand,
+	UpdateWebsiteSettingsCommand
+} from "@templates/application/command/websites"
 import {
 	CheckDomainAvailabilityQuery,
 	CheckSubDomainAvailabilityQuery,
 	GetWebsitesByIdQuery
 } from "@templates/application/query/websites"
 import { GetWebsiteQuery } from "@templates/application/query/websites/getWebsiteQuery"
+import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import {
 	DomainNotAvaibleException,
 	StoreAlreadyHasMainWebSiteException,
 	SubDomainNotAvaibleException,
-	TemplateNotAvaibleException
+	TemplateNotAvaibleException,
+	TemplateNotValidException
 } from "@templates/domain/exceptions"
 import { Request, Response } from "express"
 
@@ -52,7 +58,10 @@ export class WebsitesController {
 		private readonly getWebsiteQuery: GetWebsiteQuery,
 
 		@Inject(InfrastructureInjectionTokens.UpdateWebsiteCommand)
-		private readonly updateWebsiteCommand: UpdateWebSiteCommand
+		private readonly updateWebsiteCommand: UpdateWebSiteCommand,
+
+		@Inject(InfrastructureInjectionTokens.UpdateWebsiteSettingsCommand)
+		private readonly updateWebsiteSettingsCommand: UpdateWebsiteSettingsCommand
 	) {}
 
 	@Post()
@@ -140,6 +149,46 @@ export class WebsitesController {
 		} catch (error) {
 			return handlerHttpResponse(res, {
 				message: "Error getting website",
+				success: false,
+				data: null,
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+			})
+		}
+	}
+
+	@Patch("settings/:websiteId/:nTemplate")
+	@UsePipes()
+	async updateWebsiteTemplateSettings(
+		@Param("websiteId") websiteId: string,
+		@Param("nTemplate") nTemplate: number,
+		@Body() body: WebSiteTemplate,
+		@Res() res: Response
+	) {
+		try {
+			const webSite = await this.updateWebsiteSettingsCommand.execute(
+				websiteId,
+				Number(nTemplate),
+				body
+			)
+
+			return handlerHttpResponse(res, {
+				data: { updated: webSite },
+				message: "WebSite settings updated",
+				success: true,
+				statusCode: HttpStatus.OK
+			})
+		} catch (error) {
+			if (error instanceof TemplateNotValidException) {
+				return handlerHttpResponse(res, {
+					message: error.message,
+					success: false,
+					data: null,
+					statusCode: HttpStatus.NOT_FOUND
+				})
+			}
+
+			return handlerHttpResponse(res, {
+				message: "Error updating website",
 				success: false,
 				data: null,
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
