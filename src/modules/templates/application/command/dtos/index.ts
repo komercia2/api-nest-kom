@@ -1,2 +1,2 @@
-export * from "./CreateWebSiteDto"
-export * from "./UpdateWebSiteDto"
+export * from "./createWebSiteDto"
+export * from "./updateWebSiteDto"
