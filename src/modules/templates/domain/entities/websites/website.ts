@@ -39,7 +39,7 @@ export class WebSiteEntity {
 		this.subdomain = this.validateAndClean(props.subdomain)
 		this.templateNumber = props.templateNumber
 		this.templateId = props.templateId
-		this.domain = this.validateAndClean(props.domain) ?? null
+		this.domain = props.domain ?? null
 		this.isMain = props.isMain
 		;(this.active = props.active),
 			(this.webSiteTemplate = props.webSiteTemplate),
