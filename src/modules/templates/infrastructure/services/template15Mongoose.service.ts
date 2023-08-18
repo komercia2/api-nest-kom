@@ -1,4 +1,5 @@
 import { Injectable } from "@nestjs/common"
+import { OnEvent } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { Template15 as Template15Entity } from "@templates/domain/entities/template15"
@@ -92,6 +93,18 @@ export class Template15MongoService {
 			const isDeleted = await this.template15Model.deleteOne({ storeId }).exec()
 			return isDeleted.deletedCount > 0
 		} catch (error) {
+			throw new DatabaseTransactionErrorException("Has been an error deleting the template15")
+		}
+	}
+
+	@OnEvent("website.15.deleted")
+	async remove2(_id: string) {
+		try {
+			const isDeleted = await this.template15Model.deleteOne({ _id }).exec()
+
+			return { deleted: isDeleted.deletedCount > 0, count: isDeleted.deletedCount }
+		} catch (error) {
+			console.log(error)
 			throw new DatabaseTransactionErrorException("Has been an error deleting the template15")
 		}
 	}

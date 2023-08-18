@@ -15,5 +15,6 @@ export enum InfrastructureInjectionTokens {
 	GetWebsiteQuery = "GetWebsiteQuery",
 	UpdateWebsiteCommand = "UpdateWebsiteCommand",
 	FindTemplateRepoitoryQuery = "FindTemplateRepoitoryQuery",
-	UpdateWebsiteSettingsCommand = "UpdateWebsiteSettingsCommand"
+	UpdateWebsiteSettingsCommand = "UpdateWebsiteSettingsCommand",
+	DeleteWebsiteCommand = "DeleteWebsiteCommand"
 }

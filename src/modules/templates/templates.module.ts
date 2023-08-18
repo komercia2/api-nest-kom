@@ -10,6 +10,7 @@ import {
 } from "./application/command"
 import {
 	CreateWebSiteCommand,
+	DeleteWebsiteCommand,
 	UpdateWebSiteCommand,
 	UpdateWebsiteSettingsCommand
 } from "./application/command/websites"
@@ -88,6 +89,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.UpdateWebsiteSettingsCommand,
 		useClass: UpdateWebsiteSettingsCommand
+	},
+	{
+		provide: InfrastructureInjectionTokens.DeleteWebsiteCommand,
+		useClass: DeleteWebsiteCommand
 	}
 ]
 

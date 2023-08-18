@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common"
+import { OnEvent } from "@nestjs/event-emitter"
 import { ITemplate15Repository } from "@templates/domain/repositories"
 
 import { ApplicationInjectionTokens } from "../application-injection.tokens"

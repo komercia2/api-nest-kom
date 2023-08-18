@@ -1,6 +1,7 @@
 import {
 	Body,
 	Controller,
+	Delete,
 	Get,
 	HttpStatus,
 	Inject,
@@ -17,6 +18,7 @@ import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { CreateWebSiteDto, UpdateWebSiteDto } from "@templates/application/command/dtos"
 import {
 	CreateWebSiteCommand,
+	DeleteWebsiteCommand,
 	UpdateWebSiteCommand,
 	UpdateWebsiteSettingsCommand
 } from "@templates/application/command/websites"
@@ -61,7 +63,10 @@ export class WebsitesController {
 		private readonly updateWebsiteCommand: UpdateWebSiteCommand,
 
 		@Inject(InfrastructureInjectionTokens.UpdateWebsiteSettingsCommand)
-		private readonly updateWebsiteSettingsCommand: UpdateWebsiteSettingsCommand
+		private readonly updateWebsiteSettingsCommand: UpdateWebsiteSettingsCommand,
+
+		@Inject(InfrastructureInjectionTokens.DeleteWebsiteCommand)
+		private readonly deleteWebsiteCommand: DeleteWebsiteCommand
 	) {}
 
 	@Post()
@@ -234,6 +239,31 @@ export class WebsitesController {
 
 			return handlerHttpResponse(res, {
 				message: "Error updating website",
+				success: false,
+				data: null,
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+			})
+		}
+	}
+
+	@Delete(":id")
+	async deleteWebsite(
+		@Query("templateId") templateId: string,
+		@Param("id") id: string,
+		@Res() res: Response
+	) {
+		try {
+			const deleted = await this.deleteWebsiteCommand.execute(id, templateId)
+
+			return handlerHttpResponse(res, {
+				data: { deleted },
+				message: "WebSite deleted",
+				success: true,
+				statusCode: HttpStatus.OK
+			})
+		} catch (error) {
+			return handlerHttpResponse(res, {
+				message: "Error deleting website",
 				success: false,
 				data: null,
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR

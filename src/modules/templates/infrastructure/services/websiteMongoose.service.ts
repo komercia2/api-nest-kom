@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common"
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { UpdateWebSiteDto } from "@templates/application/command/dtos"
@@ -21,7 +22,9 @@ export class WebsiteMongooseService {
 		@InjectModel(WebSiteModel.name) private readonly websiteModel: Model<WebSiteModel>,
 
 		@Inject(InfrastructureInjectionTokens.Template15MongoService)
-		private readonly template15MongoService: Template15MongoService
+		private readonly template15MongoService: Template15MongoService,
+
+		private readonly eventEmitter: EventEmitter2
 	) {}
 
 	create = async (data: WebSiteEntityProps) => {
@@ -87,6 +90,24 @@ export class WebsiteMongooseService {
 			if (error instanceof WebsiteNotAvaibleException) throw error
 
 			throw new DatabaseTransactionErrorException("Has been an error updating the website")
+		}
+	}
+
+	delete = async (_id: string, templateId: string) => {
+		try {
+			const templateDeleted = await this.websiteModel.findOneAndRemove({ _id }).exec()
+			if (!templateDeleted) return false
+
+			if (templateId) {
+				this.eventEmitter.emit(`website.${templateDeleted.templateNumber}.deleted`, {
+					_id: templateId
+				})
+			}
+
+			return true
+		} catch (error) {
+			console.log(error)
+			throw new DatabaseTransactionErrorException("Has been an error deleting the website")
 		}
 	}
 

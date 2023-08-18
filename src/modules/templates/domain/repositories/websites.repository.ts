@@ -16,4 +16,5 @@ export interface IWebSitesRepository {
 		props: { isMain: boolean; active: boolean }
 	): Promise<WebSiteEntity>
 	updateSettings(_id: string, templateNumber: number, settings: WebSiteTemplate): Promise<boolean>
+	delete(_id: string, templateId: string): Promise<boolean>
 }

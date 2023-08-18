@@ -32,6 +32,10 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 		return await this.websiteMongooseService.updateSettings(_id, templateNumber, settings)
 	}
 
+	async delete(_id: string, templateId: string): Promise<boolean> {
+		return await this.websiteMongooseService.delete(_id, templateId)
+	}
+
 	async getWebSite(target: string): Promise<WebSiteEntity | null> {
 		return await this.websiteMongooseService.getWebSite(target)
 	}
