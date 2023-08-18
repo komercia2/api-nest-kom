@@ -1,6 +1,7 @@
 import { GlobalModule } from "@global/global.module"
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
+import { EventEmitterModule } from "@nestjs/event-emitter"
 import { MongooseModule } from "@nestjs/mongoose"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { pinoConfig } from "@shared/infrastructure/configs/logs"
@@ -19,6 +20,15 @@ import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module
 		ConfigModule.forRoot({
 			envFilePath: `.env.${process.env.NODE_ENV}`,
 			isGlobal: true
+		}),
+		EventEmitterModule.forRoot({
+			wildcard: false,
+			delimiter: ".",
+			newListener: false,
+			removeListener: false,
+			maxListeners: 10,
+			verboseMemoryLeak: false,
+			ignoreErrors: false
 		}),
 		TypeOrmModule.forRootAsync({ useClass: TypeOrmService, inject: [ConfigModule] }),
 		MongooseModule.forRootAsync({ useClass: MongooseConfigService, inject: [ConfigModule] }),
