@@ -6,10 +6,10 @@ import { WebSiteTemplate } from "./webSiteTemplate"
 export interface WebSiteEntityProps {
 	_id?: string
 	storeId: number
-	subdomain: string
+	subdomain: string | null
 	templateNumber: number
 	templateId?: string | null
-	domain: string
+	domain: string | null
 	isMain: boolean
 	active: boolean
 	webSiteTemplate?: WebSiteTemplate | null
@@ -22,7 +22,7 @@ export class WebSiteEntity {
 	// TODO: template cant be changed
 	readonly _id?: string
 	readonly storeId: number
-	readonly subdomain: string
+	readonly subdomain: string | null
 	readonly templateNumber: number
 	readonly templateId?: string | null
 	readonly domain: string | null
@@ -36,7 +36,7 @@ export class WebSiteEntity {
 	constructor(props: WebSiteEntityProps) {
 		this._id = props._id
 		this.storeId = props.storeId
-		this.subdomain = this.validateAndClean(props.subdomain)
+		this.subdomain = props.subdomain ? this.validateAndClean(props.subdomain) : null
 		this.templateNumber = props.templateNumber
 		this.templateId = props.templateId
 		this.domain = props.domain ?? null
