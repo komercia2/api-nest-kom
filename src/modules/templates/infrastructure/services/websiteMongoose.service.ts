@@ -1,4 +1,5 @@
 import { Inject, Injectable } from "@nestjs/common"
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { UpdateWebSiteDto } from "@templates/application/command/dtos"
@@ -9,7 +10,7 @@ import { WebsiteNotAvaibleException } from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
 
 import { InfrastructureInjectionTokens } from "../infrastructure-injection.tokens"
-import { WebSiteModel } from "../models/website"
+import { ExistingDomainModel, ExistingSubdomainModel, WebSiteModel } from "../models/website"
 import { createObjectIdFromHexString } from "../util"
 import { Template15MongoService } from "./template15Mongoose.service"
 
@@ -20,8 +21,16 @@ export class WebsiteMongooseService {
 	constructor(
 		@InjectModel(WebSiteModel.name) private readonly websiteModel: Model<WebSiteModel>,
 
+		@InjectModel(ExistingDomainModel.name)
+		private readonly existingDomainModel: Model<ExistingDomainModel>,
+
+		@InjectModel(ExistingSubdomainModel.name)
+		private readonly existingSubdomainModel: Model<ExistingSubdomainModel>,
+
 		@Inject(InfrastructureInjectionTokens.Template15MongoService)
-		private readonly template15MongoService: Template15MongoService
+		private readonly template15MongoService: Template15MongoService,
+
+		private readonly eventEmitter: EventEmitter2
 	) {}
 
 	create = async (data: WebSiteEntityProps) => {
@@ -31,15 +40,52 @@ export class WebsiteMongooseService {
 
 			const repository = this.getRepositoryByTemplateNumber(templateNumber)
 
+			if (data.domain && data.domain.trim()) {
+				const fullDomain = `https://www.${data.domain}`
+				const allDomains = await this.existingDomainModel.find()
+				const domainExists = allDomains.some(({ dominio }) => dominio.startsWith(fullDomain))
+
+				if (domainExists) {
+					console.log("Domain already exists in the database")
+					throw new Error("Domain already exists")
+				}
+			}
+
+			if (data.subdomain && data.subdomain.trim()) {
+				const cleanSubdomain = data.subdomain.trim()
+				const allSubdomains = await this.existingSubdomainModel.find()
+
+				console.log(allSubdomains)
+
+				const subdomainExists = allSubdomains.some(({ subdominio }) =>
+					String(subdominio).startsWith(cleanSubdomain)
+				)
+
+				if (subdomainExists) {
+					console.log("Subdomain already exists in the database")
+					throw new Error("Subdomain already exists")
+				}
+			}
+
+			let _id
+
 			if (!repository) {
 				websiteCreated = await this.saveWebSite(data, null)
 			} else {
-				const { _id } = await repository.create2()
-				websiteCreated = await this.saveWebSite(data, _id)
+				try {
+					_id = (await repository.create2())._id
+					websiteCreated = await this.saveWebSite(data, _id)
+				} catch (error) {
+					this.eventEmitter.emit(`website.${templateNumber}.deleted`, {
+						_id
+					})
+					throw new Error("Error creating the website")
+				}
 			}
 
 			return !!websiteCreated?._id
 		} catch (error) {
+			console.log(error)
 			throw new DatabaseTransactionErrorException("Has been an error creating the website")
 		}
 	}
@@ -87,6 +133,24 @@ export class WebsiteMongooseService {
 			if (error instanceof WebsiteNotAvaibleException) throw error
 
 			throw new DatabaseTransactionErrorException("Has been an error updating the website")
+		}
+	}
+
+	delete = async (_id: string, templateId: string) => {
+		try {
+			const templateDeleted = await this.websiteModel.findOneAndRemove({ _id }).exec()
+			if (!templateDeleted) return false
+
+			if (templateId) {
+				this.eventEmitter.emit(`website.${templateDeleted.templateNumber}.deleted`, {
+					_id: templateId
+				})
+			}
+
+			return true
+		} catch (error) {
+			console.log(error)
+			throw new DatabaseTransactionErrorException("Has been an error deleting the website")
 		}
 	}
 

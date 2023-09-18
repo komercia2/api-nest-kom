@@ -1,16 +1,13 @@
-import { IsBoolean, IsNotEmpty, IsNumber, IsString } from "class-validator"
+import { IsBoolean, IsNotEmpty, IsNumber } from "class-validator"
 
 export class CreateWebSiteDto {
-	@IsString()
-	@IsNotEmpty()
-	subdomain: string
+	subdomain: string | null
 
 	@IsNumber()
 	@IsNotEmpty()
 	templateNumber: number
 
-	@IsString()
-	domain: string
+	domain: string | null
 
 	@IsBoolean()
 	isMain: boolean

@@ -1,5 +1,4 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
-import { Transform, Type } from "class-transformer"
 import { ObjectId, Types } from "mongoose"
 
 import { Template15Model } from "../template15"
@@ -11,14 +10,14 @@ export class WebSiteModel {
 	@Prop({ required: true, type: Number })
 	storeId: number
 
-	@Prop({ required: true, type: String, unique: true })
-	subdomain: string
+	@Prop({ type: String, unique: true })
+	subdomain: string | null
 
 	@Prop({ required: true, type: Number })
 	templateNumber: number
 
-	@Prop({ required: false, type: String, unique: true })
-	domain: string
+	@Prop({ type: String, unique: true })
+	domain: string | null
 
 	@Prop({ required: true, type: Boolean })
 	isMain: boolean

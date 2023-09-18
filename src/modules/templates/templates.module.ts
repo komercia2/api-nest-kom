@@ -10,6 +10,7 @@ import {
 } from "./application/command"
 import {
 	CreateWebSiteCommand,
+	DeleteWebsiteCommand,
 	UpdateWebSiteCommand,
 	UpdateWebsiteSettingsCommand
 } from "./application/command/websites"
@@ -24,7 +25,14 @@ import { GetWebsiteQuery } from "./application/query/websites/getWebsiteQuery"
 import { Template15Controller, WebsitesController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
-import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
+import {
+	ExistingDomainModel,
+	ExistingDomainSchema,
+	ExistingSubdomainModel,
+	ExistingSubdomainSchema,
+	WebSiteModel,
+	WebsitesSchema
+} from "./infrastructure/models/website"
 import {
 	Template15MongooseRepository,
 	WebsiteMongooseRepository
@@ -88,6 +96,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.UpdateWebsiteSettingsCommand,
 		useClass: UpdateWebsiteSettingsCommand
+	},
+	{
+		provide: InfrastructureInjectionTokens.DeleteWebsiteCommand,
+		useClass: DeleteWebsiteCommand
 	}
 ]
 
@@ -118,7 +130,9 @@ const infrastructure = [
 	imports: [
 		MongooseModule.forFeature([
 			{ name: Template15Model.name, schema: Template15Schema },
-			{ name: WebSiteModel.name, schema: WebsitesSchema }
+			{ name: WebSiteModel.name, schema: WebsitesSchema },
+			{ name: ExistingDomainModel.name, schema: ExistingDomainSchema },
+			{ name: ExistingSubdomainModel.name, schema: ExistingSubdomainSchema }
 		])
 	],
 	controllers: [Template15Controller, WebsitesController],
