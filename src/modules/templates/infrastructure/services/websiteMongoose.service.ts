@@ -7,7 +7,11 @@ import { UpdateWebSiteDto } from "@templates/application/command/dtos"
 import { TemplateNotFoundException } from "@templates/application/exceptions"
 import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
-import { WebsiteNotAvaibleException } from "@templates/domain/exceptions"
+import {
+	DomainNotAvaibleException,
+	SubDomainNotAvaibleException,
+	WebsiteNotAvaibleException
+} from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
 import { Tiendas } from "src/entities/Tiendas"
 import { TiendasInfo } from "src/entities/TiendasInfo"
@@ -49,7 +53,7 @@ export class WebsiteMongooseService {
 
 				if (domainExists) {
 					console.log("Domain already exists in the database")
-					throw new Error("Domain already exists")
+					throw new DomainNotAvaibleException("Domain already exists")
 				}
 			}
 
@@ -63,7 +67,7 @@ export class WebsiteMongooseService {
 
 				if (subdomainExists) {
 					console.log("Subdomain already exists in the database")
-					throw new Error("Subdomain already exists")
+					throw new SubDomainNotAvaibleException("Subdomain already exists")
 				}
 			}
 
@@ -85,8 +89,7 @@ export class WebsiteMongooseService {
 
 			return !!websiteCreated?._id
 		} catch (error) {
-			console.log(error)
-			throw new DatabaseTransactionErrorException("Has been an error creating the website")
+			throw error
 		}
 	}
 

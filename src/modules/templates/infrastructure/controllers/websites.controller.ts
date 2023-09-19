@@ -82,7 +82,12 @@ export class WebsitesController {
 				success: true
 			})
 		} catch (error) {
-			if (error instanceof StoreAlreadyHasMainWebSiteException) {
+			console.log(error)
+			if (
+				error instanceof StoreAlreadyHasMainWebSiteException ||
+				error instanceof DomainNotAvaibleException ||
+				error instanceof SubDomainNotAvaibleException
+			) {
 				return handlerHttpResponse(res, {
 					message: error.message,
 					statusCode: HttpStatus.CONFLICT,
