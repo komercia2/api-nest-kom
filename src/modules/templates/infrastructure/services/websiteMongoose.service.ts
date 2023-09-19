@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
+import { InjectRepository } from "@nestjs/typeorm"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { UpdateWebSiteDto } from "@templates/application/command/dtos"
 import { TemplateNotFoundException } from "@templates/application/exceptions"
@@ -8,9 +9,12 @@ import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/we
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import { WebsiteNotAvaibleException } from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
+import { Tiendas } from "src/entities/Tiendas"
+import { TiendasInfo } from "src/entities/TiendasInfo"
+import { Repository } from "typeorm"
 
 import { InfrastructureInjectionTokens } from "../infrastructure-injection.tokens"
-import { ExistingDomainModel, ExistingSubdomainModel, WebSiteModel } from "../models/website"
+import { WebSiteModel } from "../models/website"
 import { createObjectIdFromHexString } from "../util"
 import { Template15MongoService } from "./template15Mongoose.service"
 
@@ -21,11 +25,9 @@ export class WebsiteMongooseService {
 	constructor(
 		@InjectModel(WebSiteModel.name) private readonly websiteModel: Model<WebSiteModel>,
 
-		@InjectModel(ExistingDomainModel.name)
-		private readonly existingDomainModel: Model<ExistingDomainModel>,
+		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
 
-		@InjectModel(ExistingSubdomainModel.name)
-		private readonly existingSubdomainModel: Model<ExistingSubdomainModel>,
+		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>,
 
 		@Inject(InfrastructureInjectionTokens.Template15MongoService)
 		private readonly template15MongoService: Template15MongoService,
@@ -42,8 +44,8 @@ export class WebsiteMongooseService {
 
 			if (data.domain && data.domain.trim()) {
 				const fullDomain = `https://www.${data.domain}`
-				const allDomains = await this.existingDomainModel.find()
-				const domainExists = allDomains.some(({ dominio }) => dominio.startsWith(fullDomain))
+				const allDomains = await this.tiendasInfoRepository.find()
+				const domainExists = allDomains.some(({ dominio }) => dominio?.startsWith(fullDomain))
 
 				if (domainExists) {
 					console.log("Domain already exists in the database")
@@ -53,9 +55,7 @@ export class WebsiteMongooseService {
 
 			if (data.subdomain && data.subdomain.trim()) {
 				const cleanSubdomain = data.subdomain.trim()
-				const allSubdomains = await this.existingSubdomainModel.find()
-
-				console.log(allSubdomains)
+				const allSubdomains = await this.tiendasRepository.find()
 
 				const subdomainExists = allSubdomains.some(({ subdominio }) =>
 					String(subdominio).startsWith(cleanSubdomain)
