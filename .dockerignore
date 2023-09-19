@@ -7,6 +7,5 @@ dist
 .prettierrc
 .eslintrc.js
 README.md
-entities/*
 npm-debug.log
 .env.example
