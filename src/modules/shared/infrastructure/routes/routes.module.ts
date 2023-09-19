@@ -1,4 +1,3 @@
-import { GlobalModule } from "@global/global.module"
 import { Module } from "@nestjs/common"
 import { RouterModule, RouteTree } from "@nestjs/core"
 import { TemplatesModule } from "@templates/templates.module"
@@ -16,10 +15,6 @@ const routes: RouteTree[] = [
 	{
 		path: "/",
 		module: AppModule
-	},
-	{
-		path: `${apiVersions.v1}/common`,
-		module: GlobalModule
 	},
 	{
 		path: `${apiVersions.v1}/ai-suggetions`,

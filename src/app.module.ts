@@ -1,4 +1,3 @@
-import { GlobalModule } from "@global/global.module"
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { EventEmitterModule } from "@nestjs/event-emitter"
@@ -33,7 +32,6 @@ import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module
 		TypeOrmModule.forRootAsync({ useClass: TypeOrmService, inject: [ConfigModule] }),
 		MongooseModule.forRootAsync({ useClass: MongooseConfigService, inject: [ConfigModule] }),
 		RoutesModule,
-		GlobalModule,
 		AiSuggetionsModule,
 		TemplatesModule
 	],

@@ -1,4 +1,3 @@
-import { City, Country, Departament } from "@global/infrastructure/models"
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { TypeOrmModuleOptions, TypeOrmOptionsFactory } from "@nestjs/typeorm"
@@ -15,6 +14,6 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
 		database: this.configService.get<string>("DB_NAME"),
 		password: this.configService.get<string>("DB_PASSWORD"),
 		logging: this.configService.get<boolean>("DB_LOGGING"),
-		entities: [City, Departament, Country]
+		entities: []
 	})
 }
