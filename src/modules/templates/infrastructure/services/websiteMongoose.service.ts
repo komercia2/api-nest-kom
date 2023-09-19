@@ -7,13 +7,8 @@ import { UpdateWebSiteDto } from "@templates/application/command/dtos"
 import { TemplateNotFoundException } from "@templates/application/exceptions"
 import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
-import {
-	DomainNotAvaibleException,
-	SubDomainNotAvaibleException,
-	WebsiteNotAvaibleException
-} from "@templates/domain/exceptions"
+import { DomainNotAvaibleException, WebsiteNotAvaibleException } from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
-import { Tiendas } from "src/entities/Tiendas"
 import { TiendasInfo } from "src/entities/TiendasInfo"
 import { Repository } from "typeorm"
 
@@ -28,8 +23,6 @@ export class WebsiteMongooseService {
 
 	constructor(
 		@InjectModel(WebSiteModel.name) private readonly websiteModel: Model<WebSiteModel>,
-
-		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
 
 		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>,
 
@@ -54,20 +47,6 @@ export class WebsiteMongooseService {
 				if (domainExists) {
 					console.log("Domain already exists in the database")
 					throw new DomainNotAvaibleException("Domain already exists")
-				}
-			}
-
-			if (data.subdomain && data.subdomain.trim()) {
-				const cleanSubdomain = data.subdomain.trim()
-				const allSubdomains = await this.tiendasRepository.find()
-
-				const subdomainExists = allSubdomains.some(({ subdominio }) =>
-					String(subdominio).startsWith(cleanSubdomain)
-				)
-
-				if (subdomainExists) {
-					console.log("Subdomain already exists in the database")
-					throw new SubDomainNotAvaibleException("Subdomain already exists")
 				}
 			}
 
