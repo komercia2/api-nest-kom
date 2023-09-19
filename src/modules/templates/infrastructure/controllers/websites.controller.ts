@@ -82,7 +82,6 @@ export class WebsitesController {
 				success: true
 			})
 		} catch (error) {
-			console.log(error)
 			if (
 				error instanceof StoreAlreadyHasMainWebSiteException ||
 				error instanceof DomainNotAvaibleException ||

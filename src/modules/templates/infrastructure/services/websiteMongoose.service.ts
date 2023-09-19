@@ -7,7 +7,11 @@ import { UpdateWebSiteDto } from "@templates/application/command/dtos"
 import { TemplateNotFoundException } from "@templates/application/exceptions"
 import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
-import { DomainNotAvaibleException, WebsiteNotAvaibleException } from "@templates/domain/exceptions"
+import {
+	DomainNotAvaibleException,
+	SubDomainNotAvaibleException,
+	WebsiteNotAvaibleException
+} from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
 import { TiendasInfo } from "src/entities/TiendasInfo"
 import { Repository } from "typeorm"
@@ -34,7 +38,7 @@ export class WebsiteMongooseService {
 
 	create = async (data: WebSiteEntityProps) => {
 		try {
-			const { templateNumber } = data
+			const { templateNumber, domain, subdomain } = data
 			let websiteCreated
 
 			const repository = this.getRepositoryByTemplateNumber(templateNumber)
@@ -50,6 +54,16 @@ export class WebsiteMongooseService {
 				}
 			}
 
+			if (subdomain && subdomain.trim()) {
+				const subdomainExists = await this.isCriteriaUsed(subdomain)
+				if (subdomainExists) throw new SubDomainNotAvaibleException("Subdomain already exists")
+			}
+
+			if (domain && domain.trim()) {
+				const domainExists = await this.isCriteriaUsed(domain)
+				if (domainExists) throw new DomainNotAvaibleException("Domain already exists")
+			}
+
 			let _id
 
 			if (!repository) {
@@ -59,6 +73,7 @@ export class WebsiteMongooseService {
 					_id = (await repository.create2())._id
 					websiteCreated = await this.saveWebSite(data, _id)
 				} catch (error) {
+					console.log(error)
 					this.eventEmitter.emit(`website.${templateNumber}.deleted`, {
 						_id
 					})
@@ -69,6 +84,17 @@ export class WebsiteMongooseService {
 			return !!websiteCreated?._id
 		} catch (error) {
 			throw error
+		}
+	}
+
+	isCriteriaUsed = async (criteria: string) => {
+		try {
+			const searchQuery = [{ domain: criteria }, { subdomain: criteria }]
+			const template = await this.websiteModel.findOne({ $or: searchQuery }).exec()
+
+			return !!template
+		} catch (error) {
+			throw new DatabaseTransactionErrorException("Error checking if criteria is used")
 		}
 	}
 
@@ -160,6 +186,7 @@ export class WebsiteMongooseService {
 				templateId
 			}).save()
 		} catch (error) {
+			console.log(error)
 			throw new DatabaseTransactionErrorException("Has been an error saving the website")
 		}
 	}
