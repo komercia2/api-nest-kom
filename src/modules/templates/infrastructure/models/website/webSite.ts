@@ -10,13 +10,13 @@ export class WebSiteModel {
 	@Prop({ required: true, type: Number })
 	storeId: number
 
-	@Prop({ type: String, unique: true })
+	@Prop({ type: String, unique: true, sparse: true, default: null, trim: true })
 	subdomain: string | null
 
 	@Prop({ required: true, type: Number })
 	templateNumber: number
 
-	@Prop({ type: String, unique: true })
+	@Prop({ type: String, unique: true, sparse: true, default: null, trim: true })
 	domain: string | null
 
 	@Prop({ required: true, type: Boolean })
