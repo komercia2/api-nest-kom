@@ -34,6 +34,7 @@ import {
 	WebsiteMongooseRepository
 } from "./infrastructure/repositories"
 import {
+	MysqlTemplatesService,
 	Template15MongoService,
 	WebSiteMockService,
 	WebsiteMongooseService
@@ -119,6 +120,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.WebSiteMockService,
 		useClass: WebSiteMockService
+	},
+	{
+		provide: InfrastructureInjectionTokens.MySqlTemplatesService,
+		useClass: MysqlTemplatesService
 	}
 ]
 

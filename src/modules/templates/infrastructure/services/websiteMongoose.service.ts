@@ -1,20 +1,17 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { EventEmitter2 } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
-import { InjectRepository } from "@nestjs/typeorm"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { UpdateWebSiteDto } from "@templates/application/command/dtos"
-import { TemplateNotFoundException } from "@templates/application/exceptions"
 import { WebSiteEntity, WebSiteEntityProps } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import {
 	DomainNotAvaibleException,
 	SubDomainNotAvaibleException,
+	TemplateNotAvaibleException,
 	WebsiteNotAvaibleException
 } from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
-import { TiendasInfo } from "src/entities/TiendasInfo"
-import { Repository } from "typeorm"
 
 import { InfrastructureInjectionTokens } from "../infrastructure-injection.tokens"
 import { WebSiteModel } from "../models/website"
@@ -28,8 +25,6 @@ export class WebsiteMongooseService {
 	constructor(
 		@InjectModel(WebSiteModel.name) private readonly websiteModel: Model<WebSiteModel>,
 
-		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>,
-
 		@Inject(InfrastructureInjectionTokens.Template15MongoService)
 		private readonly template15MongoService: Template15MongoService,
 
@@ -42,17 +37,6 @@ export class WebsiteMongooseService {
 			let websiteCreated
 
 			const repository = this.getRepositoryByTemplateNumber(templateNumber)
-
-			if (data.domain && data.domain.trim()) {
-				const fullDomain = `https://www.${data.domain}`
-				const allDomains = await this.tiendasInfoRepository.find()
-				const domainExists = allDomains.some(({ dominio }) => dominio?.startsWith(fullDomain))
-
-				if (domainExists) {
-					console.log("Domain already exists in the database")
-					throw new DomainNotAvaibleException("Domain already exists")
-				}
-			}
 
 			if (subdomain && subdomain.trim()) {
 				const subdomainExists = await this.isCriteriaUsed(subdomain)
@@ -98,8 +82,13 @@ export class WebsiteMongooseService {
 		}
 	}
 
-	getWebSite = async (templateId: string): Promise<WebSiteEntity> => {
+	getWebSite = async (templateId: string, criteria?: string): Promise<WebSiteEntity> => {
 		try {
+			if (!templateId && criteria) {
+				const data = await this.findWebsiteByCriteria(criteria)
+				if (data) return this.fromModelToEntity(data)
+			}
+
 			const isValidTemplateId = isValidObjectId(templateId)
 			const parsedTemplateId = isValidTemplateId ? createObjectIdFromHexString(templateId) : null
 
@@ -243,12 +232,26 @@ export class WebsiteMongooseService {
 			const searchQuery = [{ domain: criteria }, { subdomain: criteria }]
 			const template = await this.websiteModel.findOne({ $or: searchQuery, active: true }).exec()
 
-			if (!template)
-				throw new TemplateNotFoundException(`Template not found for criteria ${criteria}`)
+			if (!template) return null
 
 			if (!template?.templateId) return null
 
 			return template.templateId.toString()
+		} catch (error) {
+			throw new DatabaseTransactionErrorException(
+				"There was an error finding the template id by criteria"
+			)
+		}
+	}
+
+	findWebsiteByCriteria = async (criteria: string) => {
+		try {
+			const searchQuery = [{ domain: criteria }, { subdomain: criteria }]
+			const website = await this.websiteModel.findOne({ $or: searchQuery, active: true }).exec()
+
+			if (!website) throw new WebsiteNotAvaibleException("Website not found")
+
+			return website
 		} catch (error) {
 			throw new DatabaseTransactionErrorException(
 				"There was an error finding the template id by criteria"

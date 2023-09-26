@@ -28,6 +28,7 @@ import {
 	GetWebsitesByIdQuery
 } from "@templates/application/query/websites"
 import { GetWebsiteQuery } from "@templates/application/query/websites/getWebsiteQuery"
+import { WebSiteEntity } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import {
 	DomainNotAvaibleException,
@@ -109,14 +110,16 @@ export class WebsitesController {
 		try {
 			const websiteWithSettings = await this.getWebsiteQuery.execute(criteria)
 
-			if (!websiteWithSettings?.templateId) {
-				return handlerHttpResponse(res, {
-					data: websiteWithSettings,
-					message:
-						"Website required does not have a template associated. Please consult in another templates service",
-					statusCode: HttpStatus.OK,
-					success: true
-				})
+			if (websiteWithSettings instanceof WebSiteEntity) {
+				if (!websiteWithSettings?.templateId) {
+					return handlerHttpResponse(res, {
+						data: websiteWithSettings,
+						message:
+							"Website required does not have a template associated. Please consult in another templates service",
+						statusCode: HttpStatus.OK,
+						success: true
+					})
+				}
 			}
 
 			return handlerHttpResponse(res, {

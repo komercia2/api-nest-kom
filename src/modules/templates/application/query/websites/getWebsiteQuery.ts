@@ -11,7 +11,10 @@ export class GetWebsiteQuery {
 
 	async execute(criteria: string) {
 		const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria)
-
-		return await this.websiteRepository.getWebSite(templateId)
+		if (!templateId) {
+			const mySQLData = await this.websiteRepository.findMySQLTemplateByCriteria(criteria)
+			if (mySQLData) return mySQLData
+		}
+		return await this.websiteRepository.getWebSite(templateId, criteria)
 	}
 }
