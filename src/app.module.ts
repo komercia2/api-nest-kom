@@ -12,6 +12,7 @@ import { LoggerModule } from "nestjs-pino"
 
 import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
+import { ProductModule } from "./modules/products/products.module"
 
 @Module({
 	imports: [
@@ -33,6 +34,7 @@ import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module
 		MongooseModule.forRootAsync({ useClass: MongooseConfigService, inject: [ConfigModule] }),
 		RoutesModule,
 		AiSuggetionsModule,
+		ProductModule,
 		TemplatesModule
 	],
 	providers: [ConfigModule],
