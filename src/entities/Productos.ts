@@ -135,7 +135,7 @@ export class Productos {
 	@OneToMany(() => ProductosFotos, (productosFotos) => productosFotos.idProducto2)
 	productosFotos: ProductosFotos[]
 
-	@OneToOne(() => ProductosInfo, (productosInfo) => productosInfo.id)
+	@OneToOne(() => ProductosInfo, (productosInfo) => productosInfo.productos)
 	productosInfo: ProductosInfo
 
 	@OneToMany(() => ProductosVariantes, (productosVariantes) => productosVariantes.idProducto2)

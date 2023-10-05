@@ -1,6 +1,6 @@
 import { Inject } from "@nestjs/common"
 
-import { IProductRepository } from "../../domain/repositories"
+import { IProductFilterDTO, IProductRepository } from "../../domain/repositories"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
 import { MySQLProductService } from "../services"
 
@@ -10,7 +10,7 @@ export class MySQLProductRepository implements IProductRepository {
 		private readonly mysqlProductService: MySQLProductService
 	) {}
 
-	async getPagedProducts(storeId: number, page: number, limit: number, active: boolean) {
-		return await this.mysqlProductService.getPagedProducts(storeId, page, limit, active)
+	async getPagedProducts(input: IProductFilterDTO) {
+		return await this.mysqlProductService.getPagedProducts(input)
 	}
 }
