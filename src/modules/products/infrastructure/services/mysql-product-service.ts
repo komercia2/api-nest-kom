@@ -71,7 +71,7 @@ export class MySQLProductService {
 				) as variantes`
 			])
 			.groupBy("productos.id")
-			.orderBy("productos.id", "DESC")
+			.orderBy("productos.orden", "DESC")
 			.limit(limit)
 			.offset((page - 1) * limit)
 
