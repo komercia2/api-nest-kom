@@ -32,6 +32,7 @@ export class MySQLProductService {
 				"productos_variantes.productosVariantesCombinaciones",
 				"productos_variantes_combinaciones"
 			)
+			.leftJoinAndSelect("productos.tagProducts", "tag_product")
 			.where("productos.tienda = :id", { id: storeId })
 			.andWhere("productos.activo = :activo", { activo: active })
 			.andWhere("productos.deletedAt IS NULL")
@@ -68,7 +69,18 @@ export class MySQLProductService {
 							'id_productos_variantes', productos_variantes_combinaciones.id_productos_variantes
 						)
 					)
-				) as variantes`
+				) as variantes`,
+				`
+				JSON_ARRAYAGG(
+					JSON_OBJECT(
+						'id', tag_product.id,
+						'tag_property_id', tag_product.tag_property_id,
+						'productos_id', tag_product.productos_id,
+						'created_at', tag_product.created_at,
+						'updated_at', tag_product.updated_at
+					)
+				) as tags
+				`
 			])
 			.groupBy("productos.id")
 			.orderBy("productos.orden", "DESC")
