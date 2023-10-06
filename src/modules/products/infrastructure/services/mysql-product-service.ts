@@ -22,7 +22,8 @@ export class MySQLProductService {
 			minPrice,
 			promotion,
 			subcategory,
-			tagPropertyId
+			tagPropertyId,
+			withVariants
 		} = data
 		const queryBuilder = this.productRepository
 			.createQueryBuilder("productos")
@@ -120,6 +121,10 @@ export class MySQLProductService {
 
 		if (tagPropertyId) {
 			queryBuilder.andWhere("tag_product.tag_property_id = :tagPropertyId", { tagPropertyId })
+		}
+
+		if (withVariants) {
+			queryBuilder.andWhere("productos.conVariante = :withVariants", { withVariants })
 		}
 
 		const count = await queryBuilder.getCount()

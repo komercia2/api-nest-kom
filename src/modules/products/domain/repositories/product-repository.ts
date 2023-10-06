@@ -12,6 +12,7 @@ export interface IProductFilterDTO {
 	minPrice: number
 	maxPrice: number
 	tagPropertyId: number
+	withVariants: boolean
 }
 
 export interface IProductRepository {
