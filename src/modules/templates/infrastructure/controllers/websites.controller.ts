@@ -106,9 +106,13 @@ export class WebsitesController {
 	}
 
 	@Get("template")
-	async getWebsiteFromCriteria(@Query("criteria") criteria: string, @Res() res: Response) {
+	async getWebsiteFromCriteria(
+		@Query("criteria") criteria: string,
+		@Query("isDomain") isDomain: boolean,
+		@Res() res: Response
+	) {
 		try {
-			const websiteWithSettings = await this.getWebsiteQuery.execute(criteria)
+			const websiteWithSettings = await this.getWebsiteQuery.execute(criteria, isDomain)
 
 			if (websiteWithSettings instanceof WebSiteEntity) {
 				if (!websiteWithSettings?.templateId) {

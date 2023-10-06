@@ -13,7 +13,10 @@ export class MysqlTemplatesService {
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>
 	) {}
 
-	async findMySQLTemplateByCriteria(criteria: string): Promise<IStoreInfo | null> {
+	async findMySQLTemplateByCriteria(
+		criteria: string,
+		isDomain: boolean
+	): Promise<IStoreInfo | null> {
 		const subdomainSearched = this.tiendasRepository.findOne({ where: { subdominio: criteria } })
 
 		const domainSearched = this.tiendasInfoRepository.findOne({
@@ -22,12 +25,7 @@ export class MysqlTemplatesService {
 
 		const [subdomain, domain] = await Promise.allSettled([subdomainSearched, domainSearched])
 
-		if (subdomain.status === "fulfilled" && subdomain.value) {
-			const { id, template } = subdomain.value
-			return { id, template }
-		}
-
-		if (domain.status === "fulfilled" && domain.value) {
+		if (domain.status === "fulfilled" && domain.value && isDomain) {
 			const { tiendaInfo } = domain.value
 			const info = await this.tiendasRepository.findOne({ where: { id: tiendaInfo } })
 
@@ -35,6 +33,10 @@ export class MysqlTemplatesService {
 			const { template } = info
 
 			return { id: tiendaInfo, template }
+		}
+		if (subdomain.status === "fulfilled" && subdomain.value) {
+			const { id, template } = subdomain.value
+			return { id, template }
 		}
 
 		return null
