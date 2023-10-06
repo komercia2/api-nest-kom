@@ -1,5 +1,6 @@
-import { Module } from "@nestjs/common"
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import { Productos } from "src/entities"
 
 import { ProductsApplicationInjectionTokens } from "./application/application-injection-tokens"
@@ -31,4 +32,8 @@ const infrastructure = [
 	controllers: [ProductController],
 	providers: [...application, ...infrastructure]
 })
-export class ProductModule {}
+export class ProductModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(PublicApiKeyAuthMiddleware).forRoutes(ProductController)
+	}
+}
