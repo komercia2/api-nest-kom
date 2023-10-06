@@ -71,15 +71,20 @@ export class MySQLProductService {
 					)
 				) as variantes`,
 				`
-				JSON_ARRAYAGG(
-					JSON_OBJECT(
-						'id', tag_product.id,
-						'tag_property_id', tag_product.tag_property_id,
-						'productos_id', tag_product.productos_id,
-						'created_at', tag_product.created_at,
-						'updated_at', tag_product.updated_at
-					)
-				) as tags
+				CASE
+					WHEN tag_product.id IS NULL THEN JSON_ARRAY()
+				ELSE
+					JSON_ARRAYAGG(
+						JSON_OBJECT(
+							'id', tag_product.id,
+							'tag_property_id', tag_product.tag_property_id,
+							'productos_id', tag_product.productos_id,
+							'created_at', tag_product.created_at,
+							'updated_at', tag_product.updated_at
+						)
+					) 
+				END
+				as tags
 				`
 			])
 			.groupBy("productos.id")
@@ -115,6 +120,7 @@ export class MySQLProductService {
 		const count = await queryBuilder.getCount()
 
 		const publicProductList = await queryBuilder.getRawMany()
+
 		return { publicProductList, count }
 	}
 }
