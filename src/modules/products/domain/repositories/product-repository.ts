@@ -11,6 +11,7 @@ export interface IProductFilterDTO {
 	promotion: boolean
 	minPrice: number
 	maxPrice: number
+	tagPropertyId: number
 }
 
 export interface IProductRepository {

@@ -21,7 +21,8 @@ export class MySQLProductService {
 			maxPrice,
 			minPrice,
 			promotion,
-			subcategory
+			subcategory,
+			tagPropertyId
 		} = data
 		const queryBuilder = this.productRepository
 			.createQueryBuilder("productos")
@@ -115,6 +116,10 @@ export class MySQLProductService {
 				minPrice,
 				maxPrice
 			})
+		}
+
+		if (tagPropertyId) {
+			queryBuilder.andWhere("tag_product.tag_property_id = :tagPropertyId", { tagPropertyId })
 		}
 
 		const count = await queryBuilder.getCount()
