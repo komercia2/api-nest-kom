@@ -7,6 +7,8 @@ import { IProductFilterDTO } from "../../domain/repositories"
 
 @Injectable()
 export class MySQLProductService {
+	private readonly delimiter = "-"
+
 	constructor(
 		@InjectRepository(Productos) private readonly productRepository: Repository<Productos>
 	) {}
@@ -132,5 +134,43 @@ export class MySQLProductService {
 		const publicProductList = await queryBuilder.getRawMany()
 
 		return { publicProductList, count }
+	}
+
+	async getProductBySlug(slug: string) {
+		const { productId } = this.getSlug(slug)
+
+		const product = await this.productRepository
+			.createQueryBuilder("product")
+			.where("product.id = :productId", { productId })
+			.leftJoinAndSelect("product.productosInfo", "info")
+			.leftJoinAndSelect("product.categoriaProducto2", "categoria")
+			.leftJoinAndSelect("product.productosFotos", "fotos")
+			.leftJoinAndSelect("product.productosVariantes", "variantes")
+			.leftJoinAndSelect("variantes.productosVariantesCombinaciones", "combinaciones")
+			.leftJoinAndSelect("product.subcategoria2", "subcategoria_producto")
+			.getOne()
+
+		if (product && product.productosVariantes.length > 0) {
+			const { productosVariantes, ...rest } = product
+			const combinaciones = productosVariantes.map(
+				(variante) => variante.productosVariantesCombinaciones
+			)
+
+			return { ...rest, combinaciones, productosVariantes }
+		}
+
+		if (product) {
+			const { productosVariantes: _, ...rest } = product
+			return { ...rest, combinaciones: [], productosVariantes: [] }
+		}
+
+		return product
+	}
+
+	private getSlug(slug: string) {
+		const arraySlug = slug.split(this.delimiter)
+		const length = arraySlug.length
+		const productId = Number(arraySlug[length - 1])
+		return { productId }
 	}
 }

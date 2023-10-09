@@ -10,7 +10,6 @@ export class PublicApiKeyAuthMiddleware implements NestMiddleware {
 	async use(@Req() req: Request, res: Response, next: NextFunction) {
 		try {
 			const { komercia_public_routes_key } = req.headers
-			console.log(req.headers)
 
 			if (!komercia_public_routes_key) {
 				handlerHttpResponse(res, {

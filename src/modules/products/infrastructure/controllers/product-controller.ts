@@ -1,17 +1,20 @@
-import { HttpStatus, Inject, Query, Req, Res } from "@nestjs/common"
+import { HttpStatus, Inject, Param, Query, Req, Res } from "@nestjs/common"
 import { Get } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
-import { GetPaginatedProductsQuery } from "../../application/query"
+import { GetPaginatedProductsQuery, GetProductBySlugQuery } from "../../application/query"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
 
 @Controller("")
 export class ProductController {
 	constructor(
 		@Inject(InfrastructureInjectionTokens.GetPaginatedProductsQuery)
-		private readonly getPaginatedProductsQuery: GetPaginatedProductsQuery
+		private readonly getPaginatedProductsQuery: GetPaginatedProductsQuery,
+
+		@Inject(InfrastructureInjectionTokens.GetProductBySlugQuery)
+		private readonly getProductBySlugQuery: GetProductBySlugQuery
 	) {}
 
 	@Get("public/paged")
@@ -55,10 +58,32 @@ export class ProductController {
 				success: true
 			})
 		} catch (error) {
-			console.log(error)
 			handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting paginated products",
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				success: false
+			})
+		}
+	}
+
+	@Get("public/:slug")
+	async getProductById(@Req() _req: Request, @Res() res: Response, @Param("slug") slug: string) {
+		try {
+			const product = await this.getProductBySlugQuery.execute(slug)
+
+			handlerHttpResponse(res, {
+				data: product,
+				message: "Product found",
+				statusCode: HttpStatus.OK,
+				success: true
+			})
+			return
+		} catch (error) {
+			console.log(error)
+			handlerHttpResponse(res, {
+				data: null,
+				message: "Error getting product by id",
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
 				success: false
 			})

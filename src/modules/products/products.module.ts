@@ -4,7 +4,7 @@ import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/k
 import { Productos } from "src/entities"
 
 import { ProductsApplicationInjectionTokens } from "./application/application-injection-tokens"
-import { GetPaginatedProductsQuery } from "./application/query"
+import { GetPaginatedProductsQuery, GetProductBySlugQuery } from "./application/query"
 import { ProductController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection-tokens"
 import { MySQLProductService } from "./infrastructure/services"
@@ -13,6 +13,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.GetPaginatedProductsQuery,
 		useClass: GetPaginatedProductsQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.GetProductBySlugQuery,
+		useClass: GetProductBySlugQuery
 	}
 ]
 

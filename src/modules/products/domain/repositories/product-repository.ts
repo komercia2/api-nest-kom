@@ -19,4 +19,6 @@ export interface IProductRepository {
 	getPagedProducts(
 		input: IProductFilterDTO
 	): Promise<{ publicProductList: Productos[]; count: number }>
+
+	getProductBySlug(slug: string): Promise<Productos | null>
 }
