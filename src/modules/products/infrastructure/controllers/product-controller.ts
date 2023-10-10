@@ -51,10 +51,10 @@ export class ProductController {
 				tagPropertyId,
 				withVariants
 			})
-			const { count, publicProductList } = products
+			const { count, publicProductList, priceLimit } = products
 
 			handlerHttpResponse(res, {
-				data: { publicProductList, page, limit, count },
+				data: { publicProductList, page, limit, count, priceLimit },
 				message: "Paginated products",
 				statusCode: HttpStatus.OK,
 				success: true

@@ -19,7 +19,7 @@ export interface IProductFilterDTO {
 export interface IProductRepository {
 	getPagedProducts(
 		input: IProductFilterDTO
-	): Promise<{ publicProductList: Productos[]; count: number }>
+	): Promise<{ publicProductList: Productos[]; count: number; priceLimit: number }>
 
 	getProductBySlug(slug: string): Promise<Productos | null>
 }

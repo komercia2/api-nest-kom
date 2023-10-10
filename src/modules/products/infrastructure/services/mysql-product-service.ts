@@ -139,7 +139,11 @@ export class MySQLProductService {
 
 		const publicProductList = await queryBuilder.getRawMany()
 
-		return { publicProductList, count }
+		const priceLimit = publicProductList.reduce((prev, curr) =>
+			prev.precio > curr.precio ? prev : curr
+		).precio
+
+		return { publicProductList, count, priceLimit }
 	}
 
 	async getProductBySlug(slug: string) {
