@@ -143,7 +143,14 @@ export class MySQLProductService {
 			prev.precio > curr.precio ? prev : curr
 		).precio
 
-		return { publicProductList, count, priceLimit }
+		const priceMinimum = publicProductList.reduce((prev, curr) => {
+			if (prev.precio < curr.precio) {
+				return prev
+			}
+			return curr
+		}).precio
+
+		return { publicProductList, count, priceLimit, priceMinimum }
 	}
 
 	async getProductBySlug(slug: string) {

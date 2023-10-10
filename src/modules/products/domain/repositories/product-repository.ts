@@ -17,9 +17,12 @@ export interface IProductFilterDTO {
 }
 
 export interface IProductRepository {
-	getPagedProducts(
-		input: IProductFilterDTO
-	): Promise<{ publicProductList: Productos[]; count: number; priceLimit: number }>
+	getPagedProducts(input: IProductFilterDTO): Promise<{
+		publicProductList: Productos[]
+		count: number
+		priceMinimum: number
+		priceLimit: number
+	}>
 
 	getProductBySlug(slug: string): Promise<Productos | null>
 }

@@ -51,10 +51,10 @@ export class ProductController {
 				tagPropertyId,
 				withVariants
 			})
-			const { count, publicProductList, priceLimit } = products
+			const { count, publicProductList, priceLimit, priceMinimum } = products
 
 			handlerHttpResponse(res, {
-				data: { publicProductList, page, limit, count, priceLimit },
+				data: { publicProductList, page, limit, count, priceLimit, priceMinimum },
 				message: "Paginated products",
 				statusCode: HttpStatus.OK,
 				success: true
@@ -82,7 +82,6 @@ export class ProductController {
 			})
 			return
 		} catch (error) {
-			console.log(error)
 			handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting product by id",
