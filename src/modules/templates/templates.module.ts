@@ -1,6 +1,9 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common"
 import { MongooseModule } from "@nestjs/mongoose"
+import { TypeOrmModule } from "@nestjs/typeorm"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
+import { Tiendas } from "src/entities/Tiendas"
+import { TiendasInfo } from "src/entities/TiendasInfo"
 
 import { ApplicationInjectionTokens } from "./application/application-injection.tokens"
 import {
@@ -25,19 +28,13 @@ import { GetWebsiteQuery } from "./application/query/websites/getWebsiteQuery"
 import { Template15Controller, WebsitesController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
-import {
-	ExistingDomainModel,
-	ExistingDomainSchema,
-	ExistingSubdomainModel,
-	ExistingSubdomainSchema,
-	WebSiteModel,
-	WebsitesSchema
-} from "./infrastructure/models/website"
+import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
 import {
 	Template15MongooseRepository,
 	WebsiteMongooseRepository
 } from "./infrastructure/repositories"
 import {
+	MysqlTemplatesService,
 	Template15MongoService,
 	WebSiteMockService,
 	WebsiteMongooseService
@@ -123,6 +120,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.WebSiteMockService,
 		useClass: WebSiteMockService
+	},
+	{
+		provide: InfrastructureInjectionTokens.MySqlTemplatesService,
+		useClass: MysqlTemplatesService
 	}
 ]
 
@@ -130,10 +131,9 @@ const infrastructure = [
 	imports: [
 		MongooseModule.forFeature([
 			{ name: Template15Model.name, schema: Template15Schema },
-			{ name: WebSiteModel.name, schema: WebsitesSchema },
-			{ name: ExistingDomainModel.name, schema: ExistingDomainSchema },
-			{ name: ExistingSubdomainModel.name, schema: ExistingSubdomainSchema }
-		])
+			{ name: WebSiteModel.name, schema: WebsitesSchema }
+		]),
+		TypeOrmModule.forFeature([Tiendas, TiendasInfo])
 	],
 	controllers: [Template15Controller, WebsitesController],
 	providers: [...application, ...infrastructure]

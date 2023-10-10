@@ -18,6 +18,11 @@ export interface WebSiteEntityProps {
 	deletedAt?: Date | null
 }
 
+export interface IStoreInfo {
+	id: number
+	template: number
+}
+
 export class WebSiteEntity {
 	// TODO: template cant be changed
 	readonly _id?: string

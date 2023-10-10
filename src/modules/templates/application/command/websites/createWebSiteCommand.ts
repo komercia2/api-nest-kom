@@ -38,7 +38,7 @@ export class CreateWebSiteCommand {
 
 			await this.saveWebsite({ ...data })
 		} catch (error) {
-			return false
+			throw error
 		}
 
 		return true

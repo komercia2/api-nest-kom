@@ -1,4 +1,3 @@
-import { GlobalModule } from "@global/global.module"
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { EventEmitterModule } from "@nestjs/event-emitter"
@@ -13,6 +12,7 @@ import { LoggerModule } from "nestjs-pino"
 
 import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
+import { ProductModule } from "./modules/products/products.module"
 
 @Module({
 	imports: [
@@ -33,8 +33,8 @@ import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module
 		TypeOrmModule.forRootAsync({ useClass: TypeOrmService, inject: [ConfigModule] }),
 		MongooseModule.forRootAsync({ useClass: MongooseConfigService, inject: [ConfigModule] }),
 		RoutesModule,
-		GlobalModule,
 		AiSuggetionsModule,
+		ProductModule,
 		TemplatesModule
 	],
 	providers: [ConfigModule],

@@ -1,5 +1,6 @@
 export * from "./checkDomainAvailabilityQuery"
 export * from "./checkIfStoreHasMainWebSiteQuery"
 export * from "./checkSubDomainAvailabilityQuery"
+export * from "./findMySQLTemplateByCriteriaQuery"
 export * from "./findTemplateIdByCriteriaQuery"
 export * from "./getWebsitesByIdQuery"

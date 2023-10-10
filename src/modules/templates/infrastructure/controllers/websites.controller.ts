@@ -28,6 +28,7 @@ import {
 	GetWebsitesByIdQuery
 } from "@templates/application/query/websites"
 import { GetWebsiteQuery } from "@templates/application/query/websites/getWebsiteQuery"
+import { WebSiteEntity } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import {
 	DomainNotAvaibleException,
@@ -82,7 +83,11 @@ export class WebsitesController {
 				success: true
 			})
 		} catch (error) {
-			if (error instanceof StoreAlreadyHasMainWebSiteException) {
+			if (
+				error instanceof StoreAlreadyHasMainWebSiteException ||
+				error instanceof DomainNotAvaibleException ||
+				error instanceof SubDomainNotAvaibleException
+			) {
 				return handlerHttpResponse(res, {
 					message: error.message,
 					statusCode: HttpStatus.CONFLICT,
@@ -101,18 +106,24 @@ export class WebsitesController {
 	}
 
 	@Get("template")
-	async getWebsiteFromCriteria(@Query("criteria") criteria: string, @Res() res: Response) {
+	async getWebsiteFromCriteria(
+		@Query("criteria") criteria: string,
+		@Query("isDomain") isDomain: boolean,
+		@Res() res: Response
+	) {
 		try {
-			const websiteWithSettings = await this.getWebsiteQuery.execute(criteria)
+			const websiteWithSettings = await this.getWebsiteQuery.execute(criteria, isDomain)
 
-			if (!websiteWithSettings?.templateId) {
-				return handlerHttpResponse(res, {
-					data: websiteWithSettings,
-					message:
-						"Website required does not have a template associated. Please consult in another templates service",
-					statusCode: HttpStatus.OK,
-					success: true
-				})
+			if (websiteWithSettings instanceof WebSiteEntity) {
+				if (!websiteWithSettings?.templateId) {
+					return handlerHttpResponse(res, {
+						data: websiteWithSettings,
+						message:
+							"Website required does not have a template associated. Please consult in another templates service",
+						statusCode: HttpStatus.OK,
+						success: true
+					})
+				}
 			}
 
 			return handlerHttpResponse(res, {

@@ -1,6 +1,7 @@
 export enum InfrastructureInjectionTokens {
 	Template15MongoService = "Template15MongoService",
 	WebSiteMockService = "WebSiteMockService",
+	MySqlTemplatesService = "MySqlTemplatesService",
 	CreateTemplate15Command = "CreateTemplate15Command",
 	FindTemplate15ByIdQuery = "FindTemplate15ByIdQuery",
 	UpdateTemplate15Command = "UpdateTemplate15Command",
