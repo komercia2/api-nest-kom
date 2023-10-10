@@ -15,6 +15,7 @@ export class MySQLProductService {
 	async getPagedProducts(data: IProductFilterDTO) {
 		const {
 			storeId,
+			name,
 			page,
 			limit,
 			active,
@@ -95,6 +96,11 @@ export class MySQLProductService {
 			.orderBy("productos.orden", "DESC")
 			.limit(limit)
 			.offset((page - 1) * limit)
+
+		if (name) {
+			const cleanName = name.toLowerCase().trim()
+			queryBuilder.andWhere("LOWER(productos.nombre) LIKE :name", { name: `%${cleanName}%` })
+		}
 
 		if (category) {
 			queryBuilder.andWhere("categoria_producto.nombreCategoriaProducto = :category", { category })

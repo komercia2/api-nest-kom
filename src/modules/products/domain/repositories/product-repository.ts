@@ -1,6 +1,7 @@
 import { Productos } from "../../../../entities"
 
 export interface IProductFilterDTO {
+	name: string
 	storeId: number
 	page: number
 	limit: number
