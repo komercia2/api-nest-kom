@@ -14,6 +14,8 @@ export interface IProductFilterDTO {
 	maxPrice: number
 	tagPropertyId: number
 	withVariants: boolean
+	topSales: boolean
+	alphabetic: "ASC" | "DESC"
 }
 
 export interface IProductRepository {

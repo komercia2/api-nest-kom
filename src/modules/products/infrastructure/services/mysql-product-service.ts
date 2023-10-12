@@ -26,7 +26,9 @@ export class MySQLProductService {
 			promotion,
 			subcategory,
 			tagPropertyId,
-			withVariants
+			withVariants,
+			topSales,
+			alphabetic
 		} = data
 		const queryBuilder = this.productRepository
 			.createQueryBuilder("productos")
@@ -135,6 +137,16 @@ export class MySQLProductService {
 			queryBuilder.andWhere("productos.conVariante = :withVariants", { withVariants })
 		}
 
+		if (String(topSales) === "1") {
+			queryBuilder
+				.leftJoin("productos.productosCarritos", "productos_carritos")
+				.groupBy("productos.id")
+				.orderBy("COUNT(productos_carritos.producto)", "DESC")
+		}
+
+		if (alphabetic) {
+			queryBuilder.orderBy("productos.nombre", alphabetic)
+		}
 		const count = await queryBuilder.getCount()
 
 		const publicProductList = await queryBuilder.getRawMany()
