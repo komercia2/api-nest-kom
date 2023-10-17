@@ -11,6 +11,10 @@ export class MySQLProductRepository implements IProductRepository {
 		private readonly mysqlProductService: MySQLProductService
 	) {}
 
+	async createFromFile(storeId: number, file: Express.Multer.File): Promise<void> {
+		await this.mysqlProductService.createFromFile(storeId, file)
+	}
+
 	async getProductBySlug(slug: string): Promise<Productos | null> {
 		return await this.mysqlProductService.getProductBySlug(slug)
 	}

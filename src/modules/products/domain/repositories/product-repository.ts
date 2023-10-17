@@ -27,4 +27,6 @@ export interface IProductRepository {
 	}>
 
 	getProductBySlug(slug: string): Promise<Productos | null>
+
+	createFromFile(storeId: number, file: Express.Multer.File): Promise<void>
 }
