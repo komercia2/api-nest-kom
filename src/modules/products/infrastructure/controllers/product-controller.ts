@@ -1,17 +1,6 @@
-import {
-	HttpStatus,
-	Inject,
-	Param,
-	Post,
-	Query,
-	Req,
-	Res,
-	UploadedFile,
-	UseInterceptors
-} from "@nestjs/common"
+import { HttpStatus, Inject, Param, Query, Req, Res } from "@nestjs/common"
 import { Get } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
-import { FileInterceptor } from "@nestjs/platform-express"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
