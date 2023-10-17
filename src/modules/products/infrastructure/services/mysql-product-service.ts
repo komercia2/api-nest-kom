@@ -1,5 +1,6 @@
 import { Inject, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
+import { paginateArray } from "@shared/infrastructure/utils"
 import {
 	Productos,
 	ProductosInfo,
@@ -107,8 +108,6 @@ export class MySQLProductService {
 			])
 			.groupBy("productos.id")
 			.orderBy("productos.orden", "DESC")
-			.limit(limit)
-			.offset((page - 1) * limit)
 
 		if (name) {
 			const cleanName = name.toLowerCase().trim()
@@ -158,9 +157,12 @@ export class MySQLProductService {
 		if (alphabetic) {
 			queryBuilder.orderBy("productos.nombre", alphabetic)
 		}
+
 		const count = await queryBuilder.getCount()
 
 		const publicProductList = await queryBuilder.getRawMany()
+
+		const paginatedProducts = paginateArray(publicProductList, page, limit)
 
 		const priceLimit = publicProductList.reduce((prev, curr) =>
 			prev.precio > curr.precio ? prev : curr
@@ -173,7 +175,7 @@ export class MySQLProductService {
 			return curr
 		}).precio
 
-		return { publicProductList, count, priceLimit, priceMinimum }
+		return { publicProductList: paginatedProducts, count, priceLimit, priceMinimum }
 	}
 
 	async getProductBySlug(slug: string) {
