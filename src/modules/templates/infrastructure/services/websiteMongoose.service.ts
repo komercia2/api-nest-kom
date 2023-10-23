@@ -227,14 +227,18 @@ export class WebsiteMongooseService {
 		}
 	}
 
-	findTemplateIdByCriteria = async (criteria: string) => {
+	findTemplateIdByCriteria = async (criteria: string, isDomain: boolean) => {
 		try {
-			const searchQuery = [{ domain: criteria }, { subdomain: criteria }]
-			const template = await this.websiteModel.findOne({ $or: searchQuery, active: true }).exec()
+			let template
+			if (String(isDomain) === "1") {
+				template = await this.websiteModel.findOne({
+					domain: { $regex: ".*" + criteria + ".*" }
+				})
+			} else {
+				template = await this.websiteModel.findOne({ subdomain: criteria, active: true }).exec()
+			}
 
-			if (!template) return null
-
-			if (!template?.templateId) return null
+			if (!template || !template.templateId) return null
 
 			return template.templateId.toString()
 		} catch (error) {
