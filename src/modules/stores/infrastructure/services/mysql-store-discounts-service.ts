@@ -12,7 +12,8 @@ export class MySQLStoreDiscountService {
 
 	async getDiscountsByStoreId(storeId: number) {
 		return await this.storeDiscountRepository.find({
-			where: { tiendasId: storeId }
+			where: { tiendasId: storeId },
+			order: { createdAt: "DESC" }
 		})
 	}
 }
