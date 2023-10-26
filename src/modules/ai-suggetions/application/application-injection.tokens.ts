@@ -1,3 +1,4 @@
 export enum ApplicationInjectionTokens {
-	IProductDescriptionSuggetionRepository = "IProductDescriptionSuggetionRepository"
+	IProductDescriptionSuggetionRepository = "IProductDescriptionSuggetionRepository",
+	IEditorSuggetionsRepository = "IEditorSuggetionsRepository"
 }
