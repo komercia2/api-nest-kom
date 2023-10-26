@@ -14,7 +14,7 @@ export class StoreExternalApiController {
 		private readonly getStoreExternalApisQuery: GetStoreExternalApisQuery
 	) {}
 
-	@Get("store/:storeId")
+	@Get("/:storeId")
 	async getAllExternalApis(@Req() req: Request, @Res() res: Response) {
 		try {
 			const storeId = Number(req.params.storeId)
