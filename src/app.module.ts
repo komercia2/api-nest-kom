@@ -12,8 +12,9 @@ import { LoggerModule } from "nestjs-pino"
 
 import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
-import { CommonModule } from "./modules/common/infrastructure/common.module"
+import { CommonModule } from "./modules/common/common.module"
 import { ProductModule } from "./modules/products/products.module"
+import { StoresModule } from "./modules/stores/stores.module"
 
 @Module({
 	imports: [
@@ -37,7 +38,8 @@ import { ProductModule } from "./modules/products/products.module"
 		AiSuggetionsModule,
 		ProductModule,
 		TemplatesModule,
-		CommonModule
+		CommonModule,
+		StoresModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
