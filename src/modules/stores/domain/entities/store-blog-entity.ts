@@ -1,44 +1,41 @@
 interface IStoreBlog {
 	id: string
-	title: string
-	content: string
-	author: string
-	mainImage: string
-	mainImageId: string
-	slug: string
-	summary: string
-	storeId: number
-	createdAt: Date | null
-	updatedAt: Date | null
-	status: boolean
+	titulo: string
+	contenido: string
+	autor: string | null
+	imagen_principal_url: string
+	imagen_principal_id: string
+	slug: string | null
+	resumen: string | null
+	created_at: Date | null
+	updated_at: Date | null
+	estado: boolean
 }
 
 export class StoreBlogEntity implements IStoreBlog {
 	id: string
-	title: string
-	content: string
-	author: string
-	mainImage: string
-	mainImageId: string
-	slug: string
-	summary: string
-	storeId: number
-	createdAt: Date | null
-	updatedAt: Date | null
-	status: boolean
+	titulo: string
+	contenido: string
+	autor: string | null
+	imagen_principal_url: string
+	imagen_principal_id: string
+	slug: string | null
+	resumen: string | null
+	created_at: Date | null
+	updated_at: Date | null
+	estado: boolean
 
 	constructor(props: IStoreBlog) {
 		this.id = props.id
-		this.title = props.title
-		this.content = props.content
-		this.author = props.author
-		this.mainImage = props.mainImage
-		this.mainImageId = props.mainImageId
+		this.titulo = props.titulo
+		this.contenido = props.contenido
+		this.autor = props.autor
+		this.imagen_principal_url = props.imagen_principal_url
+		this.imagen_principal_id = props.imagen_principal_id
 		this.slug = props.slug
-		this.summary = props.summary
-		this.storeId = props.storeId
-		this.createdAt = props.createdAt
-		this.updatedAt = props.updatedAt
-		this.status = props.status
+		this.resumen = props.resumen
+		this.created_at = props.created_at
+		this.updated_at = props.updated_at
+		this.estado = props.estado
 	}
 }

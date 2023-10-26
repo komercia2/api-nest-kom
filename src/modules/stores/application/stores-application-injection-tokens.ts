@@ -1,4 +1,5 @@
 export enum StoresApplicationInjectionTokens {
 	IStoreExternalApiRepository = "IStoreExternalApiRepository",
-	IStoreDiscountRepository = "IStoreDiscountRepository"
+	IStoreDiscountRepository = "IStoreDiscountRepository",
+	IStoreBlogRepository = "IStoreBlogRepository"
 }

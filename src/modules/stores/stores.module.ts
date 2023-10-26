@@ -1,16 +1,29 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
-import { ApisConexiones, DescuentoRango } from "src/entities"
+import { ApisConexiones, DescuentoRango, TiendaBlogs } from "src/entities"
 
-import { GetStoreDiscountsQuery, GetStoreExternalApisQuery } from "./application/query"
-import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
-import { StoreDiscountController, StoreExternalApiController } from "./infrastructure/controllers"
 import {
+	GetPagedStoreBlogsQuery,
+	GetStoreDiscountsQuery,
+	GetStoreExternalApisQuery
+} from "./application/query"
+import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
+import {
+	StoreBlogController,
+	StoreDiscountController,
+	StoreExternalApiController
+} from "./infrastructure/controllers"
+import {
+	MySQLStoreBlogRepository,
 	MySQLStoreDiscountRepository,
 	MySQLStoreExternalApiRepository
 } from "./infrastructure/repositories"
-import { MySQLStoreDiscountService, MySQLStoreExternalApiService } from "./infrastructure/services"
+import {
+	MySQLStoreBlogService,
+	MySQLStoreDiscountService,
+	MySQLStoreExternalApiService
+} from "./infrastructure/services"
 import { StoresInfrastructureInjectionTokens } from "./infrastructure/store-infrastructure-injection-tokens"
 
 const application = [
@@ -21,6 +34,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreDiscountRepository,
 		useClass: MySQLStoreDiscountRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreBlogRepository,
+		useClass: MySQLStoreBlogRepository
 	}
 ]
 
@@ -34,24 +51,32 @@ const infrastructure = [
 		useClass: GetStoreDiscountsQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetPagedStoreBlogsQuery,
+		useClass: GetPagedStoreBlogsQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
 		useClass: MySQLStoreExternalApiService
 	},
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreDiscountService,
 		useClass: MySQLStoreDiscountService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreBlogService,
+		useClass: MySQLStoreBlogService
 	}
 ]
 
 @Module({
-	imports: [TypeOrmModule.forFeature([ApisConexiones, DescuentoRango])],
-	controllers: [StoreDiscountController, StoreExternalApiController],
+	imports: [TypeOrmModule.forFeature([ApisConexiones, DescuentoRango, TiendaBlogs])],
+	controllers: [StoreDiscountController, StoreExternalApiController, StoreBlogController],
 	providers: [...application, ...infrastructure]
 })
 export class StoresModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 		consumer
 			.apply(PublicApiKeyAuthMiddleware)
-			.forRoutes(StoreDiscountController, StoreExternalApiController)
+			.forRoutes(StoreDiscountController, StoreExternalApiController, StoreBlogController)
 	}
 }

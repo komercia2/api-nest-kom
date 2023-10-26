@@ -18,15 +18,15 @@ export class MySQLStoreExternalApiRepository implements IStoreExternalApiReposit
 	}
 
 	private toEntity = (entity: ApisConexiones): StoreExternalApi => ({
-		storeId: entity.tiendaId,
+		tienda_id: entity.tiendaId,
 		facebook: entity.facebook,
 		analytics: entity.analytics,
-		facebookChat: entity.facebookChat,
-		facebookPixelMetatag1: entity.facebookPixelMetatag_1,
-		googleMerchant: entity.googleMerchant,
+		facebook_chat: entity.facebookChat,
+		facebook_pixel_metatag_1: entity.facebookPixelMetatag_1,
+		google_merchant: entity.googleMerchant,
 		mercadolibre: entity.mercadolibre,
-		pixelFacebook: entity.pixelFacebook,
-		tagManager: entity.tagManager,
-		tidioUser: entity.tidioUser
+		pixel_facebook: entity.pixelFacebook,
+		tag_manager: entity.tagManager,
+		tidio_user: entity.tidioUser
 	})
 }

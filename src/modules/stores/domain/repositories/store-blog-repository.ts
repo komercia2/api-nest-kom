@@ -14,7 +14,10 @@ interface IStoreBlogFilter {
 export interface IStoreBlogRepository {
 	getPagedStoreBlogs: (
 		storeId: number,
-		options: IPagination,
-		filter?: IStoreBlogFilter
-	) => Promise<StoreBlogEntity[]>
+		options: IPagination
+	) => Promise<{
+		data: StoreBlogEntity[]
+		count: number
+		limit: number
+	}>
 }

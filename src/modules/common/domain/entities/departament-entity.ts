@@ -1,17 +1,17 @@
 interface IDepartamentEntity {
 	id: number
-	name: string
-	countryId: number
+	nombre_dep: string
+	paises_id: number
 }
 
 export class DepartamentEntity implements IDepartamentEntity {
 	id: number
-	name: string
-	countryId: number
+	nombre_dep: string
+	paises_id: number
 
 	constructor(departament: IDepartamentEntity) {
 		this.id = departament.id
-		this.name = departament.name
-		this.countryId = departament.countryId
+		this.nombre_dep = departament.nombre_dep
+		this.paises_id = departament.paises_id
 	}
 }

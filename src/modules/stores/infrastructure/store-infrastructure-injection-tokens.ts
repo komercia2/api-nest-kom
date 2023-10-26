@@ -1,6 +1,8 @@
 export enum StoresInfrastructureInjectionTokens {
 	MySQLStoreExternalApiService = "MySQLStoreExternalApiService",
 	MySQLStoreDiscountService = "MySQLStoreDiscountService",
+	MySQLStoreBlogService = "MySQLStoreBlogService",
 	GetStoreExternalApisQuery = "GetStoreExternalApisQuery",
-	GetStoreDiscountsQuery = "GetStoreDiscountsQuery"
+	GetStoreDiscountsQuery = "GetStoreDiscountsQuery",
+	GetPagedStoreBlogsQuery = "GetPagedStoreBlogsQuery"
 }

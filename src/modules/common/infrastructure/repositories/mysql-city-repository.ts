@@ -19,13 +19,13 @@ export class MySQLCityRepository implements ICityRepository {
 
 	static toEntity = (city: Ciudades): CityEntity => ({
 		id: city.id,
-		name: city.nombreCiu,
-		departmentId: city.dep,
-		daneCode: city.codigoDane,
-		depatament: {
+		nombre_ciu: city.nombreCiu,
+		dep: city.dep,
+		codigo_dane: city.codigoDane,
+		departamento: {
 			id: city.departamento.id,
-			name: city.departamento.nombreDep,
-			countryId: city.departamento.paisesId
+			nombre_dep: city.departamento.nombreDep,
+			paises_id: city.departamento.paisesId
 		}
 	})
 }

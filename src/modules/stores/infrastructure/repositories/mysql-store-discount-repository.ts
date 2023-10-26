@@ -19,16 +19,16 @@ export class MySQLStoreDiscountRepository implements IStoreDiscountRepository {
 
 	private toEntity = (entity: DescuentoRango): StoreDiscountEntity => ({
 		id: entity.id,
-		storeId: entity.tiendasId,
-		name: entity.nombre,
-		discountPercentage: entity.porcentajeDescuento,
-		discountValue: entity.valorDescuento,
-		productsAmount: entity.cantidadProductos,
-		priceRanges: entity.rangosPrecios,
-		option: entity.opcion,
-		status: entity.estado,
-		type: entity.tipo,
-		upadatedAt: entity.updatedAt,
-		createdAt: entity.createdAt
+		tiendas_id: entity.tiendasId,
+		nombre: entity.nombre,
+		porcentaje_descuento: entity.porcentajeDescuento,
+		valor_descuento: entity.valorDescuento,
+		cantidad_productos: entity.cantidadProductos,
+		rangos_precios: entity.rangosPrecios,
+		opcion: entity.opcion,
+		estado: entity.estado,
+		tipo: entity.tipo,
+		updated_at: entity.updatedAt,
+		created_at: entity.createdAt
 	})
 }
