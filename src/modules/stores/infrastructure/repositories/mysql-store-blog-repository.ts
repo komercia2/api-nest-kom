@@ -13,6 +13,11 @@ export class MySQLStoreBlogRepository implements IStoreBlogRepository {
 		private readonly storeBlogService: MySQLStoreBlogService
 	) {}
 
+	async getStoreBlogById(storeId: number, storeBlogId: number): Promise<StoreBlogEntity | null> {
+		const result = await this.storeBlogService.getStoreBlogById(storeId, storeBlogId)
+		return result ? this.toEntity(result) : null
+	}
+
 	async getPagedStoreBlogs(
 		storeId: number,
 		options: GetPagedStoreBlogsDto,

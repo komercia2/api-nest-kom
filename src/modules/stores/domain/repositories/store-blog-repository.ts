@@ -19,4 +19,6 @@ export interface IStoreBlogRepository {
 		count: number
 		limit: number
 	}>
+
+	getStoreBlogById: (storeId: number, storeBlogId: number) => Promise<StoreBlogEntity | null>
 }

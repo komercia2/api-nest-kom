@@ -48,4 +48,26 @@ export class MySQLStoreBlogService {
 			data: results
 		}
 	}
+
+	async getStoreBlogById(storeId: number, storeBlogId: number) {
+		const result = await this.storeBlogsRepository.findOne({
+			where: { id: String(storeBlogId), tiendasId: storeId, estado: true },
+			select: {
+				id: true,
+				autor: true,
+				createdAt: true,
+				estado: true,
+				contenido: true,
+				imagenPrincipalId: true,
+				imagenPrincipalUrl: true,
+				slug: true,
+				resumen: true,
+				updatedAt: true,
+				titulo: true,
+				tiendasId: true
+			}
+		})
+
+		return result
+	}
 }

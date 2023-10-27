@@ -5,6 +5,7 @@ import { ApisConexiones, DescuentoRango, TiendaBlogs } from "src/entities"
 
 import {
 	GetPagedStoreBlogsQuery,
+	GetStoreBlogByIdQuery,
 	GetStoreDiscountsQuery,
 	GetStoreExternalApisQuery
 } from "./application/query"
@@ -53,6 +54,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.GetPagedStoreBlogsQuery,
 		useClass: GetPagedStoreBlogsQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreBlogByIdQuery,
+		useClass: GetStoreBlogByIdQuery
 	},
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
