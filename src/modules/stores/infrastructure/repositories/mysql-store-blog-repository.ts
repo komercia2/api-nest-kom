@@ -1,7 +1,7 @@
 import { Inject } from "@nestjs/common"
 import { TiendaBlogs } from "src/entities"
 
-import { GetPagedStoreBlogsDto } from "../../application/query/dtos"
+import { GetPagedStoreBlogsDto, StoreBlogsFilterDTO } from "../../application/query/dtos"
 import { StoreBlogEntity } from "../../domain/entities"
 import { IStoreBlogRepository } from "../../domain/repositories"
 import { MySQLStoreBlogService } from "../services"
@@ -15,9 +15,10 @@ export class MySQLStoreBlogRepository implements IStoreBlogRepository {
 
 	async getPagedStoreBlogs(
 		storeId: number,
-		options: GetPagedStoreBlogsDto
+		options: GetPagedStoreBlogsDto,
+		filter?: StoreBlogsFilterDTO
 	): Promise<{ count: number; limit: number; data: StoreBlogEntity[] }> {
-		const pagedBlogs = await this.storeBlogService.getPagedStoreBlogs(storeId, options)
+		const pagedBlogs = await this.storeBlogService.getPagedStoreBlogs(storeId, options, filter)
 		return {
 			count: pagedBlogs.count,
 			limit: pagedBlogs.limit,

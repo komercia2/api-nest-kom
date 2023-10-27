@@ -7,14 +7,13 @@ interface IPagination {
 
 interface IStoreBlogFilter {
 	title?: string
-	content?: string
-	author?: string
 }
 
 export interface IStoreBlogRepository {
 	getPagedStoreBlogs: (
 		storeId: number,
-		options: IPagination
+		options: IPagination,
+		filters?: IStoreBlogFilter
 	) => Promise<{
 		data: StoreBlogEntity[]
 		count: number

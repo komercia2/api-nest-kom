@@ -5,7 +5,7 @@ import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
 import { GetPagedStoreBlogsQuery } from "../../application/query"
-import { GetPagedStoreBlogsDto } from "../../application/query/dtos"
+import { GetPagedStoreBlogsDto, StoreBlogsFilterDTO } from "../../application/query/dtos"
 import { StoresInfrastructureInjectionTokens } from "../store-infrastructure-injection-tokens"
 
 @Controller("blogs")
@@ -20,11 +20,12 @@ export class StoreBlogController {
 	async getPagedBlogs(
 		@Req() req: Request,
 		@Query() query: GetPagedStoreBlogsDto,
+		@Query() filter: StoreBlogsFilterDTO,
 		@Res() res: Response
 	) {
 		try {
 			const storeId = Number(req.params.storeId)
-			const pagedStoreBlogs = await this.getPagedStoreBlogsQuery.execute(storeId, query)
+			const pagedStoreBlogs = await this.getPagedStoreBlogsQuery.execute(storeId, query, filter)
 
 			return handlerHttpResponse(res, {
 				data: pagedStoreBlogs,

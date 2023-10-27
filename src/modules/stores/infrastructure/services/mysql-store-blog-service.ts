@@ -1,9 +1,9 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { TiendaBlogs } from "src/entities"
-import { Repository } from "typeorm"
+import { Like, Repository } from "typeorm"
 
-import { GetPagedStoreBlogsDto } from "../../application/query/dtos"
+import { GetPagedStoreBlogsDto, StoreBlogsFilterDTO } from "../../application/query/dtos"
 
 @Injectable()
 export class MySQLStoreBlogService {
@@ -12,13 +12,19 @@ export class MySQLStoreBlogService {
 		private readonly storeBlogsRepository: Repository<TiendaBlogs>
 	) {}
 
-	async getPagedStoreBlogs(storeId: number, options: GetPagedStoreBlogsDto) {
+	async getPagedStoreBlogs(
+		storeId: number,
+		options: GetPagedStoreBlogsDto,
+		filter?: StoreBlogsFilterDTO
+	) {
 		const { page, limit } = options
 		const skip = (page - 1) * limit
 		const take = limit
+		const title = filter?.title
+		const titleQuery = title ? Like(`%${title}%`) : Like("%%")
 
 		const results = await this.storeBlogsRepository.find({
-			where: { tiendasId: storeId },
+			where: { tiendasId: storeId, estado: true, titulo: titleQuery },
 			select: {
 				id: true,
 				autor: true,

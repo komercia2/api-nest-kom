@@ -1,4 +1,4 @@
-import { IsNumber, IsOptional } from "class-validator"
+import { IsOptional } from "class-validator"
 
 export class GetPagedStoreBlogsDto {
 	@IsOptional()
@@ -6,4 +6,9 @@ export class GetPagedStoreBlogsDto {
 
 	@IsOptional()
 	limit: number
+}
+
+export class StoreBlogsFilterDTO {
+	@IsOptional()
+	title?: string
 }
