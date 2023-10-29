@@ -3,7 +3,9 @@ import { RouterModule, RouteTree } from "@nestjs/core"
 import { TemplatesModule } from "@templates/templates.module"
 import { AppModule } from "src/app.module"
 import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.module"
+import { CommonModule } from "src/modules/common/common.module"
 import { ProductModule } from "src/modules/products/products.module"
+import { StoresModule } from "src/modules/stores/stores.module"
 
 const apiVersions = { v1: "v1" }
 
@@ -28,6 +30,14 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/products`,
 		module: ProductModule
+	},
+	{
+		path: `${apiVersions.v1}/stores`,
+		module: StoresModule
+	},
+	{
+		path: `${apiVersions.v1}/common`,
+		module: CommonModule
 	}
 ]
 

@@ -7,14 +7,14 @@ import { Request, Response } from "express"
 import { GetAllCitiesQuery } from "../../application/query"
 import { CommonInfrastructureInjectionTokens } from "../common-infrastructure-injection-tokens"
 
-@Controller("common")
+@Controller("cities")
 export class CityController {
 	constructor(
 		@Inject(CommonInfrastructureInjectionTokens.GetAllCitiesQuery)
 		private readonly getAllCitiesQuery: GetAllCitiesQuery
 	) {}
 
-	@Get("cities")
+	@Get("")
 	async getAllCities(@Req() _req: Request, @Res() res: Response) {
 		try {
 			const cities = await this.getAllCitiesQuery.execute()
