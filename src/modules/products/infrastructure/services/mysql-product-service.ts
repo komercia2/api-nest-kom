@@ -5,7 +5,8 @@ import {
 	Productos,
 	ProductosInfo,
 	ProductosVariantes,
-	ProductosVariantesCombinaciones
+	ProductosVariantesCombinaciones,
+	VisitaProducto
 } from "src/entities"
 import { Repository } from "typeorm"
 
@@ -20,6 +21,9 @@ export class MySQLProductService {
 
 	constructor(
 		@InjectRepository(Productos) private readonly productRepository: Repository<Productos>,
+
+		@InjectRepository(VisitaProducto)
+		private readonly visitProductRepository: Repository<VisitaProducto>,
 
 		@Inject(InfrastructureInjectionTokens.XlsxProductService)
 		private readonly xlsxService: XlsxProductService
@@ -192,6 +196,8 @@ export class MySQLProductService {
 			.leftJoinAndSelect("product.subcategoria2", "subcategoria_producto")
 			.getOne()
 
+		await this.increaseProductVisits(productId)
+
 		if (product && product.productosVariantes.length > 0) {
 			const { productosVariantes, ...rest } = product
 			const combinaciones = productosVariantes.map(
@@ -203,10 +209,18 @@ export class MySQLProductService {
 
 		if (product) {
 			const { productosVariantes: _, ...rest } = product
+
 			return { ...rest, combinaciones: [], productosVariantes: [] }
 		}
 
 		return product
+	}
+
+	async increaseProductVisits(productId: number) {
+		await this.visitProductRepository.update(
+			{ productoId: productId },
+			{ numeroVisitas: () => "numeroVisitas + 1" }
+		)
 	}
 
 	async createFromFile(storeId: number, file: Express.Multer.File) {

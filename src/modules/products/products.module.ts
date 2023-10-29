@@ -3,7 +3,7 @@ import { MulterModule } from "@nestjs/platform-express"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
-import { Productos } from "src/entities"
+import { Productos, VisitaProducto } from "src/entities"
 
 import { ProductsApplicationInjectionTokens } from "./application/application-injection-tokens"
 import { CreateFromFileCommand } from "./application/command"
@@ -43,7 +43,7 @@ const infrastructure = [
 ]
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Productos]), MulterModule.register()],
+	imports: [TypeOrmModule.forFeature([Productos, VisitaProducto]), MulterModule.register()],
 	controllers: [ProductController, AdminProductController],
 	providers: [...application, ...infrastructure]
 })
