@@ -4,11 +4,11 @@ import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
-import { CheckWithoutAuthQuery } from "../../application/query"
-import { StoresInfrastructureInjectionTokens } from "../store-infrastructure-injection-tokens"
+import { CheckWithoutAuthQuery } from "../../../application/query"
+import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
 @Controller("access-code")
-export class StoreCustomerAccessCodeController {
+export class PublicStoreCustomerAccessCodeController {
 	constructor(
 		@Inject(StoresInfrastructureInjectionTokens.CheckWithoutAuthQuery)
 		private readonly checkWithoutAuthQuery: CheckWithoutAuthQuery

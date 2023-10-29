@@ -4,29 +4,28 @@ import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
-import { GetStoreExternalApisQuery } from "../../application/query"
-import { StoresInfrastructureInjectionTokens } from "../store-infrastructure-injection-tokens"
+import { GetStoreDiscountsQuery } from "../../../application/query"
+import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
-@Controller("apis")
-export class StoreExternalApiController {
+@Controller("discounts")
+export class PublicStoreDiscountController {
 	constructor(
-		@Inject(StoresInfrastructureInjectionTokens.GetStoreExternalApisQuery)
-		private readonly getStoreExternalApisQuery: GetStoreExternalApisQuery
+		@Inject(StoresInfrastructureInjectionTokens.GetStoreDiscountsQuery)
+		private readonly getStoreDiscountsQuery: GetStoreDiscountsQuery
 	) {}
 
 	@Get("/:storeId")
-	async getAllExternalApis(@Req() req: Request, @Res() res: Response) {
+	async getAllCities(@Req() req: Request, @Res() res: Response) {
 		try {
 			const storeId = Number(req.params.storeId)
-			const storeExternalApis = await this.getStoreExternalApisQuery.execute(storeId)
+			const storeDiscounts = await this.getStoreDiscountsQuery.execute(storeId)
 			return handlerHttpResponse(res, {
-				data: storeExternalApis,
+				data: storeDiscounts,
 				message: "External Apis for store fetched successfully",
 				success: true,
 				statusCode: HttpStatus.OK
 			})
 		} catch (error) {
-			console.log(error)
 			return handlerHttpResponse(res, {
 				data: null,
 				message: "Error fetching external apis for store",

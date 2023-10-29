@@ -12,11 +12,11 @@ import {
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
-	StoreBlogController,
-	StoreDiscountController,
-	StoreExternalApiController
-} from "./infrastructure/controllers"
-import { StoreCustomerAccessCodeController } from "./infrastructure/controllers/store-cutomer-access-code-controller"
+	PublicStoreBlogController,
+	PublicStoreDiscountController,
+	PublicStoreExternalApiController
+} from "./infrastructure/controllers/public"
+import { PublicStoreCustomerAccessCodeController } from "./infrastructure/controllers/public/public-store-cutomer-access-code-controller"
 import {
 	MySQLStoreBlogRepository,
 	MySQLStoreDiscountRepository,
@@ -94,10 +94,10 @@ const infrastructure = [
 		TypeOrmModule.forFeature([ApisConexiones, DescuentoRango, TiendaBlogs, CustomerAccessCode])
 	],
 	controllers: [
-		StoreDiscountController,
-		StoreExternalApiController,
-		StoreBlogController,
-		StoreCustomerAccessCodeController
+		PublicStoreDiscountController,
+		PublicStoreExternalApiController,
+		PublicStoreBlogController,
+		PublicStoreCustomerAccessCodeController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -105,6 +105,6 @@ export class StoresModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 		consumer
 			.apply(PublicApiKeyAuthMiddleware)
-			.forRoutes(StoreDiscountController, StoreExternalApiController, StoreBlogController)
+			.forRoutes(PublicStoreDiscountController, PublicStoreExternalApiController, PublicStoreBlogController)
 	}
 }

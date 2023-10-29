@@ -4,12 +4,12 @@ import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
-import { GetPagedStoreBlogsQuery, GetStoreBlogByIdQuery } from "../../application/query"
-import { GetPagedStoreBlogsDto, StoreBlogsFilterDTO } from "../../application/query/dtos"
-import { StoresInfrastructureInjectionTokens } from "../store-infrastructure-injection-tokens"
+import { GetPagedStoreBlogsQuery, GetStoreBlogByIdQuery } from "../../../application/query"
+import { GetPagedStoreBlogsDto, StoreBlogsFilterDTO } from "../../../application/query/dtos"
+import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
 @Controller("blogs")
-export class StoreBlogController {
+export class PublicStoreBlogController {
 	constructor(
 		@Inject(StoresInfrastructureInjectionTokens.GetPagedStoreBlogsQuery)
 		private readonly getPagedStoreBlogsQuery: GetPagedStoreBlogsQuery,
