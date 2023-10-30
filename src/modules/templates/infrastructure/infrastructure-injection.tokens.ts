@@ -3,6 +3,7 @@ export enum InfrastructureInjectionTokens {
 	WebSiteMockService = "WebSiteMockService",
 	MysqlTemplate5Service = "MysqlTemplate5Service",
 	MySqlTemplateRepository = "MySqlTemplateRepository",
+	MySqlTemplatesRepository = "MySqlTemplatesRepository",
 	MysqlTemplate99Service = "MysqlTemplate99Service",
 	MySqlTemplate5Repository = "MySqlTemplate5Repository",
 	MySqlTemplate99Repository = "MySqlTemplate99Repository",

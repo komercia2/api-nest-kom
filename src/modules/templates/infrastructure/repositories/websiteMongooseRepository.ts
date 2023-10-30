@@ -16,7 +16,7 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 		@Inject(InfrastructureInjectionTokens.WebSiteMockService)
 		private readonly webSiteMockService: WebSiteMockService,
 
-		@Inject(InfrastructureInjectionTokens.MysqlTemplate5Service)
+		@Inject(InfrastructureInjectionTokens.MySqlTemplatesRepository)
 		private readonly mysqlTemplatesService: MysqlTemplatesService
 	) {}
 

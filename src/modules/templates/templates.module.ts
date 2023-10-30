@@ -47,6 +47,7 @@ import {
 import {
 	MysqlTemplate5Service,
 	MysqlTemplate99Service,
+	MysqlTemplatesService,
 	Template15MongoService,
 	WebSiteMockService,
 	WebsiteMongooseService
@@ -176,6 +177,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.MysqlTemplate99Service,
 		useClass: MysqlTemplate99Service
+	},
+	{
+		provide: InfrastructureInjectionTokens.MySqlTemplatesRepository,
+		useClass: MysqlTemplatesService
 	}
 ]
 

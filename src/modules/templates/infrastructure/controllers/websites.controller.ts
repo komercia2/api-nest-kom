@@ -133,6 +133,7 @@ export class WebsitesController {
 				success: true
 			})
 		} catch (error) {
+			console.log(error)
 			if (error instanceof TemplateNotAvaibleException) {
 				return handlerHttpResponse(res, {
 					message: error.message,
