@@ -1,7 +1,8 @@
 export enum InfrastructureInjectionTokens {
 	Template15MongoService = "Template15MongoService",
 	WebSiteMockService = "WebSiteMockService",
-	MySqlTemplatesService = "MySqlTemplatesService",
+	MysqlTemplate5Service = "MysqlTemplate5Service",
+	MySqlTemplateRepository = "MySqlTemplateRepository",
 	CreateTemplate15Command = "CreateTemplate15Command",
 	FindTemplate15ByIdQuery = "FindTemplate15ByIdQuery",
 	UpdateTemplate15Command = "UpdateTemplate15Command",
@@ -17,5 +18,7 @@ export enum InfrastructureInjectionTokens {
 	UpdateWebsiteCommand = "UpdateWebsiteCommand",
 	FindTemplateRepoitoryQuery = "FindTemplateRepoitoryQuery",
 	UpdateWebsiteSettingsCommand = "UpdateWebsiteSettingsCommand",
-	DeleteWebsiteCommand = "DeleteWebsiteCommand"
+	DeleteWebsiteCommand = "DeleteWebsiteCommand",
+	GetStoreTemplateSettingsQuery = "GetStoreTemplateSettingsQuery",
+	GetStoreTemplateQuery = "GetStoreTemplateQuery"
 }

@@ -1,3 +1,4 @@
+export * from "./mysql-template5-service"
 export * from "./template15Mongoose.service"
 export * from "./templates-mysql.service"
 export * from "./websiteMock.service"
