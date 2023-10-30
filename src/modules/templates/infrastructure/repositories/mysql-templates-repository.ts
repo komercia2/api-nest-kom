@@ -1,20 +1,29 @@
 import { Inject } from "@nestjs/common"
-import { Template5Entity } from "@templates/domain/entities/template5"
-import { ITemplateRepository } from "@templates/domain/repositories"
+import { ITemplateRepository, TemplateSetting } from "@templates/domain/repositories"
 
 import { InfrastructureInjectionTokens } from "../infrastructure-injection.tokens"
-import { MysqlTemplate5Service } from "../services"
+import { MySQLTemplate5Repository } from "./mysql-template5-repository"
+import { MySQLTemplate99Repository } from "./mysql-template99-repository"
 
 export class MySQLTemplateRepository implements ITemplateRepository {
 	constructor(
-		@Inject(InfrastructureInjectionTokens.MysqlTemplate5Service)
-		private readonly mysqlTemplate5Service: MysqlTemplate5Service
+		@Inject(InfrastructureInjectionTokens.MySqlTemplate5Repository)
+		private readonly mysqlTemplate5Repository: MySQLTemplate5Repository,
+
+		@Inject(InfrastructureInjectionTokens.MySqlTemplate99Repository)
+		private readonly mysqlTemplate99Service: MySQLTemplate99Repository
 	) {}
-	async getTemplateSettings(template: number, storeId: string): Promise<Template5Entity | null> {
+	async getTemplateSettings(template: number, storeId: string): Promise<TemplateSetting | null> {
 		let settings = null
+
 		if (Number(template) === 5) {
-			settings = await this.mysqlTemplate5Service.getStoreTemplate5(storeId)
+			settings = await this.mysqlTemplate5Repository.getTemplate5Settings(storeId)
 		}
+
+		if (Number(template) === 99) {
+			settings = await this.mysqlTemplate99Service.getTemplate99Settings(storeId)
+		}
+
 		return settings
 	}
 }

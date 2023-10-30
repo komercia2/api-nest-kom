@@ -20,7 +20,7 @@ import {
 	UpdateWebsiteSettingsCommand
 } from "./application/command/websites"
 import { FindTemplate15ByIdQuery, FindTemplateRepositoryQuery } from "./application/query"
-import { GetTemplate5Query } from "./application/query/store-template-settings"
+import { GetTemplate5Query, GetTemplate99Query } from "./application/query/store-template-settings"
 import { GetStoreTemplateQuery } from "./application/query/store-template-settings/get-template-setting-query"
 import {
 	CheckDomainAvailabilityQuery,
@@ -38,13 +38,15 @@ import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-i
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
 import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
 import {
+	MySQLTemplate5Repository,
+	MySQLTemplate99Repository,
 	MySQLTemplateRepository,
 	Template15MongooseRepository,
 	WebsiteMongooseRepository
 } from "./infrastructure/repositories"
-import { MySQLTemplate5Repository } from "./infrastructure/repositories/mysql-template5-repository"
 import {
 	MysqlTemplate5Service,
+	MysqlTemplate99Service,
 	Template15MongoService,
 	WebSiteMockService,
 	WebsiteMongooseService
@@ -109,12 +111,16 @@ const application = [
 		useClass: DeleteWebsiteCommand
 	},
 	{
-		provide: InfrastructureInjectionTokens.GetStoreTemplateSettingsQuery,
+		provide: InfrastructureInjectionTokens.GetTemplate5Query,
 		useClass: GetTemplate5Query
 	},
 	{
 		provide: InfrastructureInjectionTokens.GetStoreTemplateQuery,
 		useClass: GetStoreTemplateQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.GetTemplate99Query,
+		useClass: GetTemplate99Query
 	}
 ]
 
@@ -136,6 +142,10 @@ const infrastructure = [
 		useClass: MySQLTemplateRepository
 	},
 	{
+		provide: ApplicationInjectionTokens.ITemplate99Repository,
+		useClass: MySQLTemplate99Repository
+	},
+	{
 		provide: InfrastructureInjectionTokens.MySqlTemplateRepository,
 		useClass: MySQLTemplateRepository
 	},
@@ -152,8 +162,20 @@ const infrastructure = [
 		useClass: WebSiteMockService
 	},
 	{
+		provide: InfrastructureInjectionTokens.MySqlTemplate5Repository,
+		useClass: MySQLTemplate5Repository
+	},
+	{
 		provide: InfrastructureInjectionTokens.MysqlTemplate5Service,
 		useClass: MysqlTemplate5Service
+	},
+	{
+		provide: InfrastructureInjectionTokens.MySqlTemplate99Repository,
+		useClass: MySQLTemplate99Repository
+	},
+	{
+		provide: InfrastructureInjectionTokens.MysqlTemplate99Service,
+		useClass: MysqlTemplate99Service
 	}
 ]
 
