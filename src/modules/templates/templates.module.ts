@@ -207,9 +207,15 @@ export class TemplatesModule implements NestModule {
 			.apply(LaravelAuthMiddleware)
 			.exclude({ path: "v1/templates/template15/:storeId", method: RequestMethod.GET })
 			.exclude({ path: "v1/templates/websites/template", method: RequestMethod.GET })
-			.exclude({ path: "v1/templates/store-template-settings", method: RequestMethod.GET })
-			.forRoutes({ path: "v1/templates/*", method: RequestMethod.ALL })
-			.apply(PublicApiKeyAuthMiddleware)
-			.forRoutes(PublicStoreTemplateSettingsController)
+			.forRoutes(
+				{ path: "v1/templates/*", method: RequestMethod.POST },
+				{ path: "v1/templates/*", method: RequestMethod.PATCH },
+				{ path: "v1/templates/*", method: RequestMethod.PUT },
+				{ path: "v1/templates/*", method: RequestMethod.DELETE }
+			)
+
+		// .forRoutes({ path: "v1/templates/*", method: RequestMethod.ALL })
+		// .apply(PublicApiKeyAuthMiddleware)
+		// .forRoutes(PublicStoreTemplateSettingsController)
 	}
 }
