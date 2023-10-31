@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Tiendas } from "src/entities"
-import { Repository, SelectQueryBuilder } from "typeorm"
+import { Repository } from "typeorm"
 
 @Injectable()
 export class MySQLStoreInfoService {
@@ -11,7 +11,7 @@ export class MySQLStoreInfoService {
 	) {}
 
 	async getStoreInfo(storeId: number) {
-		const query: SelectQueryBuilder<Tiendas> = this.storeInfoRepository
+		const query = this.storeInfoRepository
 			.createQueryBuilder("tiendas")
 			.leftJoinAndSelect("tiendas.tiendasInfo", "tiendasInfo")
 			.leftJoinAndSelect("tiendas.tiendasPages", "tiendasPages")
@@ -24,6 +24,13 @@ export class MySQLStoreInfoService {
 			.leftJoinAndSelect("tiendas.geolocalizacions", "geolocalizacions")
 			.leftJoinAndSelect("tiendas.politicas", "politicas")
 			.leftJoinAndSelect("tiendas.medioPagos", "medios_pago")
+			.leftJoinAndSelect("tiendas.mediosEnvios", "medios_envios")
+			.leftJoinAndSelect("tiendas.entidadesTiendas", "pivot")
+			.leftJoinAndSelect("pivot.entidad", "entidades")
+			.leftJoinAndSelect("tiendas.disenoModals", "modal")
+			.leftJoinAndSelect("tiendas.tags", "tags")
+			.leftJoinAndSelect("tags.tagProperties", "properties")
+			.leftJoinAndSelect("tiendas.whatsappCheckouts", "whatsapp_checkout")
 			.where("tiendas.id = :storeId", { storeId })
 			.select([
 				"tiendas.id",
@@ -109,7 +116,66 @@ export class MySQLStoreInfoService {
 				"medios_pago.flow",
 				"medios_pago.paymentsWay",
 				"medios_pago.tuCompra",
-				"medios_pago.wepay4u"
+				"medios_pago.wepay4u",
+				"medios_envios.id",
+				"medios_envios.valores",
+				"medios_envios.estado",
+				"medios_envios.idPais",
+				"medios_envios.idTienda",
+				"medios_envios.createdAt",
+				"medios_envios.updatedAt",
+				"entidades.id",
+				"entidades.nombre",
+				"entidades.logo",
+				"entidades.createdAt",
+				"entidades.updatedAt",
+				"pivot.tiendaId",
+				"pivot.entidadId",
+				"modal.id",
+				"modal.title",
+				"modal.description",
+				"modal.img",
+				"modal.password",
+				"modal.colorTitle",
+				"modal.colorDescription",
+				"modal.fontWeighTitle",
+				"modal.fontSizeTitle",
+				"modal.fontWeighDescription",
+				"modal.fontSizeDescription",
+				"modal.widthImg",
+				"modal.colorTextBtn",
+				"modal.colorBgBtn",
+				"modal.colorBorder",
+				"modal.colorBg_1",
+				"modal.colorBg_2",
+				"modal.stateModal",
+				"modal.marginBottomImg",
+				"modal.marginBottomDescription",
+				"modal.marginBottomTitle",
+				"modal.createdAt",
+				"modal.updatedAt",
+				"tags.id",
+				"tags.name",
+				"tags.status",
+				"tags.order",
+				"tags.tiendasId",
+				"tags.createdAt",
+				"tags.updatedAt",
+				"tags.edit",
+				"tags.visible",
+				"properties.id",
+				"properties.name",
+				"properties.status",
+				"properties.order",
+				"properties.tagId",
+				"properties.createdAt",
+				"properties.updatedAt",
+				"properties.edit",
+				"whatsapp_checkout.id",
+				"whatsapp_checkout.configuration",
+				"whatsapp_checkout.tiendasId",
+				"whatsapp_checkout.createdAt",
+				"whatsapp_checkout.updatedAt"
 			])
 
 		const info = await query.getOne()
