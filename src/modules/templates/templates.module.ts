@@ -208,6 +208,7 @@ export class TemplatesModule implements NestModule {
 			.exclude({ path: "v1/templates/template15/:storeId", method: RequestMethod.GET })
 			.exclude({ path: "v1/templates/websites/template", method: RequestMethod.GET })
 			.forRoutes(
+				{ path: "v1/templates/websites", method: RequestMethod.GET },
 				{ path: "v1/templates/*", method: RequestMethod.POST },
 				{ path: "v1/templates/*", method: RequestMethod.PATCH },
 				{ path: "v1/templates/*", method: RequestMethod.PUT },
