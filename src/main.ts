@@ -36,7 +36,12 @@ async function bootstrap() {
 
 	app.useGlobalPipes(new ValidationPipe())
 	app.useLogger(app.get(Logger))
-	app.use(compression())
+	app.use(
+		compression({
+			level: 9,
+			memLevel: 6
+		})
+	)
 
 	await app.listen(configService.get<number>("PORT") || 3000)
 }
