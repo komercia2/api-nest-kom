@@ -11,26 +11,26 @@ export class MySQLStoreInfoService {
 	) {}
 
 	async getStoreInfo(storeId: number) {
-		const query = this.storeInfoRepository
+		const productInfoQueryBuilder = this.storeInfoRepository
 			.createQueryBuilder("tiendas")
-			.leftJoinAndSelect("tiendas.tiendasInfo", "tiendasInfo")
-			.leftJoinAndSelect("tiendas.tiendasPages", "tiendasPages")
-			.leftJoinAndSelect("tiendas.redes", "redes")
-			.leftJoinAndSelect("tiendas.categoria2", "categoria2")
-			.leftJoinAndSelect("tiendasInfo.paises", "paises")
-			.leftJoinAndSelect("tiendas.banners", "banners")
-			.leftJoinAndSelect("tiendas.categoriaProductos", "categoriaProductos")
-			.leftJoinAndSelect("tiendas.subcategorias", "subcategorias")
-			.leftJoinAndSelect("tiendas.geolocalizacions", "geolocalizacions")
-			.leftJoinAndSelect("tiendas.politicas", "politicas")
-			.leftJoinAndSelect("tiendas.medioPagos", "medios_pago")
-			.leftJoinAndSelect("tiendas.mediosEnvios", "medios_envios")
-			.leftJoinAndSelect("tiendas.entidadesTiendas", "pivot")
-			.leftJoinAndSelect("pivot.entidad", "entidades")
-			.leftJoinAndSelect("tiendas.disenoModals", "modal")
-			.leftJoinAndSelect("tiendas.tags", "tags")
-			.leftJoinAndSelect("tags.tagProperties", "properties")
-			.leftJoinAndSelect("tiendas.whatsappCheckouts", "whatsapp_checkout")
+			.innerJoin("tiendas.tiendasInfo", "tiendasInfo")
+			.leftJoin("tiendas.tiendasPages", "tiendasPages")
+			.leftJoin("tiendas.redes", "redes")
+			.leftJoin("tiendas.categoria2", "categoria2")
+			.leftJoin("tiendasInfo.paises", "paises")
+			.leftJoin("tiendas.banners", "banners")
+			.leftJoin("tiendas.categoriaProductos", "categoriaProductos")
+			.leftJoin("tiendas.subcategorias", "subcategorias")
+			.leftJoin("tiendas.geolocalizacions", "geolocalizacions")
+			.leftJoin("tiendas.politicas", "politicas")
+			.leftJoin("tiendas.medioPagos", "medios_pago")
+			.leftJoin("tiendas.mediosEnvios", "medios_envios")
+			.leftJoin("tiendas.entidadesTiendas", "pivot")
+			.leftJoin("pivot.entidad", "entidades")
+			.leftJoin("tiendas.disenoModals", "modal")
+			.leftJoin("tiendas.tags", "tags")
+			.leftJoin("tags.tagProperties", "properties")
+			.leftJoin("tiendas.whatsappCheckouts", "whatsapp_checkout")
 			.where("tiendas.id = :storeId", { storeId })
 			.select([
 				"tiendas.id",
@@ -178,8 +178,6 @@ export class MySQLStoreInfoService {
 				"whatsapp_checkout.updatedAt"
 			])
 
-		const info = await query.getOne()
-
-		return info
+		return await productInfoQueryBuilder.getOne()
 	}
 }
