@@ -50,6 +50,9 @@ dependencies:
   compression:
     specifier: 1.7.4
     version: 1.7.4
+  mercadopago:
+    specifier: ^2.0.3
+    version: 2.0.3
   mongoose:
     specifier: 7.4.0
     version: 7.4.0
@@ -5247,6 +5250,15 @@ packages:
       type-fest: 0.18.1
       yargs-parser: 20.2.9
     dev: true
+
+  /mercadopago@2.0.3:
+    resolution: {integrity: sha512-4aYlKSZxw6WrLFeJ8OKR+CW0GNwzmEfyoiyqY6aEt/BQDwKp0QCwcL7pGrNIXrR6Gjj+N1XeUv7ZaI5SmN8RTg==}
+    dependencies:
+      node-fetch: 2.6.12
+      uuid: 9.0.0
+    transitivePeerDependencies:
+      - encoding
+    dev: false
 
   /merge-descriptors@1.0.1:
     resolution: {integrity: sha512-cCi6g3/Zr1iqQi6ySbseM1Xvooa98N0w31jzUYrXPX2xqObmFGHJ0tQ5u74H3mVh7wLouTseZyYIq39g8cNp1w==}
