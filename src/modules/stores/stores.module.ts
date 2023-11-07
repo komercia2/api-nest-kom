@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import {
 	ApisConexiones,
+	Banners,
 	CategoriaProductos,
 	CustomerAccessCode,
 	DescuentoRango,
@@ -16,6 +17,7 @@ import {
 import {
 	CheckWithoutAuthQuery,
 	GetPagedStoreBlogsQuery,
+	GetStoreBannersQuery,
 	GetStoreBlogByIdQuery,
 	GetStoreDiscountsQuery,
 	GetStoreExternalApisQuery,
@@ -27,6 +29,7 @@ import {
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
+	PublicStoreBannerController,
 	PublicStoreBlogController,
 	PublicStoreDiscountController,
 	PublicStoreExternalApiController,
@@ -38,6 +41,7 @@ import {
 import { PublicStoreCustomerAccessCodeController } from "./infrastructure/controllers/public/public-store-cutomer-access-code-controller"
 import { PublicStoreInfoController } from "./infrastructure/controllers/public/public-store-info-controller"
 import {
+	MySQLStoreBannerRepository,
 	MySQLStoreBlogRepository,
 	MySQLStoreDiscountRepository,
 	MySQLStoreExternalApiRepository,
@@ -49,6 +53,7 @@ import { MySQLStoreCustomerAccessCodeRepository } from "./infrastructure/reposit
 import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositories/mysq-store-product-category-repository"
 import { MysqlStoreProductSubcategoryRepository } from "./infrastructure/repositories/mysql-store-subcategory-repository"
 import {
+	MySQLStoreBannerService,
 	MySQLStoreBlogService,
 	MySQLStoreCustomerAccessCodeService,
 	MySQLStoreDiscountService,
@@ -97,6 +102,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStorePoliciesRepository,
 		useClass: MySQLStorePoliciesRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreBannerRepository,
+		useClass: MySQLStoreBannerRepository
 	}
 ]
 
@@ -142,6 +151,10 @@ const infrastructure = [
 		useClass: GetStorePoliciesQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreBannersQuery,
+		useClass: GetStoreBannersQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
 		useClass: MySQLStoreExternalApiService
 	},
@@ -176,6 +189,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStorePoliciesService,
 		useClass: MySQLStorePoliciesService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreBannerService,
+		useClass: MySQLStoreBannerService
 	}
 ]
 
@@ -190,7 +207,8 @@ const infrastructure = [
 			CategoriaProductos,
 			Subcategorias,
 			Geolocalizacion,
-			Politicas
+			Politicas,
+			Banners
 		])
 	],
 	controllers: [
@@ -202,7 +220,8 @@ const infrastructure = [
 		PublicStoreProductCategoryController,
 		PublicStoreProductSubcategoryController,
 		PublicStoreGeolocationController,
-		PublicStorePoliciesController
+		PublicStorePoliciesController,
+		PublicStoreBannerController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -219,7 +238,8 @@ export class StoresModule implements NestModule {
 				PublicStoreProductCategoryController,
 				PublicStoreProductSubcategoryController,
 				PublicStoreGeolocationController,
-				PublicStorePoliciesController
+				PublicStorePoliciesController,
+				PublicStoreBannerController
 			)
 	}
 }

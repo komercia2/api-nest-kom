@@ -7,5 +7,6 @@ export enum StoresApplicationInjectionTokens {
 	IStoreProductCategoryRepository = "IStoreProductCategoryRepository",
 	IStoreProductSubcategoryRepository = "IStoreProductSubcategoryRepository",
 	IStoreGeolocationRepository = "IStoreGeolocationRepository",
-	IStorePoliciesRepository = "IStorePoliciesRepository"
+	IStorePoliciesRepository = "IStorePoliciesRepository",
+	IStoreBannerRepository = "IStoreBannerRepository"
 }
