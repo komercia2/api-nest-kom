@@ -20,5 +20,6 @@ export enum StoresInfrastructureInjectionTokens {
 	CheckWithoutAuthQuery = "CheckWithoutAuthQuery",
 	GetStoreInfoQuery = "GetStoreInfoQuery",
 	GetStoreProductCategoriesQuery = "GetStoreProductCategoriesQuery",
-	GetStoreProductSubcategoriesQuery = "GetStoreProductSubcategoriesQuery"
+	GetStoreProductSubcategoriesQuery = "GetStoreProductSubcategoriesQuery",
+	GetStoreGeolocationsQuery = "GetStoreGeolocationsQuery"
 }
