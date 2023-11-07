@@ -11,7 +11,8 @@ import {
 	Politicas,
 	Subcategorias,
 	TiendaBlogs,
-	Tiendas
+	Tiendas,
+	WhatsappCheckout
 } from "src/entities"
 
 import {
@@ -25,7 +26,8 @@ import {
 	GetStoreInfoQuery,
 	GetStorePoliciesQuery,
 	GetStoreProductCategoriesQuery,
-	GetStoreProductSubcategoriesQuery
+	GetStoreProductSubcategoriesQuery,
+	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
@@ -36,7 +38,8 @@ import {
 	PublicStoreGeolocationController,
 	PublicStorePoliciesController,
 	PublicStoreProductCategoryController,
-	PublicStoreProductSubcategoryController
+	PublicStoreProductSubcategoryController,
+	PublicStoreWhatsappCheckoutController
 } from "./infrastructure/controllers/public"
 import { PublicStoreCustomerAccessCodeController } from "./infrastructure/controllers/public/public-store-cutomer-access-code-controller"
 import { PublicStoreInfoController } from "./infrastructure/controllers/public/public-store-info-controller"
@@ -47,7 +50,8 @@ import {
 	MySQLStoreExternalApiRepository,
 	MySQLStoreGeolocationRepository,
 	MySQLStoreInfoRepository,
-	MySQLStorePoliciesRepository
+	MySQLStorePoliciesRepository,
+	MySQLStoreWhatsappCheckoutRepository
 } from "./infrastructure/repositories"
 import { MySQLStoreCustomerAccessCodeRepository } from "./infrastructure/repositories/mysq-store-customer-repository"
 import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositories/mysq-store-product-category-repository"
@@ -62,7 +66,8 @@ import {
 	MySQLStoreInfoService,
 	MySQLStorePoliciesService,
 	MySQLStoreProductCategoryService,
-	MysqlStoreProductSubcategoryService
+	MysqlStoreProductSubcategoryService,
+	MySQLStoreWhatsappCheckoutService
 } from "./infrastructure/services"
 import { StoresInfrastructureInjectionTokens } from "./infrastructure/store-infrastructure-injection-tokens"
 
@@ -106,6 +111,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreBannerRepository,
 		useClass: MySQLStoreBannerRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreWhatsAppCheckoutRepository,
+		useClass: MySQLStoreWhatsappCheckoutRepository
 	}
 ]
 
@@ -155,6 +164,10 @@ const infrastructure = [
 		useClass: GetStoreBannersQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreWhatsAppCheckoutQuery,
+		useClass: GetStoreWhatsAppCheckoutQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
 		useClass: MySQLStoreExternalApiService
 	},
@@ -193,6 +206,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreBannerService,
 		useClass: MySQLStoreBannerService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreWhatsAppCheckoutService,
+		useClass: MySQLStoreWhatsappCheckoutService
 	}
 ]
 
@@ -208,7 +225,8 @@ const infrastructure = [
 			Subcategorias,
 			Geolocalizacion,
 			Politicas,
-			Banners
+			Banners,
+			WhatsappCheckout
 		])
 	],
 	controllers: [
@@ -221,7 +239,8 @@ const infrastructure = [
 		PublicStoreProductSubcategoryController,
 		PublicStoreGeolocationController,
 		PublicStorePoliciesController,
-		PublicStoreBannerController
+		PublicStoreBannerController,
+		PublicStoreWhatsappCheckoutController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -239,7 +258,8 @@ export class StoresModule implements NestModule {
 				PublicStoreProductSubcategoryController,
 				PublicStoreGeolocationController,
 				PublicStorePoliciesController,
-				PublicStoreBannerController
+				PublicStoreBannerController,
+				PublicStoreWhatsappCheckoutController
 			)
 	}
 }
