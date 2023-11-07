@@ -13,12 +13,17 @@ export class MySQLStoreProductCategoryService {
 	) {}
 
 	async getStoreProductCategories(id: number): Promise<StoreProductCategoryEntity[]> {
-		const categories = await this.storeProductCategoryRepository.find({
-			where: {
-				tienda: id
-			}
-		})
-		return categories.map((category) => this.toEntity(category))
+		const categories = await this.storeProductCategoryRepository
+			.createQueryBuilder("categoria_productos")
+			.where("categoria_productos.tienda = :id", { id })
+			.select([
+				"categoria_productos.id",
+				"categoria_productos.nombreCategoriaProducto",
+				"categoria_productos.orden",
+				"categoria_productos.imagenCloudinary"
+			])
+			.getMany()
+		return categories.map((categoria) => this.toEntity(categoria))
 	}
 
 	toEntity(categoria: CategoriaProductos): StoreProductCategoryEntity {
