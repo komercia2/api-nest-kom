@@ -1,4 +1,4 @@
-interface IProductSubcategoryEntity {
+interface IStoreProductSubcategoryEntity {
 	id: number
 	nombreSubcategoria: string
 	categoria: number
@@ -7,7 +7,7 @@ interface IProductSubcategoryEntity {
 	imagenCloudinary: string | null
 }
 
-export class ProductSubcategoryEntity implements IProductSubcategoryEntity {
+export class StoreProductSubcategoryEntity implements IStoreProductSubcategoryEntity {
 	public id: number
 	public nombreSubcategoria: string
 	public categoria: number
@@ -15,7 +15,7 @@ export class ProductSubcategoryEntity implements IProductSubcategoryEntity {
 	public idCloudinary: string | null
 	public imagenCloudinary: string | null
 
-	constructor(data: IProductSubcategoryEntity) {
+	constructor(data: IStoreProductSubcategoryEntity) {
 		this.id = data.id
 		this.nombreSubcategoria = data.nombreSubcategoria
 		this.categoria = data.categoria

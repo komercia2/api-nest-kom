@@ -6,6 +6,7 @@ import {
 	CategoriaProductos,
 	CustomerAccessCode,
 	DescuentoRango,
+	Subcategorias,
 	TiendaBlogs,
 	Tiendas
 } from "src/entities"
@@ -17,14 +18,16 @@ import {
 	GetStoreDiscountsQuery,
 	GetStoreExternalApisQuery,
 	GetStoreInfoQuery,
-	GetStoreProductCategoriesQuery
+	GetStoreProductCategoriesQuery,
+	GetStoreProductSubcategoriesQuery
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
 	PublicStoreBlogController,
 	PublicStoreDiscountController,
 	PublicStoreExternalApiController,
-	PublicStoreProductCategoryController
+	PublicStoreProductCategoryController,
+	PublicStoreProductSubcategoryController
 } from "./infrastructure/controllers/public"
 import { PublicStoreCustomerAccessCodeController } from "./infrastructure/controllers/public/public-store-cutomer-access-code-controller"
 import { PublicStoreInfoController } from "./infrastructure/controllers/public/public-store-info-controller"
@@ -36,13 +39,15 @@ import {
 } from "./infrastructure/repositories"
 import { MySQLStoreCustomerAccessCodeRepository } from "./infrastructure/repositories/mysq-store-customer-repository"
 import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositories/mysq-store-product-category-repository"
+import { MysqlStoreProductSubcategoryRepository } from "./infrastructure/repositories/mysql-store-subcategory-repository"
 import {
 	MySQLStoreBlogService,
 	MySQLStoreCustomerAccessCodeService,
 	MySQLStoreDiscountService,
 	MySQLStoreExternalApiService,
 	MySQLStoreInfoService,
-	MySQLStoreProductCategoryService
+	MySQLStoreProductCategoryService,
+	MysqlStoreProductSubcategoryService
 } from "./infrastructure/services"
 import { StoresInfrastructureInjectionTokens } from "./infrastructure/store-infrastructure-injection-tokens"
 
@@ -70,6 +75,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreProductCategoryRepository,
 		useClass: MySQLStoreProductCategoryRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreProductSubcategoryRepository,
+		useClass: MysqlStoreProductSubcategoryRepository
 	}
 ]
 
@@ -103,6 +112,10 @@ const infrastructure = [
 		useClass: GetStoreProductCategoriesQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreProductSubcategoriesQuery,
+		useClass: GetStoreProductSubcategoriesQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
 		useClass: MySQLStoreExternalApiService
 	},
@@ -125,6 +138,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreProductCategoryService,
 		useClass: MySQLStoreProductCategoryService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreProductSubcategoryService,
+		useClass: MysqlStoreProductSubcategoryService
 	}
 ]
 
@@ -136,7 +153,8 @@ const infrastructure = [
 			TiendaBlogs,
 			CustomerAccessCode,
 			Tiendas,
-			CategoriaProductos
+			CategoriaProductos,
+			Subcategorias
 		])
 	],
 	controllers: [
@@ -145,7 +163,8 @@ const infrastructure = [
 		PublicStoreBlogController,
 		PublicStoreCustomerAccessCodeController,
 		PublicStoreInfoController,
-		PublicStoreProductCategoryController
+		PublicStoreProductCategoryController,
+		PublicStoreProductSubcategoryController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -159,7 +178,8 @@ export class StoresModule implements NestModule {
 				PublicStoreBlogController,
 				PublicStoreCustomerAccessCodeController,
 				PublicStoreInfoController,
-				PublicStoreProductCategoryController
+				PublicStoreProductCategoryController,
+				PublicStoreProductSubcategoryController
 			)
 	}
 }
