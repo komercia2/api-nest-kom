@@ -7,6 +7,7 @@ export enum StoresInfrastructureInjectionTokens {
 	MySQLStoreBlogService = "MySQLStoreBlogService",
 	MySQLStoreCustomerAccessCodeService = "MySQLStoreCustomerAccessCodeService",
 	MysqlStoreInfoService = "MysqlStoreInfoService",
+	MySQLStoreProductCategoryService = "MySQLStoreProductCategoryService",
 
 	/**
 	 * Use cases (queries)
@@ -16,5 +17,6 @@ export enum StoresInfrastructureInjectionTokens {
 	GetPagedStoreBlogsQuery = "GetPagedStoreBlogsQuery",
 	GetStoreBlogByIdQuery = "GetStoreBlogByIdQuery",
 	CheckWithoutAuthQuery = "CheckWithoutAuthQuery",
-	GetStoreInfoQuery = "GetStoreInfoQuery"
+	GetStoreInfoQuery = "GetStoreInfoQuery",
+	GetStoreProductCategoriesQuery = "GetStoreProductCategoriesQuery"
 }

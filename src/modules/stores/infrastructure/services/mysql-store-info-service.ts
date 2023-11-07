@@ -18,19 +18,14 @@ export class MySQLStoreInfoService {
 			.leftJoin("tiendas.redes", "redes")
 			.leftJoin("tiendas.categoria2", "categoria2")
 			.leftJoin("tiendasInfo.paises", "paises")
-			.leftJoin("tiendas.banners", "banners")
-			.leftJoin("tiendas.categoriaProductos", "categoriaProductos")
-			.leftJoin("tiendas.subcategorias", "subcategorias")
-			.leftJoin("tiendas.geolocalizacions", "geolocalizacions")
-			.leftJoin("tiendas.politicas", "politicas")
 			.leftJoin("tiendas.medioPagos", "medios_pago")
 			.leftJoin("tiendas.mediosEnvios", "medios_envios")
 			.leftJoin("tiendas.entidadesTiendas", "pivot")
-			.leftJoin("pivot.entidad", "entidades")
+			// .leftJoin("pivot.entidad", "entidades")
 			.leftJoin("tiendas.disenoModals", "modal")
 			.leftJoin("tiendas.tags", "tags")
 			.leftJoin("tags.tagProperties", "properties")
-			.leftJoin("tiendas.whatsappCheckouts", "whatsapp_checkout")
+			// .leftJoin("tiendas.whatsappCheckouts", "whatsapp_checkout")
 			.where("tiendas.id = :storeId", { storeId })
 			.select([
 				"tiendas.id",
@@ -62,39 +57,39 @@ export class MySQLStoreInfoService {
 				"paises.id",
 				"paises.codigo",
 				"paises.pais",
-				"banners.rutaBanner",
-				"banners.titulo",
-				"banners.descripcion",
-				"banners.redireccion",
-				"categoriaProductos.id",
-				"categoriaProductos.nombreCategoriaProducto",
-				"categoriaProductos.imagenCloudinary",
-				"categoriaProductos.orden",
-				"subcategorias.id",
-				"subcategorias.nombreSubcategoria",
-				"subcategorias.categoria",
-				"subcategorias.imagenCloudinary",
-				"geolocalizacions.id",
-				"geolocalizacions.nombreSede",
-				"geolocalizacions.tienda",
-				"geolocalizacions.direccion",
-				"geolocalizacions.latitud",
-				"geolocalizacions.longitud",
-				"geolocalizacions.ciudad",
-				"geolocalizacions.horario",
-				"geolocalizacions.fotoTienda",
-				"geolocalizacions.createdAt",
-				"geolocalizacions.updatedAt",
-				"geolocalizacions.telefono",
-				"politicas.idTienda",
-				"politicas.envios",
-				"politicas.pagos",
-				"politicas.createdAt",
-				"politicas.updatedAt",
-				"politicas.datos",
-				"politicas.garantia",
-				"politicas.devolucion",
-				"politicas.cambio",
+				// "banners.rutaBanner",
+				// "banners.titulo",
+				// "banners.descripcion",
+				// "banners.redireccion",
+				// "categoriaProductos.id",
+				// "categoriaProductos.nombreCategoriaProducto",
+				// "categoriaProductos.imagenCloudinary",
+				// "categoriaProductos.orden",
+				// "subcategorias.id",
+				// "subcategorias.nombreSubcategoria",
+				// "subcategorias.categoria",
+				// "subcategorias.imagenCloudinary",
+				// "geolocalizacions.id",
+				// "geolocalizacions.nombreSede",
+				// "geolocalizacions.tienda",
+				// "geolocalizacions.direccion",
+				// "geolocalizacions.latitud",
+				// "geolocalizacions.longitud",
+				// "geolocalizacions.ciudad",
+				// "geolocalizacions.horario",
+				// "geolocalizacions.fotoTienda",
+				// "geolocalizacions.createdAt",
+				// "geolocalizacions.updatedAt",
+				// "geolocalizacions.telefono",
+				// "politicas.idTienda",
+				// "politicas.envios",
+				// "politicas.pagos",
+				// "politicas.createdAt",
+				// "politicas.updatedAt",
+				// "politicas.datos",
+				// "politicas.garantia",
+				// "politicas.devolucion",
+				// "politicas.cambio",
 				"medios_pago.idMedios",
 				"medios_pago.convenir",
 				"medios_pago.consignacion",
@@ -124,11 +119,11 @@ export class MySQLStoreInfoService {
 				"medios_envios.idTienda",
 				"medios_envios.createdAt",
 				"medios_envios.updatedAt",
-				"entidades.id",
-				"entidades.nombre",
-				"entidades.logo",
-				"entidades.createdAt",
-				"entidades.updatedAt",
+				// "entidades.id",
+				// "entidades.nombre",
+				// "entidades.logo",
+				// "entidades.createdAt",
+				// "entidades.updatedAt",
 				"pivot.tiendaId",
 				"pivot.entidadId",
 				"modal.id",
@@ -170,12 +165,12 @@ export class MySQLStoreInfoService {
 				"properties.tagId",
 				"properties.createdAt",
 				"properties.updatedAt",
-				"properties.edit",
-				"whatsapp_checkout.id",
-				"whatsapp_checkout.configuration",
-				"whatsapp_checkout.tiendasId",
-				"whatsapp_checkout.createdAt",
-				"whatsapp_checkout.updatedAt"
+				"properties.edit"
+				// "whatsapp_checkout.id",
+				// "whatsapp_checkout.configuration",
+				// "whatsapp_checkout.tiendasId",
+				// "whatsapp_checkout.createdAt",
+				// "whatsapp_checkout.updatedAt"
 			])
 
 		return await productInfoQueryBuilder.getOne()
