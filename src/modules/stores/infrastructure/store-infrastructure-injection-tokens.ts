@@ -9,6 +9,7 @@ export enum StoresInfrastructureInjectionTokens {
 	MysqlStoreInfoService = "MysqlStoreInfoService",
 	MySQLStoreProductCategoryService = "MySQLStoreProductCategoryService",
 	MySQLStoreProductSubcategoryService = "MySQLStoreProductSubcategoryService",
+	MySQLStoreGeolocationService = "MySQLStoreGeolocationService",
 
 	/**
 	 * Use cases (queries)

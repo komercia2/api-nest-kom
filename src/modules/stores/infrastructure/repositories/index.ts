@@ -1,4 +1,5 @@
 export * from "./mysql-store-blog-repository"
 export * from "./mysql-store-discount-repository"
 export * from "./mysql-store-external-api-repository"
+export * from "./mysql-store-geolocation-repository"
 export * from "./mysql-store-info-repository"

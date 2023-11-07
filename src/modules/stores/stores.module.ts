@@ -6,6 +6,7 @@ import {
 	CategoriaProductos,
 	CustomerAccessCode,
 	DescuentoRango,
+	Geolocalizacion,
 	Subcategorias,
 	TiendaBlogs,
 	Tiendas
@@ -17,6 +18,7 @@ import {
 	GetStoreBlogByIdQuery,
 	GetStoreDiscountsQuery,
 	GetStoreExternalApisQuery,
+	GetStoreGeolocationsQuery,
 	GetStoreInfoQuery,
 	GetStoreProductCategoriesQuery,
 	GetStoreProductSubcategoriesQuery
@@ -26,6 +28,7 @@ import {
 	PublicStoreBlogController,
 	PublicStoreDiscountController,
 	PublicStoreExternalApiController,
+	PublicStoreGeolocationController,
 	PublicStoreProductCategoryController,
 	PublicStoreProductSubcategoryController
 } from "./infrastructure/controllers/public"
@@ -35,6 +38,7 @@ import {
 	MySQLStoreBlogRepository,
 	MySQLStoreDiscountRepository,
 	MySQLStoreExternalApiRepository,
+	MySQLStoreGeolocationRepository,
 	MySQLStoreInfoRepository
 } from "./infrastructure/repositories"
 import { MySQLStoreCustomerAccessCodeRepository } from "./infrastructure/repositories/mysq-store-customer-repository"
@@ -45,6 +49,7 @@ import {
 	MySQLStoreCustomerAccessCodeService,
 	MySQLStoreDiscountService,
 	MySQLStoreExternalApiService,
+	MySQLStoreGeolocationService,
 	MySQLStoreInfoService,
 	MySQLStoreProductCategoryService,
 	MysqlStoreProductSubcategoryService
@@ -79,6 +84,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreProductSubcategoryRepository,
 		useClass: MysqlStoreProductSubcategoryRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreGeolocationRepository,
+		useClass: MySQLStoreGeolocationRepository
 	}
 ]
 
@@ -116,6 +125,10 @@ const infrastructure = [
 		useClass: GetStoreProductSubcategoriesQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreGeolocationsQuery,
+		useClass: GetStoreGeolocationsQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
 		useClass: MySQLStoreExternalApiService
 	},
@@ -142,6 +155,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreProductSubcategoryService,
 		useClass: MysqlStoreProductSubcategoryService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreGeolocationService,
+		useClass: MySQLStoreGeolocationService
 	}
 ]
 
@@ -154,7 +171,8 @@ const infrastructure = [
 			CustomerAccessCode,
 			Tiendas,
 			CategoriaProductos,
-			Subcategorias
+			Subcategorias,
+			Geolocalizacion
 		])
 	],
 	controllers: [
@@ -164,7 +182,8 @@ const infrastructure = [
 		PublicStoreCustomerAccessCodeController,
 		PublicStoreInfoController,
 		PublicStoreProductCategoryController,
-		PublicStoreProductSubcategoryController
+		PublicStoreProductSubcategoryController,
+		PublicStoreGeolocationController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -179,7 +198,8 @@ export class StoresModule implements NestModule {
 				PublicStoreCustomerAccessCodeController,
 				PublicStoreInfoController,
 				PublicStoreProductCategoryController,
-				PublicStoreProductSubcategoryController
+				PublicStoreProductSubcategoryController,
+				PublicStoreGeolocationController
 			)
 	}
 }
