@@ -7,6 +7,8 @@ import {
 	CategoriaProductos,
 	CustomerAccessCode,
 	DescuentoRango,
+	Entidades,
+	EntidadesTiendas,
 	Geolocalizacion,
 	Politicas,
 	Subcategorias,
@@ -21,6 +23,7 @@ import {
 	GetStoreBannersQuery,
 	GetStoreBlogByIdQuery,
 	GetStoreDiscountsQuery,
+	GetStoreEntitiesQuery,
 	GetStoreExternalApisQuery,
 	GetStoreGeolocationsQuery,
 	GetStoreInfoQuery,
@@ -34,6 +37,7 @@ import {
 	PublicStoreBannerController,
 	PublicStoreBlogController,
 	PublicStoreDiscountController,
+	PublicStoreEntitiesController,
 	PublicStoreExternalApiController,
 	PublicStoreGeolocationController,
 	PublicStorePoliciesController,
@@ -47,6 +51,7 @@ import {
 	MySQLStoreBannerRepository,
 	MySQLStoreBlogRepository,
 	MySQLStoreDiscountRepository,
+	MySQLStoreEntitiesRepository,
 	MySQLStoreExternalApiRepository,
 	MySQLStoreGeolocationRepository,
 	MySQLStoreInfoRepository,
@@ -61,6 +66,7 @@ import {
 	MySQLStoreBlogService,
 	MySQLStoreCustomerAccessCodeService,
 	MySQLStoreDiscountService,
+	MySQLStoreEntitiesService,
 	MySQLStoreExternalApiService,
 	MySQLStoreGeolocationService,
 	MySQLStoreInfoService,
@@ -115,6 +121,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreWhatsAppCheckoutRepository,
 		useClass: MySQLStoreWhatsappCheckoutRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreEntitiesRepository,
+		useClass: MySQLStoreEntitiesRepository
 	}
 ]
 
@@ -168,6 +178,10 @@ const infrastructure = [
 		useClass: GetStoreWhatsAppCheckoutQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreEntitiesQuery,
+		useClass: GetStoreEntitiesQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
 		useClass: MySQLStoreExternalApiService
 	},
@@ -210,6 +224,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreWhatsAppCheckoutService,
 		useClass: MySQLStoreWhatsappCheckoutService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MysqlStoreEntitiesService,
+		useClass: MySQLStoreEntitiesService
 	}
 ]
 
@@ -226,7 +244,9 @@ const infrastructure = [
 			Geolocalizacion,
 			Politicas,
 			Banners,
-			WhatsappCheckout
+			WhatsappCheckout,
+			Entidades,
+			EntidadesTiendas
 		])
 	],
 	controllers: [
@@ -240,7 +260,8 @@ const infrastructure = [
 		PublicStoreGeolocationController,
 		PublicStorePoliciesController,
 		PublicStoreBannerController,
-		PublicStoreWhatsappCheckoutController
+		PublicStoreWhatsappCheckoutController,
+		PublicStoreEntitiesController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -259,7 +280,8 @@ export class StoresModule implements NestModule {
 				PublicStoreGeolocationController,
 				PublicStorePoliciesController,
 				PublicStoreBannerController,
-				PublicStoreWhatsappCheckoutController
+				PublicStoreWhatsappCheckoutController,
+				PublicStoreEntitiesController
 			)
 	}
 }

@@ -6,7 +6,7 @@ interface IStoreEntitiesEntity {
 	logo: string | null
 	createdAt: Date | null
 	updatedAt: Date | null
-	entidadesTiendas: StoreEntitiesStoresEntity[]
+	entidadesTiendas: StoreEntitiesStoresEntity
 }
 
 export class StoreEntitiesEntity implements IStoreEntitiesEntity {
@@ -15,7 +15,7 @@ export class StoreEntitiesEntity implements IStoreEntitiesEntity {
 	logo: string | null
 	createdAt: Date | null
 	updatedAt: Date | null
-	entidadesTiendas: StoreEntitiesStoresEntity[]
+	entidadesTiendas: StoreEntitiesStoresEntity
 
 	constructor(storeEntities: IStoreEntitiesEntity) {
 		this.id = storeEntities.id

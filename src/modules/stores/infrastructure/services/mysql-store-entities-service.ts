@@ -1,37 +1,41 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Entidades } from "src/entities"
+import { EntidadesTiendas } from "src/entities"
 import { Repository } from "typeorm"
 
-import { StoreEntitiesEntity } from "../../domain/entities"
+import { StoreEntitiesEntity, StoreEntitiesStoresEntity } from "../../domain/entities"
 
 @Injectable()
 export class MySQLStoreEntitiesService {
 	constructor(
-		@InjectRepository(Entidades)
-		private readonly storeEntitiesRepository: Repository<Entidades>
+		@InjectRepository(EntidadesTiendas)
+		private readonly storeEntitiesRepository: Repository<EntidadesTiendas>
 	) {}
 
 	async getStoreEntities(storeId: number) {
-		const entities = await this.storeEntitiesRepository
-			.createQueryBuilder("entidades")
-			.where("entidades.id = :storeId", { storeId })
-			.leftJoinAndSelect("entidades.entidadesTiendas", "entidadesTiendas")
-			.select([
-				"entidades.id",
-				"entidades.nombre",
-				"entidades.logo",
-				"entidades.createdAt",
-				"entidades.updatedAt",
-				"entidadesTiendas.id",
-				"entidadesTiendas.entidadId"
-			])
-			.getMany()
+		const entities = await this.storeEntitiesRepository.find({
+			where: { tiendaId: storeId },
+			relations: ["entidad"],
+			select: {
+				entidad: {
+					id: true,
+					nombre: true,
+					logo: true,
+					createdAt: true,
+					updatedAt: true
+				},
+				tiendaId: true,
+				entidadId: true
+			}
+		})
 
-		return entities
+		return entities.map(this.toEntity)
 	}
 
-	toEntity = (entity: Entidades): StoreEntitiesEntity => ({
-		...entity
+	toEntity = (entity: EntidadesTiendas): StoreEntitiesEntity => ({
+		...entity.entidad,
+		entidadesTiendas: new StoreEntitiesStoresEntity({
+			...entity
+		})
 	})
 }

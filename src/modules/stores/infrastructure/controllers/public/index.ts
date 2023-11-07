@@ -1,6 +1,7 @@
 export * from "./public-store-banner-controller"
 export * from "./public-store-blogs-controller"
 export * from "./public-store-discount-controller"
+export * from "./public-store-entities-controller"
 export * from "./public-store-external-api-controller"
 export * from "./public-store-geolocation-controller"
 export * from "./public-store-policies-controller"
