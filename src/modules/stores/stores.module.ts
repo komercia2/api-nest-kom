@@ -30,6 +30,7 @@ import {
 	GetStorePoliciesQuery,
 	GetStoreProductCategoriesQuery,
 	GetStoreProductSubcategoriesQuery,
+	GetStoresInfoByEntityQuery,
 	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
@@ -180,6 +181,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.GetStoreEntitiesQuery,
 		useClass: GetStoreEntitiesQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.GetStoresInfoByEntityQuery,
+		useClass: GetStoresInfoByEntityQuery
 	},
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,

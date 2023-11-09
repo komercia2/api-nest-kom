@@ -1,13 +1,16 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Tiendas } from "src/entities"
+import { EntidadesTiendas, Tiendas } from "src/entities"
 import { Repository } from "typeorm"
 
 @Injectable()
 export class MySQLStoreInfoService {
 	constructor(
 		@InjectRepository(Tiendas)
-		private readonly storeInfoRepository: Repository<Tiendas>
+		private readonly storeInfoRepository: Repository<Tiendas>,
+
+		@InjectRepository(EntidadesTiendas)
+		private readonly storeEntityRepository: Repository<EntidadesTiendas>
 	) {}
 
 	async getStoreInfo(storeId: number) {
@@ -126,5 +129,26 @@ export class MySQLStoreInfoService {
 			])
 
 		return await productInfoQueryBuilder.getOne()
+	}
+
+	async getStoresInfoByEntityId(entityId: number) {
+		const storesInfoByEntity = await this.storeEntityRepository
+			.createQueryBuilder("entidades_tiendas")
+			.innerJoin("entidades_tiendas.tienda", "tienda")
+			.leftJoin("tienda.tiendasInfo", "info")
+			.leftJoin("tienda.categoria2", "categoria")
+			.where("entidades_tiendas.entidadId = :entityId", { entityId })
+			.select([
+				"tienda.id",
+				"tienda.subdominio",
+				"tienda.fachada",
+				"tienda.logo",
+				"info.dominio",
+				"categoria.id",
+				"categoria.nombreCategoria"
+			])
+			.getRawMany()
+
+		return storesInfoByEntity
 	}
 }

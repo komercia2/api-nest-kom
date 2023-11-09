@@ -1,5 +1,5 @@
 import { Inject } from "@nestjs/common"
-import { Tiendas } from "src/entities"
+import { EntidadesTiendas, Tiendas } from "src/entities"
 
 import { IStoreInfoRepository } from "../../domain/repositories"
 import { MySQLStoreInfoService } from "../services"
@@ -10,6 +10,10 @@ export class MySQLStoreInfoRepository implements IStoreInfoRepository {
 		@Inject(StoresInfrastructureInjectionTokens.MysqlStoreInfoService)
 		private readonly storeInfoService: MySQLStoreInfoService
 	) {}
+
+	async getStoresInfoByEntityId(entityId: number): Promise<EntidadesTiendas[]> {
+		return await this.storeInfoService.getStoresInfoByEntityId(entityId)
+	}
 
 	async getStoreInfo(storeId: number): Promise<Tiendas | null> {
 		return await this.storeInfoService.getStoreInfo(storeId)

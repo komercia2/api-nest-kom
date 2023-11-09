@@ -30,5 +30,6 @@ export enum StoresInfrastructureInjectionTokens {
 	GetStorePoliciesQuery = "GetStorePoliciesQuery",
 	GetStoreBannersQuery = "GetStoreBannersQuery",
 	GetStoreWhatsAppCheckoutQuery = "GetStoreWhatsAppCheckoutQuery",
-	GetStoreEntitiesQuery = "GetStoreEntitiesQuery"
+	GetStoreEntitiesQuery = "GetStoreEntitiesQuery",
+	GetStoresInfoByEntityQuery = "GetStoresInfoByEntityQuery"
 }
