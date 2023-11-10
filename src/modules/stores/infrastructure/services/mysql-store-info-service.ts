@@ -140,9 +140,11 @@ export class MySQLStoreInfoService {
 			.where("entidades_tiendas.entidadId = :entityId", { entityId })
 			.select([
 				"tienda.id",
+				"tienda.nombre",
 				"tienda.subdominio",
 				"tienda.fachada",
 				"tienda.logo",
+				"tienda.estado",
 				"info.dominio",
 				"categoria.id",
 				"categoria.nombreCategoria"
