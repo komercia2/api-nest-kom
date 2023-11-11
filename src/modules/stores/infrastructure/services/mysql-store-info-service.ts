@@ -27,6 +27,7 @@ export class MySQLStoreInfoService {
 			.leftJoin("tiendas.tags", "tags")
 			.leftJoin("tags.tagProperties", "properties")
 			.where("tiendas.id = :storeId", { storeId })
+			.andWhere("modal.stateModal = 0")
 			.select([
 				"tiendas.id",
 				"tiendas.ciudad",
