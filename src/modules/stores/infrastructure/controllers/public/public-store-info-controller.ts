@@ -3,7 +3,11 @@ import { Get } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
-import { GetStoreInfoQuery, GetStoresInfoByEntityQuery } from "src/modules/stores/application/query"
+import {
+	GetStoreEntityQuery,
+	GetStoreInfoQuery,
+	GetStoresInfoByEntityQuery
+} from "src/modules/stores/application/query"
 
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
@@ -14,7 +18,10 @@ export class PublicStoreInfoController {
 		private readonly getStoreInfoQuery: GetStoreInfoQuery,
 
 		@Inject(StoresInfrastructureInjectionTokens.GetStoresInfoByEntityQuery)
-		private readonly getStoresInfoByEntityQuery: GetStoresInfoByEntityQuery
+		private readonly getStoresInfoByEntityQuery: GetStoresInfoByEntityQuery,
+
+		@Inject(StoresInfrastructureInjectionTokens.GetStoreEntityQuery)
+		private readonly getStoreEntityQuery: GetStoreEntityQuery
 	) {}
 
 	@Get("/:storeId")
@@ -57,6 +64,29 @@ export class PublicStoreInfoController {
 			return handlerHttpResponse(res, {
 				data: null,
 				message: "Error fetching external apis for store",
+				success: false,
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+			})
+		}
+	}
+
+	@Get("/my-entity/:storeId")
+	async getStoreEntity(@Req() req: Request, @Res() res: Response) {
+		try {
+			const storeId = Number(req.params.storeId)
+			const storeEntity = await this.getStoreEntityQuery.execute(storeId)
+
+			return handlerHttpResponse(res, {
+				data: storeEntity,
+				message: "Store entity fetched successfully",
+				success: true,
+				statusCode: HttpStatus.OK
+			})
+		} catch (error) {
+			console.log(error)
+			return handlerHttpResponse(res, {
+				data: null,
+				message: "Error fetching store entity",
 				success: false,
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
 			})

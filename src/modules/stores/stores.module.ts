@@ -24,6 +24,7 @@ import {
 	GetStoreBlogByIdQuery,
 	GetStoreDiscountsQuery,
 	GetStoreEntitiesQuery,
+	GetStoreEntityQuery,
 	GetStoreExternalApisQuery,
 	GetStoreGeolocationsQuery,
 	GetStoreInfoQuery,
@@ -185,6 +186,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.GetStoresInfoByEntityQuery,
 		useClass: GetStoresInfoByEntityQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreEntityQuery,
+		useClass: GetStoreEntityQuery
 	},
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,

@@ -154,4 +154,16 @@ export class MySQLStoreInfoService {
 
 		return storesInfoByEntity
 	}
+
+	async getStoreEntity(storeId: number) {
+		const storeEntity = await this.storeEntityRepository
+			.createQueryBuilder("entidades_tiendas")
+			.innerJoin("entidades_tiendas.tienda", "tienda")
+			.leftJoin("entidades_tiendas.entidad", "entidad")
+			.where("tienda.id = :storeId", { storeId })
+			.select(["entidad.id", "entidad.nombre"])
+			.getRawOne()
+		console.log(storeEntity)
+		return storeEntity
+	}
 }
