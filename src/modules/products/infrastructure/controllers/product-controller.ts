@@ -61,7 +61,7 @@ export class ProductController {
 				handlerHttpResponse(res, {
 					data: null,
 					message: "No products found",
-					statusCode: HttpStatus.OK,
+					statusCode: HttpStatus.NOT_FOUND,
 					success: true
 				})
 				return
