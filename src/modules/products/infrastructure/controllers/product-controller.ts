@@ -57,6 +57,16 @@ export class ProductController {
 			})
 			const { count, publicProductList, priceLimit, priceMinimum } = products
 
+			if (!publicProductList.length) {
+				handlerHttpResponse(res, {
+					data: null,
+					message: "No products found",
+					statusCode: HttpStatus.OK,
+					success: true
+				})
+				return
+			}
+
 			handlerHttpResponse(res, {
 				data: { publicProductList, page, limit, count, priceLimit, priceMinimum },
 				message: "Paginated products",

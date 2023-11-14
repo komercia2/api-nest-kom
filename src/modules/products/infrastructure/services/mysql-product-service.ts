@@ -166,6 +166,10 @@ export class MySQLProductService {
 
 		const publicProductList = await queryBuilder.getRawMany()
 
+		if (!publicProductList.length) {
+			return { publicProductList: [], count, priceLimit: 0, priceMinimum: 0 }
+		}
+
 		const paginatedProducts = paginateArray(publicProductList, page, limit)
 
 		const priceLimit = publicProductList.reduce((prev, curr) =>
