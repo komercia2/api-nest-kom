@@ -20,6 +20,7 @@ export class Template15Banner2 {
 	color_bg_btn_2: string
 	url_redirect_2: string
 	visible_btn_2: boolean
+	imgBg_res: string
 
 	constructor(
 		background_color_1 = banner2Settings["--background_color_1"],
@@ -39,7 +40,8 @@ export class Template15Banner2 {
 		text_btn_2 = banner2Settings.text_btn_2,
 		color_text_btn_2 = banner2Settings.color_text_btn_2,
 		color_bg_btn_2 = banner2Settings.color_bg_btn_2,
-		url_redirect_2 = banner2Settings.url_redirect_2
+		url_redirect_2 = banner2Settings.url_redirect_2,
+		imgBg_res = banner2Settings.imgBg_res
 	) {
 		this["--background_color_1"] = background_color_1
 		this.imgBg = imgBg
@@ -59,5 +61,6 @@ export class Template15Banner2 {
 		this.color_text_btn_2 = color_text_btn_2
 		this.color_bg_btn_2 = color_bg_btn_2
 		this.url_redirect_2 = url_redirect_2
+		this.imgBg_res = imgBg_res
 	}
 }

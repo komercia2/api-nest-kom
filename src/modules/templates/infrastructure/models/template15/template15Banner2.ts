@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 
-@Schema({ _id: false })
+@Schema({ _id: false, strict: false })
 export class Template15Banner2 {
 	@Prop({ required: true })
 	"--background_color_1": string
@@ -58,6 +58,9 @@ export class Template15Banner2 {
 
 	@Prop({ required: true, type: Boolean })
 	visible_btn_2: boolean
+
+	@Prop({ required: true })
+	imgBg_res: string
 }
 
 export const Template15Banner2Schema = SchemaFactory.createForClass(Template15Banner2)
