@@ -16,7 +16,7 @@ export class MySQLStoreInfoService {
 	async getStoreInfo(storeId: number) {
 		const productInfoQueryBuilder = this.storeInfoRepository
 			.createQueryBuilder("tiendas")
-			.innerJoin("tiendas.tiendasInfo", "tiendasInfo")
+			.leftJoin("tiendas.tiendasInfo", "tiendasInfo")
 			.leftJoin("tiendas.tiendasPages", "tiendasPages")
 			.leftJoin("tiendas.redes", "redes")
 			.leftJoin("tiendas.categoria2", "categoria2")
@@ -27,7 +27,8 @@ export class MySQLStoreInfoService {
 			.leftJoin("tiendas.tags", "tags")
 			.leftJoin("tags.tagProperties", "properties")
 			.where("tiendas.id = :storeId", { storeId })
-			.andWhere("modal.stateModal = 0")
+			.andWhere("(modal.stateModal = 0 OR modal.stateModal IS NULL OR modal.stateModal = 1)")
+			// .andWhere("modal.stateModal = 0")
 			.select([
 				"tiendas.id",
 				"tiendas.ciudad",
