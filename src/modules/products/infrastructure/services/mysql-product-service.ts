@@ -44,6 +44,7 @@ export class MySQLProductService {
 			tagPropertyId,
 			withVariants,
 			topSales,
+			favorite,
 			alphabetic
 		} = data
 		const queryBuilder = this.productRepository
@@ -156,6 +157,10 @@ export class MySQLProductService {
 				.leftJoin("productos.productosCarritos", "productos_carritos")
 				.groupBy("productos.id")
 				.orderBy("COUNT(productos_carritos.producto)", "DESC")
+		}
+
+		if (String(favorite) === "1") {
+			queryBuilder.andWhere("productos.favorito = :favorite", { favorite })
 		}
 
 		if (alphabetic) {

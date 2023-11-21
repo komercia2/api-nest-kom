@@ -15,6 +15,7 @@ export interface IProductFilterDTO {
 	tagPropertyId: number
 	withVariants: boolean
 	topSales: boolean
+	favorite: number
 	alphabetic: "ASC" | "DESC"
 }
 

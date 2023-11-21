@@ -35,6 +35,7 @@ export class ProductController {
 		@Query("tag") tagPropertyId: number,
 		@Query("variants") withVariants: boolean,
 		@Query("top-sales") topSales: boolean,
+		@Query("favorite") favorite: number,
 		@Query("alphabetic") alphabetic: "ASC" | "DESC"
 	) {
 		try {
@@ -53,7 +54,8 @@ export class ProductController {
 				tagPropertyId,
 				withVariants,
 				topSales,
-				alphabetic
+				alphabetic,
+				favorite
 			})
 			const { count, publicProductList, priceLimit, priceMinimum } = products
 
