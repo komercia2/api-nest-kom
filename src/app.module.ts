@@ -13,6 +13,7 @@ import { LoggerModule } from "nestjs-pino"
 import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
 import { CommonModule } from "./modules/common/common.module"
+import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
 import { StoresModule } from "./modules/stores/stores.module"
 
@@ -39,7 +40,8 @@ import { StoresModule } from "./modules/stores/stores.module"
 		ProductModule,
 		TemplatesModule,
 		CommonModule,
-		StoresModule
+		StoresModule,
+		PaymentsModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

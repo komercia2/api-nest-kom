@@ -4,6 +4,7 @@ import { TemplatesModule } from "@templates/templates.module"
 import { AppModule } from "src/app.module"
 import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.module"
 import { CommonModule } from "src/modules/common/common.module"
+import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
 import { StoresModule } from "src/modules/stores/stores.module"
 
@@ -38,6 +39,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/common`,
 		module: CommonModule
+	},
+	{
+		path: `${apiVersions.v1}/payments`,
+		module: PaymentsModule
 	}
 ]
 
