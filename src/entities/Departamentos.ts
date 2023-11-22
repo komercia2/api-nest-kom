@@ -1,5 +1,14 @@
-import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+import {
+	Column,
+	Entity,
+	Index,
+	JoinColumn,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn
+} from "typeorm"
 
+import { Ciudades } from "./Ciudades"
 import { Paises } from "./Paises"
 
 @Index("departamentos_paises_id_foreign", ["paisesId"], {})
@@ -13,6 +22,9 @@ export class Departamentos {
 
 	@Column("int", { name: "paises_id", unsigned: true, default: () => "'1'" })
 	paisesId: number
+
+	@OneToMany(() => Ciudades, (ciudad) => ciudad.departamento)
+	ciudades: Ciudades[]
 
 	@ManyToOne(() => Paises, (paises) => paises.departamentos, {
 		onDelete: "CASCADE",

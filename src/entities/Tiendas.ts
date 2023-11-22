@@ -242,7 +242,7 @@ export class Tiendas {
 	@OneToMany(() => Proveedores, (proveedores) => proveedores.tienda)
 	proveedores: Proveedores[]
 
-	@OneToOne(() => Redes, (redes) => redes.id)
+	@OneToOne(() => Redes, (redes) => redes.tiendas)
 	redes: Redes
 
 	@OneToMany(

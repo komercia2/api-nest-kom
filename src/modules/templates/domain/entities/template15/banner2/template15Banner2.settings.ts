@@ -18,5 +18,7 @@ export const banner2Settings = {
 	color_text_btn_2: "#000000",
 	color_bg_btn_2: "#FFFFFF",
 	url_redirect_2: "/productos",
-	visible_btn_2: true
+	visible_btn_2: true,
+	imgBg_res:
+		"https://res.cloudinary.com/komerciaacademico/image/upload/v1699387132/template15/bg-1_tzi2i2_qbqx48_yusci6.jpg"
 }

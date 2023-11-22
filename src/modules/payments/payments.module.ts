@@ -1,0 +1,48 @@
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common"
+import { TypeOrmModule } from "@nestjs/typeorm"
+import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
+import { Carritos, TiendaMercadoPagoInfo } from "src/entities"
+
+import { ProccessPaymentCommand } from "./application/command"
+import { PaymentsApplicationInjectionToken } from "./application/payments-application-injection-token"
+import { CreateMercadopagoPreferenceQuery } from "./application/query"
+import { PublicMercadopagoController } from "./infrastructure/controllers/public"
+import { PaymentsInfrastructureInjectionTokens } from "./infrastructure/payments-infrastructure-injection-token"
+import { MercadopagoRepository } from "./infrastructure/repositories"
+import { MySQLMercadopagoService } from "./infrastructure/services"
+
+const application = [
+	{
+		provide: PaymentsInfrastructureInjectionTokens.CreateMercadopagoPreferenceQuery,
+		useClass: CreateMercadopagoPreferenceQuery
+	},
+	{
+		provide: PaymentsInfrastructureInjectionTokens.ProccessPaymentCommand,
+		useClass: ProccessPaymentCommand
+	}
+]
+
+const infrastructure = [
+	{
+		provide: PaymentsApplicationInjectionToken.IMercadopagoRepository,
+		useClass: MercadopagoRepository
+	},
+	{
+		provide: PaymentsInfrastructureInjectionTokens.MySQLMercadopagoService,
+		useClass: MySQLMercadopagoService
+	}
+]
+
+@Module({
+	imports: [TypeOrmModule.forFeature([Carritos, TiendaMercadoPagoInfo])],
+	controllers: [PublicMercadopagoController],
+	providers: [...application, ...infrastructure]
+})
+export class PaymentsModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+		consumer
+			.apply(PublicApiKeyAuthMiddleware)
+			.exclude({ path: "v1/payments/mercadopago/webhook", method: RequestMethod.POST })
+			.forRoutes({ path: "v1/payments/mercadopago/create-preference", method: RequestMethod.POST })
+	}
+}

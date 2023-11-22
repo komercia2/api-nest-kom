@@ -9,8 +9,8 @@ export class FindTemplateIdByCriteriaQuery {
 		private readonly websiteRepository: IWebSitesRepository
 	) {}
 
-	async execute(criteria: string) {
-		const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria)
+	async execute(criteria: string, isDomain: boolean) {
+		const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria, isDomain)
 
 		if (!templateId) throw new Error("Template not found")
 

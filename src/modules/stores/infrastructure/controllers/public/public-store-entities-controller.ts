@@ -1,0 +1,38 @@
+import { HttpStatus, Inject, Req, Res } from "@nestjs/common"
+import { Get } from "@nestjs/common"
+import { Controller } from "@nestjs/common"
+import { handlerHttpResponse } from "@shared/infrastructure/handlers"
+import { Request, Response } from "express"
+
+import { GetStoreEntitiesQuery } from "../../../application/query"
+import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
+
+@Controller("entities")
+export class PublicStoreEntitiesController {
+	constructor(
+		@Inject(StoresInfrastructureInjectionTokens.GetStoreEntitiesQuery)
+		private readonly getStoreEntitiesQuery: GetStoreEntitiesQuery
+	) {}
+
+	@Get("/:storeId")
+	async getStoreEntities(@Req() req: Request, @Res() res: Response) {
+		try {
+			const storeId = Number(req.params.storeId)
+			const storeEntities = await this.getStoreEntitiesQuery.execute(storeId)
+			return handlerHttpResponse(res, {
+				data: storeEntities,
+				message: "Store entities fetched successfully",
+				success: true,
+				statusCode: HttpStatus.OK
+			})
+		} catch (error) {
+			console.log(error)
+			return handlerHttpResponse(res, {
+				data: null,
+				message: "Error fetching store entities",
+				success: false,
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+			})
+		}
+	}
+}

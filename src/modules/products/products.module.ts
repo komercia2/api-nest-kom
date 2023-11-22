@@ -1,13 +1,16 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
+import { MulterModule } from "@nestjs/platform-express"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
-import { Productos } from "src/entities"
+import { Productos, VisitaProducto } from "src/entities"
 
 import { ProductsApplicationInjectionTokens } from "./application/application-injection-tokens"
+import { CreateFromFileCommand } from "./application/command"
 import { GetPaginatedProductsQuery, GetProductBySlugQuery } from "./application/query"
-import { ProductController } from "./infrastructure/controllers"
+import { AdminProductController, ProductController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection-tokens"
-import { MySQLProductService } from "./infrastructure/services"
+import { MySQLProductService, XlsxProductService } from "./infrastructure/services"
 
 const application = [
 	{
@@ -17,6 +20,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.GetProductBySlugQuery,
 		useClass: GetProductBySlugQuery
+	},
+	{
+		provide: InfrastructureInjectionTokens.CreateFromFileCommand,
+		useClass: CreateFromFileCommand
 	}
 ]
 
@@ -28,16 +35,21 @@ const infrastructure = [
 	{
 		provide: ProductsApplicationInjectionTokens.IProductRepository,
 		useClass: MySQLProductService
+	},
+	{
+		provide: InfrastructureInjectionTokens.XlsxProductService,
+		useClass: XlsxProductService
 	}
 ]
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Productos])],
-	controllers: [ProductController],
+	imports: [TypeOrmModule.forFeature([Productos, VisitaProducto]), MulterModule.register()],
+	controllers: [ProductController, AdminProductController],
 	providers: [...application, ...infrastructure]
 })
 export class ProductModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
 		consumer.apply(PublicApiKeyAuthMiddleware).forRoutes(ProductController)
+		consumer.apply(LaravelAuthMiddleware).forRoutes(AdminProductController)
 	}
 }

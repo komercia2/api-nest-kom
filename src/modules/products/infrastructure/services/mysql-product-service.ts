@@ -1,16 +1,32 @@
-import { Injectable } from "@nestjs/common"
+import { Inject, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Productos } from "src/entities"
+import { paginateArray } from "@shared/infrastructure/utils"
+import {
+	Productos,
+	ProductosInfo,
+	ProductosVariantes,
+	ProductosVariantesCombinaciones,
+	VisitaProducto
+} from "src/entities"
 import { Repository } from "typeorm"
 
 import { IProductFilterDTO } from "../../domain/repositories"
+import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
+import { productDefaultValues } from "../typings"
+import { XlsxProductService } from "./xlsxl-product-service"
 
 @Injectable()
 export class MySQLProductService {
 	private readonly delimiter = "-"
 
 	constructor(
-		@InjectRepository(Productos) private readonly productRepository: Repository<Productos>
+		@InjectRepository(Productos) private readonly productRepository: Repository<Productos>,
+
+		@InjectRepository(VisitaProducto)
+		private readonly visitProductRepository: Repository<VisitaProducto>,
+
+		@Inject(InfrastructureInjectionTokens.XlsxProductService)
+		private readonly xlsxService: XlsxProductService
 	) {}
 	async getPagedProducts(data: IProductFilterDTO) {
 		const {
@@ -26,7 +42,10 @@ export class MySQLProductService {
 			promotion,
 			subcategory,
 			tagPropertyId,
-			withVariants
+			withVariants,
+			topSales,
+			favorite,
+			alphabetic
 		} = data
 		const queryBuilder = this.productRepository
 			.createQueryBuilder("productos")
@@ -94,8 +113,6 @@ export class MySQLProductService {
 			])
 			.groupBy("productos.id")
 			.orderBy("productos.orden", "DESC")
-			.limit(limit)
-			.offset((page - 1) * limit)
 
 		if (name) {
 			const cleanName = name.toLowerCase().trim()
@@ -135,15 +152,43 @@ export class MySQLProductService {
 			queryBuilder.andWhere("productos.conVariante = :withVariants", { withVariants })
 		}
 
+		if (String(topSales) === "1") {
+			queryBuilder
+				.leftJoin("productos.productosCarritos", "productos_carritos")
+				.groupBy("productos.id")
+				.orderBy("COUNT(productos_carritos.producto)", "DESC")
+		}
+
+		if (String(favorite) === "1") {
+			queryBuilder.andWhere("productos.favorito = :favorite", { favorite })
+		}
+
+		if (alphabetic) {
+			queryBuilder.orderBy("productos.nombre", alphabetic)
+		}
+
 		const count = await queryBuilder.getCount()
 
 		const publicProductList = await queryBuilder.getRawMany()
+
+		if (!publicProductList.length) {
+			return { publicProductList: [], count, priceLimit: 0, priceMinimum: 0 }
+		}
+
+		const paginatedProducts = paginateArray(publicProductList, page, limit)
 
 		const priceLimit = publicProductList.reduce((prev, curr) =>
 			prev.precio > curr.precio ? prev : curr
 		).precio
 
-		return { publicProductList, count, priceLimit }
+		const priceMinimum = publicProductList.reduce((prev, curr) => {
+			if (prev.precio < curr.precio) {
+				return prev
+			}
+			return curr
+		}).precio
+
+		return { publicProductList: paginatedProducts, count, priceLimit, priceMinimum }
 	}
 
 	async getProductBySlug(slug: string) {
@@ -160,6 +205,8 @@ export class MySQLProductService {
 			.leftJoinAndSelect("product.subcategoria2", "subcategoria_producto")
 			.getOne()
 
+		await this.increaseProductVisits(productId)
+
 		if (product && product.productosVariantes.length > 0) {
 			const { productosVariantes, ...rest } = product
 			const combinaciones = productosVariantes.map(
@@ -171,10 +218,114 @@ export class MySQLProductService {
 
 		if (product) {
 			const { productosVariantes: _, ...rest } = product
+
 			return { ...rest, combinaciones: [], productosVariantes: [] }
 		}
 
 		return product
+	}
+
+	async increaseProductVisits(productId: number) {
+		await this.visitProductRepository.update(
+			{ productoId: productId },
+			{ numeroVisitas: () => "numeroVisitas + 1" }
+		)
+	}
+
+	async createFromFile(storeId: number, file: Express.Multer.File) {
+		const LOG_IDENTITY = "MySQLProductService:createFromFile"
+
+		const queryRunner = this.productRepository.manager.connection.createQueryRunner()
+		await queryRunner.connect()
+		await queryRunner.startTransaction()
+
+		try {
+			const data = await this.xlsxService.createFromFile(file)
+
+			const productosBatch: Productos[] = []
+			const productosInfoBatch: ProductosInfo[] = []
+			const productosVariantesBatch: ProductosVariantes[] = []
+			const productosVariantesCombinacionesBatch: ProductosVariantesCombinaciones[] = []
+
+			const { productDataDefault, productosInfoDefault } = productDefaultValues
+
+			for (const importedProduct of data) {
+				const productos = new Productos()
+				productos.tienda = storeId
+				productos.nombre = importedProduct.nombre
+				productos.categoriaProducto = productDataDefault.categoriaProducto
+				productos.subcategoria = productDataDefault.subcategoria
+				productos.precio = importedProduct.precio_sin_variantes
+				productos.foto = productDataDefault.foto
+				productos.activo = productDataDefault.activo
+				productos.disponibilidad = productDataDefault.disponibilidad
+				productos.fotoCloudinary = productDataDefault.fotoCloudinary
+				productos.idCloudinary = productDataDefault.idCloudinary
+				productos.valorCompra = productDataDefault.valorCompra
+				productos.conVariante = productDataDefault.conVariante
+				productos.tag = productDataDefault.tag
+				productos.favorito = productDataDefault.favorito
+				productos.envioGratis = importedProduct.envio_gratis
+				productos.orden = productDataDefault.orden
+				productosBatch.push(productos)
+
+				const productosVariantes = new ProductosVariantes()
+				productosVariantes.idProducto2 = productos
+				productosVariantes.variantes = productDataDefault.variantes
+				productosVariantesBatch.push(productosVariantes)
+
+				const productosVariantesCombinaciones = new ProductosVariantesCombinaciones()
+				productosVariantesCombinaciones.idProductosVariantes2 = productosVariantes
+				productosVariantesCombinaciones.combinaciones = productDataDefault.variantesCombinaciones
+				productosVariantesCombinacionesBatch.push(productosVariantesCombinaciones)
+
+				const productosInfo = new ProductosInfo()
+				productosInfo.marca = importedProduct.marca
+				productosInfo.sku = importedProduct.sku
+				productosInfo.peso = importedProduct.peso
+				productosInfo.descripcion = importedProduct.descripcion
+				productosInfo.inventario = importedProduct.unidades
+				productosInfo.garantia = importedProduct.garantia
+				productosInfo.video = importedProduct.video_youtube
+				productosInfo.visitas = productosInfoDefault.visitas
+				productosInfo.positiva = productosInfoDefault.positiva
+				productosInfo.negativa = productosInfoDefault.negativa
+				productosInfo.proveedoresId = productosInfoDefault.proveedoresId
+				productosInfo.codigoBarras = productosInfoDefault.codigoBarras
+				productosInfo.codigoQr = productosInfoDefault.codigoQr
+				productosInfo.productos = productos
+				productosInfoBatch.push(productosInfo)
+			}
+
+			await queryRunner.manager.insert(Productos, productosBatch)
+
+			const ids = productosBatch.map((producto) => producto.id)
+
+			await queryRunner.manager
+				.createQueryBuilder()
+				.update(Productos)
+				.set({ slug: () => `CONCAT(LOWER(REPLACE(nombre, ' ', '-')), '${this.delimiter}', id)` })
+				.where("id IN (:...ids)", { ids })
+				.execute()
+
+			await queryRunner.manager.insert(ProductosInfo, productosInfoBatch)
+			await queryRunner.manager.insert(ProductosVariantes, productosVariantesBatch)
+			await queryRunner.manager.insert(
+				ProductosVariantesCombinaciones,
+				productosVariantesCombinacionesBatch
+			)
+
+			await queryRunner.commitTransaction()
+
+			return true
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			console.log(`${LOG_IDENTITY}: Rollback transaction`)
+			throw error
+		} finally {
+			console.log(`${LOG_IDENTITY}: Release connection`)
+			await queryRunner.release()
+		}
 	}
 
 	private getSlug(slug: string) {

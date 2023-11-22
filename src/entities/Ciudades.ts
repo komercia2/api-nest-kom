@@ -1,5 +1,14 @@
-import { Column, Entity, Index, OneToMany, PrimaryGeneratedColumn } from "typeorm"
+import {
+	Column,
+	Entity,
+	Index,
+	JoinColumn,
+	ManyToOne,
+	OneToMany,
+	PrimaryGeneratedColumn
+} from "typeorm"
 
+import { Departamentos } from "./Departamentos"
 import { DireccionesUsuario } from "./DireccionesUsuario"
 import { Tiendas } from "./Tiendas"
 import { Users } from "./Users"
@@ -19,6 +28,10 @@ export class Ciudades {
 
 	@Column("varchar", { name: "codigo_dane", nullable: true, length: 255 })
 	codigoDane: string | null
+
+	@ManyToOne(() => Departamentos, (departamento) => departamento.ciudades)
+	@JoinColumn({ name: "dep" })
+	departamento: Departamentos
 
 	@OneToMany(() => DireccionesUsuario, (direccionesUsuario) => direccionesUsuario.ciudad)
 	direccionesUsuarios: DireccionesUsuario[]

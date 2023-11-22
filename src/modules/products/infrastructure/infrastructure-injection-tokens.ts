@@ -1,5 +1,7 @@
 export enum InfrastructureInjectionTokens {
 	MySQLProductService = "MySQLProductService",
+	XlsxProductService = "XlsxProductService",
 	GetPaginatedProductsQuery = "GetPaginatedProductsQuery",
-	GetProductBySlugQuery = "GetProductByIdQuery"
+	GetProductBySlugQuery = "GetProductByIdQuery",
+	CreateFromFileCommand = "createFromFileCommand"
 }

@@ -33,7 +33,10 @@ export class ProductController {
 		@Query("max-price") maxPrice: number,
 		@Query("min-price") minPrice: number,
 		@Query("tag") tagPropertyId: number,
-		@Query("variants") withVariants: boolean
+		@Query("variants") withVariants: boolean,
+		@Query("top-sales") topSales: boolean,
+		@Query("favorite") favorite: number,
+		@Query("alphabetic") alphabetic: "ASC" | "DESC"
 	) {
 		try {
 			const products = await this.getPaginatedProductsQuery.execute({
@@ -49,12 +52,25 @@ export class ProductController {
 				maxPrice,
 				minPrice,
 				tagPropertyId,
-				withVariants
+				withVariants,
+				topSales,
+				alphabetic,
+				favorite
 			})
-			const { count, publicProductList, priceLimit } = products
+			const { count, publicProductList, priceLimit, priceMinimum } = products
+
+			if (!publicProductList.length) {
+				handlerHttpResponse(res, {
+					data: null,
+					message: "No products found",
+					statusCode: HttpStatus.NO_CONTENT,
+					success: true
+				})
+				return
+			}
 
 			handlerHttpResponse(res, {
-				data: { publicProductList, page, limit, count, priceLimit },
+				data: { publicProductList, page, limit, count, priceLimit, priceMinimum },
 				message: "Paginated products",
 				statusCode: HttpStatus.OK,
 				success: true
@@ -82,7 +98,6 @@ export class ProductController {
 			})
 			return
 		} catch (error) {
-			console.log(error)
 			handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting product by id",

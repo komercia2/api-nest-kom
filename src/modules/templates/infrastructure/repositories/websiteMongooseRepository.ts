@@ -16,7 +16,7 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 		@Inject(InfrastructureInjectionTokens.WebSiteMockService)
 		private readonly webSiteMockService: WebSiteMockService,
 
-		@Inject(InfrastructureInjectionTokens.MySqlTemplatesService)
+		@Inject(InfrastructureInjectionTokens.MySqlTemplatesRepository)
 		private readonly mysqlTemplatesService: MysqlTemplatesService
 	) {}
 
@@ -62,8 +62,8 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 		return await this.websiteMongooseService.verifySubDomainAvailability(subdomain)
 	}
 
-	async findTemplateIdByCriteria(criteria: string): Promise<string | null> {
-		return await this.websiteMongooseService.findTemplateIdByCriteria(criteria)
+	async findTemplateIdByCriteria(criteria: string, isDomain: boolean): Promise<string | null> {
+		return await this.websiteMongooseService.findTemplateIdByCriteria(criteria, isDomain)
 	}
 
 	async checkIfStoreHasMainWebSite(storeId: number): Promise<boolean> {

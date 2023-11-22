@@ -7,7 +7,7 @@ export interface IWebSitesRepository {
 	checkDomainAvailability(domain: string): Promise<boolean>
 	checkSubdomainAvailability(subdomain: string): Promise<boolean>
 	checkIfStoreHasMainWebSite(storeId: number): Promise<boolean>
-	findTemplateIdByCriteria(criteria: string): Promise<string | null>
+	findTemplateIdByCriteria(criteria: string, isDomain: boolean): Promise<string | null>
 	findMySQLTemplateByCriteria(criteria: string, isDomain: boolean): Promise<IStoreInfo | null>
 	findTemplateRepository(templateNumber: number): Promise<TemplateRepository | null>
 	getWebSite(target: string | null, criteria?: string): Promise<WebSiteEntity | IStoreInfo | null>
