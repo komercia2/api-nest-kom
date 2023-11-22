@@ -1,14 +1,14 @@
 interface IMercadopagoPreferenceEntity {
 	preferenceId: string
-	publicId: string
+	init_point: string
 }
 
 export class MercadopagoPreferenceEntity implements IMercadopagoPreferenceEntity {
 	public preferenceId: string
-	public publicId: string
+	public init_point: string
 
 	constructor(data: IMercadopagoPreferenceEntity) {
 		this.preferenceId = data.preferenceId
-		this.publicId = data.publicId
+		this.init_point = data.init_point
 	}
 }
