@@ -93,10 +93,10 @@ interface ILaravelAuthData {
 	}
 }
 
-interface IAuth {
+export interface IAuth {
 	id: number
 }
 
-interface ILaravelAuthResponse {
+export interface ILaravelAuthResponse {
 	data: ILaravelAuthData
 }
