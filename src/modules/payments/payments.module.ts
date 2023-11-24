@@ -7,6 +7,7 @@ import { ProccessPaymentCommand } from "./application/command"
 import { PaymentsApplicationInjectionToken } from "./application/payments-application-injection-token"
 import { CreateMercadopagoPreferenceQuery } from "./application/query"
 import { PublicMercadopagoController } from "./infrastructure/controllers/public"
+import { MercadoPagoPaymentNotificationGateway } from "./infrastructure/gateways"
 import { PaymentsInfrastructureInjectionTokens } from "./infrastructure/payments-infrastructure-injection-token"
 import { MercadopagoRepository } from "./infrastructure/repositories"
 import { MySQLMercadopagoService } from "./infrastructure/services"
@@ -36,7 +37,7 @@ const infrastructure = [
 @Module({
 	imports: [TypeOrmModule.forFeature([Carritos, TiendaMercadoPagoInfo])],
 	controllers: [PublicMercadopagoController],
-	providers: [...application, ...infrastructure]
+	providers: [...application, ...infrastructure, MercadoPagoPaymentNotificationGateway]
 })
 export class PaymentsModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
