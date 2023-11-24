@@ -62,7 +62,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 				payment_type_id
 			}
 
-			this.mercadoPagoPaymentNotificationGateway.sendNotificationToStore(
+			this.mercadoPagoPaymentNotificationGateway.sendPaymentNotificationToStore(
 				storeId,
 				JSON.stringify(payload)
 			)
@@ -77,7 +77,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		try {
 			const cart = await this.mercadopagoService.getCartProducts(cartId)
 
-			const { tienda, productosCarritos, usuario2 } = this.validateCart(cart)
+			const { tienda, productosCarritos, usuario2, total, metodoPago } = this.validateCart(cart)
 
 			const storeMercadopagoInfo = await this.mercadopagoService.getMercadopagoInfo(tienda)
 
@@ -90,6 +90,19 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 			const { id, init_point } = preference
 
 			if (!id || !init_point) throw new MercadopagoException("PREFERENCE_NOT_CREATED")
+
+			const totalItems = this.getOrderProductsAmount(productosCarritos)
+
+			this.mercadoPagoPaymentNotificationGateway.sendPreferenceCreatedToStore(
+				tienda,
+				JSON.stringify({
+					cartId,
+					totalItems,
+					totalPrice: total,
+					paymentMethod: metodoPago
+				})
+			)
+
 			return {
 				preferenceId: id,
 				init_point
@@ -135,6 +148,10 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		}
 
 		return { paymentStatus, mercadopagoStatus }
+	}
+
+	private getOrderProductsAmount = (products: ProductosCarritos[]) => {
+		return products.reduce((acc, el) => acc + el.unidades, 0)
 	}
 
 	private getMercadopagoPreference = async (cartId: number, items: Items[], user: Users) => {
