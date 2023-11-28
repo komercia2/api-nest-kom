@@ -38,4 +38,11 @@ export class MySQLMercadopagoService {
 	async updateCartState(cartId: number, state: string) {
 		await this.cartRepository.update({ id: cartId }, { estado: state })
 	}
+
+	async getStoreIdByCartId(cartId: number) {
+		const cart = await this.cartRepository.findOne({
+			where: { id: cartId }
+		})
+		return cart?.tienda
+	}
 }

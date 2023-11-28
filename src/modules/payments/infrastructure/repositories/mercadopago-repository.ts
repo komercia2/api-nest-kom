@@ -4,12 +4,14 @@ import axios from "axios"
 import { MercadoPagoConfig, Preference } from "mercadopago"
 import { Items } from "mercadopago/dist/clients/commonTypes"
 import { BackUrls } from "mercadopago/dist/clients/preference/commonTypes"
+import { Logger } from "nestjs-pino"
 import { Carritos, ProductosCarritos, Users } from "src/entities"
 
 import { MercadopagoPreferenceEntity } from "../../domain/entities"
 import { IMercadopagoRepository } from "../../domain/repositories"
 import { MercadopagoPaymentStatus } from "../enums"
 import { ClientMercadopagoException, MercadopagoException } from "../errors"
+import { MercadoPagoPaymentNotificationGateway } from "../gateways"
 import { PaymentsInfrastructureInjectionTokens } from "../payments-infrastructure-injection-token"
 import { MySQLMercadopagoService } from "../services"
 
@@ -31,25 +33,39 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		@Inject(PaymentsInfrastructureInjectionTokens.MySQLMercadopagoService)
 		private readonly mercadopagoService: MySQLMercadopagoService,
 
-		private readonly configService: ConfigService
+		private readonly configService: ConfigService,
+		private readonly logger: Logger,
+		private readonly mercadoPagoPaymentNotificationGateway: MercadoPagoPaymentNotificationGateway
 	) {}
 
 	async proccessPayment(paymentId: number): Promise<void> {
 		try {
-			const paymentInfo = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
-				headers: {
-					Authorization: `Bearer ${this.configService.get<string>("MERCADOPAGO_ACCESS_TOKEN")}`
-				}
-			})
-			const { status, external_reference } = paymentInfo.data
+			const { status, external_reference, transaction_amount, currency_id, payment_type_id } =
+				await this.fetchPaymentStatus(paymentId)
 
 			const cartId = Number(external_reference)
 
-			const paymentStatus = this.handlePaymentStatus(status)
+			const { paymentStatus, mercadopagoStatus } = this.handlePaymentStatus(status)
 
 			if (!paymentStatus) throw new ClientMercadopagoException("INVALID_PAYMENT_STATUS")
 
 			await this.mercadopagoService.updateCartState(cartId, paymentStatus)
+			const storeId = await this.mercadopagoService.getStoreIdByCartId(cartId)
+
+			if (!storeId) throw new ClientMercadopagoException("STORE_NOT_FOUND")
+
+			const payload = {
+				cartId,
+				transaction_amount,
+				mercadopagoStatus,
+				currency_id,
+				payment_type_id
+			}
+
+			this.mercadoPagoPaymentNotificationGateway.sendPaymentNotificationToStore(
+				storeId,
+				JSON.stringify(payload)
+			)
 
 			console.log(`MERCADOPAGO PAYMENT STATUS: ${status}`)
 		} catch (error) {
@@ -61,7 +77,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		try {
 			const cart = await this.mercadopagoService.getCartProducts(cartId)
 
-			const { tienda, productosCarritos, usuario2 } = this.validateCart(cart)
+			const { tienda, productosCarritos, usuario2, total, metodoPago } = this.validateCart(cart)
 
 			const storeMercadopagoInfo = await this.mercadopagoService.getMercadopagoInfo(tienda)
 
@@ -74,6 +90,18 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 			const { id, init_point } = preference
 
 			if (!id || !init_point) throw new MercadopagoException("PREFERENCE_NOT_CREATED")
+
+			const totalItems = this.getOrderProductsAmount(productosCarritos)
+
+			this.mercadoPagoPaymentNotificationGateway.sendPreferenceCreatedToStore(
+				tienda,
+				JSON.stringify({
+					cartId,
+					totalItems,
+					totalPrice: total,
+					paymentMethod: metodoPago
+				})
+			)
 
 			return {
 				preferenceId: id,
@@ -88,11 +116,42 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 	 * Utils
 	 */
 
-	private handlePaymentStatus = (status: string) => {
-		if (status === MercadopagoPaymentStatus.APPROVED) return "1"
-		if (status === MercadopagoPaymentStatus.IN_PROCESS) return "9"
-		if (status === MercadopagoPaymentStatus.CANCELLED) return "3"
-		if (status === MercadopagoPaymentStatus.REJECTED) return "10"
+	private fetchPaymentStatus = async (paymentId: number) => {
+		try {
+			const { data } = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
+				headers: {
+					Authorization: `Bearer ${this.configService.get<string>("MERCADOPAGO_ACCESS_TOKEN")}`
+				}
+			})
+			const { status, external_reference, transaction_amount, currency_id, payment_type_id } = data
+
+			return { status, external_reference, transaction_amount, currency_id, payment_type_id }
+		} catch (error) {
+			this.logger.error("Error fetching payment status", error)
+			throw new ClientMercadopagoException("PAYMENT_NOT_FOUND")
+		}
+	}
+
+	private handlePaymentStatus = (mercadopagoStatus: string) => {
+		let paymentStatus: string | undefined
+		if (mercadopagoStatus === MercadopagoPaymentStatus.APPROVED) {
+			paymentStatus = "1"
+		}
+		if (mercadopagoStatus === MercadopagoPaymentStatus.IN_PROCESS) {
+			paymentStatus = "9"
+		}
+		if (mercadopagoStatus === MercadopagoPaymentStatus.CANCELLED) {
+			paymentStatus = "3"
+		}
+		if (mercadopagoStatus === MercadopagoPaymentStatus.REJECTED) {
+			paymentStatus = "10"
+		}
+
+		return { paymentStatus, mercadopagoStatus }
+	}
+
+	private getOrderProductsAmount = (products: ProductosCarritos[]) => {
+		return products.reduce((acc, el) => acc + el.unidades, 0)
 	}
 
 	private getMercadopagoPreference = async (cartId: number, items: Items[], user: Users) => {

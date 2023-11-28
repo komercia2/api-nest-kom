@@ -35,6 +35,7 @@ import {
 	WebsitesController
 } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
+import { Template6Model, Template6Schema } from "./infrastructure/models/template6/template6-model"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
 import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
 import {
@@ -44,7 +45,9 @@ import {
 	Template15MongooseRepository,
 	WebsiteMongooseRepository
 } from "./infrastructure/repositories"
+import { MongooseTemplate6Repository } from "./infrastructure/repositories/mongoose-template6-repository"
 import {
+	MongooseTemplate6Service,
 	MysqlTemplate5Service,
 	MysqlTemplate99Service,
 	MysqlTemplatesService,
@@ -147,6 +150,10 @@ const infrastructure = [
 		useClass: MySQLTemplate99Repository
 	},
 	{
+		provide: ApplicationInjectionTokens.ITemplate6Repository,
+		useClass: MongooseTemplate6Repository
+	},
+	{
 		provide: InfrastructureInjectionTokens.MySqlTemplateRepository,
 		useClass: MySQLTemplateRepository
 	},
@@ -181,6 +188,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.MySqlTemplatesRepository,
 		useClass: MysqlTemplatesService
+	},
+	{
+		provide: InfrastructureInjectionTokens.MongooseTemplate6Service,
+		useClass: MongooseTemplate6Service
 	}
 ]
 
@@ -188,7 +199,8 @@ const infrastructure = [
 	imports: [
 		MongooseModule.forFeature([
 			{ name: Template15Model.name, schema: Template15Schema },
-			{ name: WebSiteModel.name, schema: WebsitesSchema }
+			{ name: WebSiteModel.name, schema: WebsitesSchema },
+			{ name: Template6Model.name, schema: Template6Schema }
 		]),
 		TypeOrmModule.forFeature([
 			Tiendas,

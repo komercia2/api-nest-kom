@@ -3,6 +3,8 @@ import { OnEvent } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { Template15 as Template15Entity } from "@templates/domain/entities/template15"
+import { WebSiteEntity } from "@templates/domain/entities/websites"
+import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import { Template15Model } from "@templates/infrastructure/models/template15/template15"
 import { plainToClass } from "class-transformer"
 import { Model } from "mongoose"
@@ -76,7 +78,7 @@ export class Template15MongoService {
 		}
 	}
 
-	update2 = async (_id: ObjectId, template15: Template15Entity) => {
+	update2 = async (_id: ObjectId, template15: WebSiteTemplate) => {
 		try {
 			const newSettings = Object.assign(template15, {})
 
