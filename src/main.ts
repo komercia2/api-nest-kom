@@ -27,6 +27,8 @@ async function bootstrap() {
 
 	const expressInstance = app.getHttpAdapter().getInstance()
 
+	expressInstance.disable("x-powered-by")
+
 	if (configService.get<string>("NODE_ENV") === "production") {
 		useNestTreblle(expressInstance, {
 			apiKey: configService.get<string>("TREBLLE_API_KEY") || "",
