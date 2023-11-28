@@ -1,3 +1,3 @@
-import { ITemplate15Repository } from "../repositories"
+import { ITemplate6Repository, ITemplate15Repository } from "../repositories"
 
-export type TemplateRepository = ITemplate15Repository
+export type TemplateRepository = ITemplate15Repository | ITemplate6Repository

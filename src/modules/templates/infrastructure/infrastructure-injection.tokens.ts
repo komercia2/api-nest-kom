@@ -25,5 +25,7 @@ export enum InfrastructureInjectionTokens {
 	DeleteWebsiteCommand = "DeleteWebsiteCommand",
 	GetTemplate5Query = "GetStoreTemplateSettingsQuery",
 	GetTemplate99Query = "GetTemplate99Query",
-	GetStoreTemplateQuery = "GetStoreTemplateQuery"
+	GetStoreTemplateQuery = "GetStoreTemplateQuery",
+	CreateTemplate6Command = "CreateTemplate6Command",
+	MongooseTemplate6Service = "MongooseTemplate6Service"
 }

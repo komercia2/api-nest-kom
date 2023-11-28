@@ -16,17 +16,27 @@ import { isValidObjectId, Model, ObjectId } from "mongoose"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection.tokens"
 import { WebSiteModel } from "../models/website"
 import { createObjectIdFromHexString } from "../util"
+import { MongooseTemplate6Service } from "./mongoose-template6-service"
 import { Template15MongoService } from "./template15Mongoose.service"
 
 @Injectable()
 export class WebsiteMongooseService {
-	private readonly validServices = new Map([[15, this.template15MongoService]])
+	private readonly validServices = new Map<
+		number,
+		Template15MongoService | MongooseTemplate6Service
+	>([
+		[15, this.template15MongoService],
+		[6, this.template6MongoService]
+	])
 
 	constructor(
 		@InjectModel(WebSiteModel.name) private readonly websiteModel: Model<WebSiteModel>,
 
 		@Inject(InfrastructureInjectionTokens.Template15MongoService)
 		private readonly template15MongoService: Template15MongoService,
+
+		@Inject(InfrastructureInjectionTokens.MongooseTemplate6Service)
+		private readonly template6MongoService: MongooseTemplate6Service,
 
 		private readonly eventEmitter: EventEmitter2
 	) {}
@@ -95,7 +105,14 @@ export class WebsiteMongooseService {
 			const getWebSiteDataOperation = this.websiteModel
 				.findOne({ templateId: parsedTemplateId })
 				.exec()
-			const getTemplateOperation = this.template15MongoService.find(templateId)
+
+			const websiteInfo = await getWebSiteDataOperation
+
+			if (!websiteInfo) throw new WebsiteNotAvaibleException("Website not found")
+
+			const templateNumber = websiteInfo.templateNumber
+
+			const getTemplateOperation = this.validServices.get(templateNumber)?.find(templateId)
 
 			const results = await Promise.allSettled([getWebSiteDataOperation, getTemplateOperation])
 

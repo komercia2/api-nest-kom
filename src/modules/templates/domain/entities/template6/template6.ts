@@ -16,4 +16,15 @@ export class Template6Entity {
 	information: Template6Information
 	informationLogos: Template6InformationLogos
 	footer: Template6Footer
+
+	constructor() {
+		this.header = new Template6Header()
+		this.settingsGeneral = new Template6SettingsGeneral()
+		this.banner = new Template6Banner()
+		this.productFeatures = new Template6ProductFeatures()
+		this.productOverviews = new Template6ProductOverviews()
+		this.information = new Template6Information()
+		this.informationLogos = new Template6InformationLogos()
+		this.footer = new Template6Footer()
+	}
 }
