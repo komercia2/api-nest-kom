@@ -12,7 +12,7 @@ export class GetEditorSettingSuggestionsQuery {
 	) {}
 
 	async execute(input: getEditorSettingSuggestionsDTO) {
-		const { storeId, inputSetting, keyWords, theme, improveAllTexts } = input
+		const { storeId, inputSetting, keyWords, theme } = input
 
 		const cleanedKeyWords = this.cleanKeyWords(keyWords)
 
@@ -20,8 +20,7 @@ export class GetEditorSettingSuggestionsQuery {
 			storeId,
 			inputSetting,
 			cleanedKeyWords,
-			theme,
-			improveAllTexts
+			theme
 		)
 	}
 

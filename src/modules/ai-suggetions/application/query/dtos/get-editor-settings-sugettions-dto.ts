@@ -28,8 +28,4 @@ export class getEditorSettingSuggestionsDTO {
 	@IsString()
 	@IsNotEmpty()
 	theme: string
-
-	@IsOptional()
-	@IsBoolean()
-	improveAllTexts?: false
 }
