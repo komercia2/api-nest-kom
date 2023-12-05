@@ -56,23 +56,23 @@ export class MercadoPagoPaymentNotificationGateway
 		this.server
 			.to(`${this.ROOM_PREFIX}-${storeID}`)
 			.emit(MercadoPagoPaymentNotificationGatewayEvents.MERCADOPAGO_PAYMENT_NOTIFICATION, data)
-		console.log(`${this.LOG_PREFIX} sent notification to store ${storeID}: ${data}`)
+		this.logger.log(`${this.LOG_PREFIX} sent notification to store ${storeID}: ${data}`)
 	}
 
 	sendPreferenceCreatedToStore(storeID: number, data: string) {
 		this.server
 			.to(`${this.ROOM_PREFIX}-${storeID}`)
 			.emit(MercadoPagoPaymentNotificationGatewayEvents.MERCADOPAGO_PREFERENCE_CREATED, data)
-		console.log(`${this.LOG_PREFIX} sent preference created to store ${storeID}: ${data}`)
+		this.logger.log(`${this.LOG_PREFIX} sent preference created to store ${storeID}: ${data}`)
 	}
 
 	@SubscribeMessage(MercadoPagoPaymentNotificationGatewayEvents.MERCADOPAGO_PAYMENT_NOTIFICATION)
 	handleNotification(@MessageBody() data: string) {
-		console.log(`${this.LOG_PREFIX} received notification: ${data}`)
+		this.logger.log(`${this.LOG_PREFIX} received notification: ${data}`)
 	}
 
 	@SubscribeMessage(MercadoPagoPaymentNotificationGatewayEvents.MERCADOPAGO_PREFERENCE_CREATED)
 	handlePreferenceCreated(@MessageBody() data: string) {
-		console.log(`${this.LOG_PREFIX} received preference created: ${data}`)
+		this.logger.log(`${this.LOG_PREFIX} received preference created: ${data}`)
 	}
 }

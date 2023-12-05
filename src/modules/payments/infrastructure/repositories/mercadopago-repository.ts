@@ -9,7 +9,8 @@ import { Carritos, ProductosCarritos, Users } from "src/entities"
 
 import {
 	MercadopagoIntegrationStatusEntity,
-	MercadopagoPreferenceEntity
+	MercadopagoPreferenceEntity,
+	MercadopagoStoreInfoEntity
 } from "../../domain/entities"
 import { IMercadopagoRepository } from "../../domain/repositories"
 import { MercadopagoPaymentStatus } from "../enums"
@@ -41,6 +42,31 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		private readonly logger: Logger,
 		private readonly mercadoPagoPaymentNotificationGateway: MercadoPagoPaymentNotificationGateway
 	) {}
+
+	async createIntegration(storeId: number, data: MercadopagoStoreInfoEntity): Promise<boolean> {
+		try {
+			const activeIntegration = await this.mercadopagoService.getMercadopagoInfo(storeId)
+
+			if (activeIntegration) {
+				const entity = MercadopagoStoreInfoEntity.create({
+					...data,
+					createdAt: activeIntegration.createdAt
+				})
+
+				await this.mercadopagoService.updateMercadopagoInfo(storeId, entity)
+				return true
+			}
+
+			const entity = MercadopagoStoreInfoEntity.create({ ...data })
+
+			await this.mercadopagoService.createIntgration(storeId, entity)
+
+			return true
+		} catch (error) {
+			console.log(error)
+			return false
+		}
+	}
 
 	/**
 	 * @description Get mercadopago integration status from store

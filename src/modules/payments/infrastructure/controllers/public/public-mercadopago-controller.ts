@@ -1,14 +1,11 @@
-import { Get, Inject, Post } from "@nestjs/common"
+import { Inject, Post } from "@nestjs/common"
 import { Query, Req, Res } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
-import { HttpStatusCode } from "axios"
+import axios, { HttpStatusCode } from "axios"
 import { Request, Response } from "express"
 import { ProccessPaymentCommand } from "src/modules/payments/application/command"
-import {
-	CreateMercadopagoPreferenceQuery,
-	GetIntegrationStatus
-} from "src/modules/payments/application/query"
+import { CreateMercadopagoPreferenceQuery } from "src/modules/payments/application/query"
 
 import { ClientMercadopagoException, MercadopagoException } from "../../errors"
 import { PaymentsInfrastructureInjectionTokens } from "../../payments-infrastructure-injection-token"
@@ -20,10 +17,7 @@ export class PublicMercadopagoController {
 		private readonly createMercadopagoPreferenceQuery: CreateMercadopagoPreferenceQuery,
 
 		@Inject(PaymentsInfrastructureInjectionTokens.ProccessPaymentCommand)
-		private readonly proccessPaymentCommand: ProccessPaymentCommand,
-
-		@Inject(PaymentsInfrastructureInjectionTokens.GetIntegrationStatus)
-		private readonly getIntegrationStatus: GetIntegrationStatus
+		private readonly proccessPaymentCommand: ProccessPaymentCommand
 	) {}
 
 	@Post("create-preference")
@@ -127,44 +121,22 @@ export class PublicMercadopagoController {
 
 			const paymentId = Number(data.id)
 
-			await this.proccessPaymentCommand.execute(paymentId)
+			const { data: paymentData } = await axios.get(
+				`https://api.mercadopago.com/v1/payments/${paymentId}`,
+				{
+					headers: {
+						Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`
+					}
+				}
+			)
+
+			console.log(paymentData)
+
+			// await this.proccessPaymentCommand.execute(paymentId)
 
 			return handlerHttpResponse(res, {
 				data: null,
 				message: "Webhook received",
-				statusCode: HttpStatusCode.Ok,
-				success: true
-			})
-		} catch (error) {
-			console.log(error)
-			return handlerHttpResponse(res, {
-				data: null,
-				message: "Internal server error",
-				statusCode: HttpStatusCode.InternalServerError,
-				success: false
-			})
-		}
-	}
-
-	@Get("status")
-	async status(@Req() req: Request, @Res() res: Response) {
-		try {
-			const { id } = req
-
-			const status = await this.getIntegrationStatus.execute(Number(id))
-
-			if (!status) {
-				return handlerHttpResponse(res, {
-					data: null,
-					message: "Integration status not found. Store not integrated",
-					statusCode: HttpStatusCode.NotFound,
-					success: false
-				})
-			}
-
-			return handlerHttpResponse(res, {
-				data: status,
-				message: "Integration status fetched successfully",
 				statusCode: HttpStatusCode.Ok,
 				success: true
 			})

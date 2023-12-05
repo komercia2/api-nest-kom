@@ -2,5 +2,6 @@ export enum PaymentsInfrastructureInjectionTokens {
 	MySQLMercadopagoService = "MySQLMercadopagoService",
 	CreateMercadopagoPreferenceQuery = "CreateMercadopagoPreferenceQuery",
 	ProccessPaymentCommand = "ProccessPaymentCommand",
-	GetIntegrationStatus = "GetIntegrationStatus"
+	GetIntegrationStatus = "GetIntegrationStatus",
+	CreateIntegrationCommand = "CreateIntegrationCommand"
 }
