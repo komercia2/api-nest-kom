@@ -1,5 +1,6 @@
 import { Inject } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
+import { PusherNotificationsService } from "@shared/infrastructure/services"
 import axios from "axios"
 import { MercadoPagoConfig, Preference } from "mercadopago"
 import { Items } from "mercadopago/dist/clients/commonTypes"
@@ -7,18 +8,19 @@ import { BackUrls } from "mercadopago/dist/clients/preference/commonTypes"
 import { Logger } from "nestjs-pino"
 import { Carritos, ProductosCarritos, Users } from "src/entities"
 
-import { MercadopagoPreferenceEntity } from "../../domain/entities"
+import {
+	MercadopagoIntegrationStatusEntity,
+	MercadopagoPreferenceEntity,
+	MercadopagoStoreInfoEntity
+} from "../../domain/entities"
 import { IMercadopagoRepository } from "../../domain/repositories"
 import { MercadopagoPaymentStatus } from "../enums"
 import { ClientMercadopagoException, MercadopagoException } from "../errors"
-import { MercadoPagoPaymentNotificationGateway } from "../gateways"
 import { PaymentsInfrastructureInjectionTokens } from "../payments-infrastructure-injection-token"
 import { MySQLMercadopagoService } from "../services"
 
 export class MercadopagoRepository implements IMercadopagoRepository {
-	private readonly mercadopagoClient: MercadoPagoConfig = {
-		accessToken: this.configService.get<string>("MERCADOPAGO_ACCESS_TOKEN") as string
-	}
+	private mercadopagoClient: MercadoPagoConfig = { accessToken: "" }
 	private readonly preference = new Preference(this.mercadopagoClient)
 
 	private readonly CURRENCY_ID = "COP"
@@ -28,6 +30,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		pending: this.configService.get<string>("PENDING_PAYMENT_REDIRECT_URL")
 	}
 	private readonly notification_url = this.configService.get<string>("MERCADOPAGO_NOTIFICATION_URL")
+	private readonly NODE_ENV = process.env.NODE_ENV
 
 	constructor(
 		@Inject(PaymentsInfrastructureInjectionTokens.MySQLMercadopagoService)
@@ -35,9 +38,61 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 		private readonly configService: ConfigService,
 		private readonly logger: Logger,
-		private readonly mercadoPagoPaymentNotificationGateway: MercadoPagoPaymentNotificationGateway
+		private readonly pusherNotificationsService: PusherNotificationsService
 	) {}
 
+	async createIntegration(storeId: number, data: MercadopagoStoreInfoEntity): Promise<boolean> {
+		try {
+			const activeIntegration = await this.mercadopagoService.getMercadopagoInfo(storeId)
+
+			if (activeIntegration) {
+				const entity = MercadopagoStoreInfoEntity.create({
+					...data,
+					createdAt: activeIntegration.createdAt
+				})
+
+				await this.mercadopagoService.updateMercadopagoInfo(storeId, entity)
+				return true
+			}
+
+			const entity = MercadopagoStoreInfoEntity.create({ ...data })
+
+			await this.mercadopagoService.createIntgration(storeId, entity)
+
+			return true
+		} catch (error) {
+			console.log(error)
+			return false
+		}
+	}
+
+	/**
+	 * @description Get mercadopago integration status from store
+	 * @param storeId Store id
+	 * @returns Mercadopago integration status
+	 * @throws ClientMercadopagoException
+	 */
+	async getIntegrationStatus(storeId: number): Promise<MercadopagoIntegrationStatusEntity | null> {
+		const integrationStatus = await this.mercadopagoService.getMercadopagoInfo(storeId)
+
+		if (!integrationStatus) return null
+
+		const { createdAt, updatedAt, estado, idTienda } = integrationStatus
+		const info = MercadopagoIntegrationStatusEntity.create({
+			createdAt,
+			updatedAt,
+			storeId: idTienda,
+			status: estado
+		})
+
+		return info
+	}
+
+	/**
+	 * @description Proccess mercadopago payment notification and send notification to store
+	 * @param paymentId Mercadopago payment id
+	 * @returns void
+	 */
 	async proccessPayment(paymentId: number): Promise<void> {
 		try {
 			const { status, external_reference, transaction_amount, currency_id, payment_type_id } =
@@ -62,8 +117,9 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 				payment_type_id
 			}
 
-			this.mercadoPagoPaymentNotificationGateway.sendPaymentNotificationToStore(
-				storeId,
+			this.pusherNotificationsService.trigger(
+				`store-${storeId}`,
+				"payment-status",
 				JSON.stringify(payload)
 			)
 
@@ -73,6 +129,11 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		}
 	}
 
+	/**
+	 * @description Create mercadopago preference and send notification to store
+	 * @param cartId  Cart id
+	 * @returns  Mercadopago preference
+	 */
 	async createPreference(cartId: number): Promise<MercadopagoPreferenceEntity | null> {
 		try {
 			const cart = await this.mercadopagoService.getCartProducts(cartId)
@@ -83,18 +144,25 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 			if (!storeMercadopagoInfo) throw new ClientMercadopagoException("STORE_NOT_FOUND")
 
+			const { accessToken } = storeMercadopagoInfo
+
+			this.mercadopagoClient.accessToken = this.getAccessToken(accessToken)
+
 			const items = productosCarritos.map(this.toPreferenceItems)
 
 			const preference = await this.getMercadopagoPreference(cartId, items, usuario2)
 
-			const { id, init_point } = preference
+			const { id, init_point, sandbox_init_point } = preference
 
-			if (!id || !init_point) throw new MercadopagoException("PREFERENCE_NOT_CREATED")
+			if (!id || !init_point || !sandbox_init_point) {
+				throw new MercadopagoException("PREFERENCE_NOT_CREATED")
+			}
 
 			const totalItems = this.getOrderProductsAmount(productosCarritos)
 
-			this.mercadoPagoPaymentNotificationGateway.sendPreferenceCreatedToStore(
-				tienda,
+			await this.pusherNotificationsService.trigger(
+				`store-${tienda}`,
+				"preference-created",
 				JSON.stringify({
 					cartId,
 					totalItems,
@@ -105,9 +173,11 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 			return {
 				preferenceId: id,
-				init_point
+				init_point,
+				sandbox_init_point
 			}
 		} catch (error) {
+			this.logger.error("Error creating mercadopago preference", error)
 			throw error
 		}
 	}
@@ -116,6 +186,22 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 	 * Utils
 	 */
 
+	/**
+	 * @description Get mercadopago access token
+	 * @param storeAccessToken Store access token
+	 * @returns Mercadopago access token (sandbox or production)
+	 */
+	private getAccessToken = (storeAccessToken: string) => {
+		if (this.NODE_ENV === "production") return storeAccessToken
+
+		return this.configService.get<string>("MERCADOPAGO_ACCESS_TOKEN") as string
+	}
+
+	/**
+	 * @description Fetch payment status from mercadopago
+	 * @param paymentId Mercadopago payment id
+	 * @returns Payment status
+	 */
 	private fetchPaymentStatus = async (paymentId: number) => {
 		try {
 			const { data } = await axios.get(`https://api.mercadopago.com/v1/payments/${paymentId}`, {
@@ -132,6 +218,11 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		}
 	}
 
+	/**
+	 * @description Handle mercadopago payment status
+	 * @param mercadopagoStatus  Mercadopago payment status
+	 * @returns Payment status and mercadopago status
+	 */
 	private handlePaymentStatus = (mercadopagoStatus: string) => {
 		let paymentStatus: string | undefined
 		if (mercadopagoStatus === MercadopagoPaymentStatus.APPROVED) {
@@ -150,10 +241,22 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		return { paymentStatus, mercadopagoStatus }
 	}
 
+	/**
+	 * @description Get order products amount
+	 * @param products Order products
+	 * @returns Order products amount (total items)
+	 */
 	private getOrderProductsAmount = (products: ProductosCarritos[]) => {
 		return products.reduce((acc, el) => acc + el.unidades, 0)
 	}
 
+	/**
+	 * @description Get mercadopago preference
+	 * @param cartId
+	 * @param items
+	 * @param user
+	 * @returns Mercadopago preference
+	 */
 	private getMercadopagoPreference = async (cartId: number, items: Items[], user: Users) => {
 		const preference = await this.preference.create({
 			body: {
@@ -173,6 +276,11 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		return preference
 	}
 
+	/**
+	 * @description Validate cart
+	 * @param cart Cart
+	 * @returns Cart validated
+	 */
 	private validateCart(cart: Carritos | null) {
 		if (!cart) throw new ClientMercadopagoException("CAR_NOT_FOUND")
 		if (cart.estado === "1") throw new ClientMercadopagoException("CAR_ALREADY_PAID")
@@ -180,6 +288,10 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		return { ...cart }
 	}
 
+	/**
+	 * @description Transform cart products to mercadopago items
+	 * @returns Mercadopago items from cart products
+	 */
 	toPreferenceItems = ({
 		producto2,
 		precioProducto,

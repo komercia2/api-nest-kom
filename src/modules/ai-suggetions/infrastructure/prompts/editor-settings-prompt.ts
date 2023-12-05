@@ -1,20 +1,22 @@
 import { getEditorSettingSuggestionsDTO } from "../../application/query/dtos"
 
 export const editorSettingsPrompt = (input: getEditorSettingSuggestionsDTO) => {
-	const { inputSetting, keyWords, theme, improveAllTexts } = input
-	return `Actúa como un experto en experiencia de usuario y diseño. 
-    A partir del siguiente texto que se encuentra en formato JSON: ${inputSetting} que
-    corresponde a la configuración de una tienda en línea, genera una configuración
-    siguiendo las mejores prácticas de diseño y experiencia de usuario.
-    Sigue el mismo formato original del JSON para la configuración de la tienda en línea.
-    Modifica los colores, tipografías, tamaños, etc. de los elementos de la tienda en línea.
-    Ten en cuenta las siguientes consideraciones:
-    ${
-			improveAllTexts
-				? `Además, mejora todos los textos de la tienda en línea. Usando un lenguaje más persuasivo y convincente.`
-				: ""
-		}
-    ${keyWords.length > 0 ? `Utiliza las siguientes palabras clave: ${keyWords.join(", ")}.` : ""}
-    ${theme ? `El tema de la tienda en línea es: ${theme}.` : ""}
-    Devuelve el JSON de la configuración de la tienda en línea.`
+	const { inputSetting, keyWords, theme } = input
+	const prompt = `As a seasoned frontend developer and graphic designer, I'm currently immersed in a captivating project – a website theme transformation for our esteemed client. The chosen theme is ${theme}, but the pivotal aspect is ensuring a contrast tolerance of 4.5:1 or higher for accessibility.
+
+  The specific settings that demand attention are: ${getSettingName(
+		inputSetting
+	)}. However, our focus extends beyond mere adjustment; we're committed to crafting a seamless blend of colors that resonates with the client's designated keywords: ${keyWords.join(
+		", "
+	)}.
+  
+  In pursuit of superior accessibility and color contrast, the color modifications will be made in hex format. The provided settings, outlined in ${JSON.stringify(
+		inputSetting
+	)}, will undergo a meticulous transformation. In cases where the settings are arrays, the entire structure will be preserved while adjusting individual values.
+  
+  The ultimate output will be a JSON configuration mirroring the input structure, albeit with the refined color palette intricately related to the specified keywords. This ensures not only a visually appealing theme but also a website that adheres to the highest standards of accessibility.`
+
+	return prompt
 }
+
+const getSettingName = (setting: object) => Object.keys(setting)[0]

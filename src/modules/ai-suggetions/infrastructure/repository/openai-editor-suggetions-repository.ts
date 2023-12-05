@@ -19,8 +19,7 @@ export class OpenAIEditorSuggetionsRepository implements IEditorSuggetionsReposi
 		storeId: number,
 		inputSetting: object,
 		keyWords: string[],
-		theme: string,
-		improveAllTexts?: false | undefined
+		theme: string
 	): Promise<EditorSettingSuggetions> {
 		const apiKey = this.configurationservice.get<string>("OPENAI_API_KEY")
 
@@ -28,7 +27,6 @@ export class OpenAIEditorSuggetionsRepository implements IEditorSuggetionsReposi
 			inputSetting,
 			keyWords,
 			theme,
-			improveAllTexts,
 			storeId
 		})
 

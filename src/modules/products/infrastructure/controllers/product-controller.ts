@@ -36,7 +36,8 @@ export class ProductController {
 		@Query("variants") withVariants: boolean,
 		@Query("top-sales") topSales: boolean,
 		@Query("favorite") favorite: number,
-		@Query("alphabetic") alphabetic: "ASC" | "DESC"
+		@Query("alphabetic") alphabetic: "ASC" | "DESC",
+		@Query("price") price: "ASC" | "DESC"
 	) {
 		try {
 			const products = await this.getPaginatedProductsQuery.execute({
@@ -55,7 +56,8 @@ export class ProductController {
 				withVariants,
 				topSales,
 				alphabetic,
-				favorite
+				favorite,
+				price
 			})
 			const { count, publicProductList, priceLimit, priceMinimum } = products
 

@@ -2,7 +2,7 @@ import { Inject, Post } from "@nestjs/common"
 import { Query, Req, Res } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
-import { HttpStatusCode } from "axios"
+import axios, { HttpStatusCode } from "axios"
 import { Request, Response } from "express"
 import { ProccessPaymentCommand } from "src/modules/payments/application/command"
 import { CreateMercadopagoPreferenceQuery } from "src/modules/payments/application/query"
@@ -96,6 +96,43 @@ export class PublicMercadopagoController {
 			const paymentId = Number(data.id)
 
 			await this.proccessPaymentCommand.execute(paymentId)
+
+			return handlerHttpResponse(res, {
+				data: null,
+				message: "Webhook received",
+				statusCode: HttpStatusCode.Ok,
+				success: true
+			})
+		} catch (error) {
+			console.log(error)
+			return handlerHttpResponse(res, {
+				data: null,
+				message: "Internal server error",
+				statusCode: HttpStatusCode.InternalServerError,
+				success: false
+			})
+		}
+	}
+
+	@Post("webhook-test")
+	async webhookTest(@Req() req: Request, @Res() res: Response) {
+		try {
+			const { data } = req.body
+
+			const paymentId = Number(data.id)
+
+			const { data: paymentData } = await axios.get(
+				`https://api.mercadopago.com/v1/payments/${paymentId}`,
+				{
+					headers: {
+						Authorization: `Bearer ${process.env.MERCADOPAGO_ACCESS_TOKEN}`
+					}
+				}
+			)
+
+			console.log(paymentData)
+
+			// await this.proccessPaymentCommand.execute(paymentId)
 
 			return handlerHttpResponse(res, {
 				data: null,

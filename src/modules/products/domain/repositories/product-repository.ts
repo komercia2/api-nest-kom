@@ -17,6 +17,7 @@ export interface IProductFilterDTO {
 	topSales: boolean
 	favorite: number
 	alphabetic: "ASC" | "DESC"
+	price: "ASC" | "DESC"
 }
 
 export interface IProductRepository {
