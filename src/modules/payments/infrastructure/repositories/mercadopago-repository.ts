@@ -20,9 +20,7 @@ import { PaymentsInfrastructureInjectionTokens } from "../payments-infrastructur
 import { MySQLMercadopagoService } from "../services"
 
 export class MercadopagoRepository implements IMercadopagoRepository {
-	private mercadopagoClient: MercadoPagoConfig = {
-		accessToken: ""
-	}
+	private mercadopagoClient: MercadoPagoConfig = { accessToken: "" }
 	private readonly preference = new Preference(this.mercadopagoClient)
 
 	private readonly CURRENCY_ID = "COP"
@@ -175,9 +173,11 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 			return {
 				preferenceId: id,
-				init_point: init_point_url
+				init_point,
+				sandbox_init_point
 			}
 		} catch (error) {
+			this.logger.error("Error creating mercadopago preference", error)
 			throw error
 		}
 	}
