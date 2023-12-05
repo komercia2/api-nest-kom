@@ -145,7 +145,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 			const { accessToken } = storeMercadopagoInfo
 
-			this.mercadopagoClient.accessToken = accessToken
+			this.mercadopagoClient.accessToken = this.getAccessToken(accessToken)
 
 			const items = productosCarritos.map(this.toPreferenceItems)
 
@@ -169,8 +169,6 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 				})
 			)
 
-			const init_point_url = this.getInitPoint(init_point, sandbox_init_point)
-
 			return {
 				preferenceId: id,
 				init_point,
@@ -187,15 +185,14 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 	 */
 
 	/**
-	 * @description Get init point depending on the environment
-	 * @param init_point
-	 * @param sandbox_init_point
-	 * @returns init_point or sandbox_init_point depending on the environment
+	 * @description Get mercadopago access token
+	 * @param storeAccessToken Store access token
+	 * @returns Mercadopago access token (sandbox or production)
 	 */
-	private getInitPoint = (init_point: string, sandbox_init_point: string) => {
-		if (this.NODE_ENV === "production") return init_point
+	private getAccessToken = (storeAccessToken: string) => {
+		if (this.NODE_ENV === "production") return storeAccessToken
 
-		return sandbox_init_point
+		return this.configService.get<string>("MERCADOPAGO_ACCESS_TOKEN") as string
 	}
 
 	/**
