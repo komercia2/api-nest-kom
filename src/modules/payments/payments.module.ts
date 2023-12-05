@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/c
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
+import { PusherNotificationsService } from "@shared/infrastructure/services"
 import { Carritos, TiendaMercadoPagoInfo } from "src/entities"
 
 import { CreateIntegrationCommand, ProccessPaymentCommand } from "./application/command"
@@ -9,7 +10,6 @@ import { PaymentsApplicationInjectionToken } from "./application/payments-applic
 import { CreateMercadopagoPreferenceQuery, GetIntegrationStatus } from "./application/query"
 import { PanelMercadopagoController } from "./infrastructure/controllers/private"
 import { PublicMercadopagoController } from "./infrastructure/controllers/public"
-import { MercadoPagoPaymentNotificationGateway } from "./infrastructure/gateways"
 import { PaymentsInfrastructureInjectionTokens } from "./infrastructure/payments-infrastructure-injection-token"
 import { MercadopagoRepository } from "./infrastructure/repositories"
 import { MySQLMercadopagoService } from "./infrastructure/services"
@@ -47,7 +47,7 @@ const infrastructure = [
 @Module({
 	imports: [TypeOrmModule.forFeature([Carritos, TiendaMercadoPagoInfo])],
 	controllers: [PublicMercadopagoController, PanelMercadopagoController],
-	providers: [...application, ...infrastructure, MercadoPagoPaymentNotificationGateway]
+	providers: [...application, ...infrastructure, PusherNotificationsService]
 })
 export class PaymentsModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {

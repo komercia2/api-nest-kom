@@ -1,5 +1,6 @@
 import { Inject } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
+import { PusherNotificationsService } from "@shared/infrastructure/services"
 import axios from "axios"
 import { MercadoPagoConfig, Preference } from "mercadopago"
 import { Items } from "mercadopago/dist/clients/commonTypes"
@@ -15,7 +16,6 @@ import {
 import { IMercadopagoRepository } from "../../domain/repositories"
 import { MercadopagoPaymentStatus } from "../enums"
 import { ClientMercadopagoException, MercadopagoException } from "../errors"
-import { MercadoPagoPaymentNotificationGateway } from "../gateways"
 import { PaymentsInfrastructureInjectionTokens } from "../payments-infrastructure-injection-token"
 import { MySQLMercadopagoService } from "../services"
 
@@ -38,7 +38,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 		private readonly configService: ConfigService,
 		private readonly logger: Logger,
-		private readonly mercadoPagoPaymentNotificationGateway: MercadoPagoPaymentNotificationGateway
+		private readonly pusherNotificationsService: PusherNotificationsService
 	) {}
 
 	async createIntegration(storeId: number, data: MercadopagoStoreInfoEntity): Promise<boolean> {
@@ -117,8 +117,9 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 				payment_type_id
 			}
 
-			this.mercadoPagoPaymentNotificationGateway.sendPaymentNotificationToStore(
-				storeId,
+			this.pusherNotificationsService.trigger(
+				`store-${storeId}`,
+				"payment-status",
 				JSON.stringify(payload)
 			)
 
@@ -159,8 +160,9 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 			const totalItems = this.getOrderProductsAmount(productosCarritos)
 
-			this.mercadoPagoPaymentNotificationGateway.sendPreferenceCreatedToStore(
-				tienda,
+			await this.pusherNotificationsService.trigger(
+				`store-${tienda}`,
+				"preference-created",
 				JSON.stringify({
 					cartId,
 					totalItems,
