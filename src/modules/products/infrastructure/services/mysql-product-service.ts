@@ -45,7 +45,8 @@ export class MySQLProductService {
 			withVariants,
 			topSales,
 			favorite,
-			alphabetic
+			alphabetic,
+			price
 		} = data
 		const queryBuilder = this.productRepository
 			.createQueryBuilder("productos")
@@ -165,6 +166,10 @@ export class MySQLProductService {
 
 		if (alphabetic) {
 			queryBuilder.orderBy("productos.nombre", alphabetic)
+		}
+
+		if (price) {
+			queryBuilder.orderBy("productos.precio", price)
 		}
 
 		const count = await queryBuilder.getCount()
