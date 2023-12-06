@@ -37,7 +37,6 @@ import {
 	EnviosMipaquete,
 	EpaycoFranquicias,
 	EpaycoLogs,
-	ExternalUser,
 	FacturasDataico,
 	FailedJobs,
 	Geolocalizacion,
@@ -293,8 +292,7 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
 			VisitasTienda,
 			WhatsappCheckout,
 			Zonas,
-			ZonasPaths,
-			ExternalUser
+			ZonasPaths
 		]
 	})
 }
