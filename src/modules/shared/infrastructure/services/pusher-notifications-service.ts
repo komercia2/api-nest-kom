@@ -10,7 +10,10 @@ export class PusherNotificationsService {
 		key: this.configService.get<string>("PUSHER_APP_KEY") as string,
 		secret: this.configService.get<string>("PUSHER_APP_SECRET") as string,
 		cluster: this.configService.get<string>("PUSHER_APP_CLUSTER") as string,
-		encrypted: true
+		useTLS: true,
+		encryptionMasterKeyBase64: this.configService.get<string>(
+			"PUSHER_APP_ENCRYPTION_MASTER_KEY_BASE64"
+		) as string
 	})
 
 	private readonly LOGGER_CONTEXT = PusherNotificationsService.name
