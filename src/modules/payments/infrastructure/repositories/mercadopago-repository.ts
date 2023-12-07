@@ -148,9 +148,9 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 
 			this.mercadopagoClient.accessToken = this.getAccessToken(accessToken)
 
-			const items = productosCarritos.map(this.toPreferenceItems)
+			const preferenceItems = this.toPreferenceItems(cartId, total)
 
-			const preference = await this.getMercadopagoPreference(cartId, items, usuario2)
+			const preference = await this.getMercadopagoPreference(cartId, preferenceItems, usuario2)
 
 			const { id, init_point, sandbox_init_point } = preference
 
@@ -292,18 +292,13 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 	 * @description Transform cart products to mercadopago items
 	 * @returns Mercadopago items from cart products
 	 */
-	toPreferenceItems = ({
-		producto2,
-		precioProducto,
-		unidades,
-		carrito
-	}: ProductosCarritos): Items => ({
-		id: String(carrito),
-		quantity: unidades,
-		title: `Komercia | Orden #${carrito}`,
-		unit_price: precioProducto,
-		category_id: producto2.categoriaProducto.toString(),
-		currency_id: this.CURRENCY_ID,
-		picture_url: producto2.fotoCloudinary
-	})
+	toPreferenceItems = (cartID: number, total: number): Items[] => [
+		{
+			id: String(cartID),
+			quantity: 1,
+			title: `Komercia | Orden #${cartID}`,
+			unit_price: total,
+			currency_id: this.CURRENCY_ID
+		}
+	]
 }

@@ -16,6 +16,7 @@ import { CommonModule } from "./modules/common/common.module"
 import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
 import { StoresModule } from "./modules/stores/stores.module"
+import { UsersModule } from "./modules/users/users.module"
 
 @Module({
 	imports: [
@@ -41,7 +42,8 @@ import { StoresModule } from "./modules/stores/stores.module"
 		TemplatesModule,
 		CommonModule,
 		StoresModule,
-		PaymentsModule
+		PaymentsModule,
+		UsersModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
