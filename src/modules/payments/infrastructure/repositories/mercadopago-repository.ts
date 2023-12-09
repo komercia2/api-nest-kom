@@ -95,8 +95,14 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 	 */
 	async proccessPayment(paymentId: number): Promise<void> {
 		try {
-			const { status, external_reference, transaction_amount, currency_id, payment_type_id } =
-				await this.fetchPaymentStatus(paymentId)
+			const {
+				status,
+				external_reference,
+				transaction_amount,
+				currency_id,
+				payment_type_id,
+				status_detail
+			} = await this.fetchPaymentStatus(paymentId)
 
 			const cartId = Number(external_reference)
 
@@ -114,7 +120,8 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 				transaction_amount,
 				mercadopagoStatus,
 				currency_id,
-				payment_type_id
+				payment_type_id,
+				status_detail
 			}
 
 			this.pusherNotificationsService.trigger(
@@ -209,9 +216,23 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 					Authorization: `Bearer ${this.configService.get<string>("MERCADOPAGO_ACCESS_TOKEN")}`
 				}
 			})
-			const { status, external_reference, transaction_amount, currency_id, payment_type_id } = data
+			const {
+				status,
+				external_reference,
+				transaction_amount,
+				currency_id,
+				payment_type_id,
+				status_detail
+			} = data
 
-			return { status, external_reference, transaction_amount, currency_id, payment_type_id }
+			return {
+				status,
+				external_reference,
+				transaction_amount,
+				currency_id,
+				payment_type_id,
+				status_detail
+			}
 		} catch (error) {
 			this.logger.error("Error fetching payment status", error)
 			throw new ClientMercadopagoException("PAYMENT_NOT_FOUND")
