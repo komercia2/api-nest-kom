@@ -1,3 +1,4 @@
+import { CacheModule } from "@nestjs/cache-manager"
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { EventEmitterModule } from "@nestjs/event-emitter"
@@ -25,6 +26,7 @@ import { StoresModule } from "./modules/stores/stores.module"
 			envFilePath: `.env.${process.env.NODE_ENV}`,
 			isGlobal: true
 		}),
+		CacheModule.register({ isGlobal: true }),
 		EventEmitterModule.forRoot({
 			wildcard: false,
 			delimiter: ".",

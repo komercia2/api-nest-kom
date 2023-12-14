@@ -14,7 +14,7 @@ export class DepartamentController {
 		private readonly getAllDepartamentsQuery: GetAllDepartamentsQuery
 	) {}
 
-	@Get("")
+	@Get()
 	async getAllDepartaments(@Req() _req: Request, @Res() res: Response) {
 		try {
 			const departaments = await this.getAllDepartamentsQuery.execute()
