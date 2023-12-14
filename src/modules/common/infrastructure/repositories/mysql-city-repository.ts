@@ -23,7 +23,7 @@ export class MySQLCityRepository implements ICityRepository {
 		const citiesFromDatabase = await this.mysqlCityService.getAll()
 		const formattedCities = citiesFromDatabase.map((city) => MySQLCityRepository.toEntity(city))
 
-		await this.cacheManager.set("cities", formattedCities)
+		await this.cacheManager.set("cities", formattedCities, 60 * 60)
 
 		return formattedCities
 	}

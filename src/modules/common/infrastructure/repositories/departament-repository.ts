@@ -20,7 +20,7 @@ export class DepartamentRepository implements IDepartamentRepository {
 		if (departaments) return departaments
 
 		const departamentsFromDatabase = await this.mysqlDepartamentService.getAll()
-		await this.cacheManager.set("departaments", departamentsFromDatabase)
+		await this.cacheManager.set("departaments", departamentsFromDatabase, 60 * 60)
 
 		return departamentsFromDatabase
 	}
