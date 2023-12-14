@@ -19,6 +19,7 @@ import {
 
 import {
 	CheckWithoutAuthQuery,
+	FindStoreHeadquartersQuery,
 	GetPagedStoreBlogsQuery,
 	GetStoreBannersQuery,
 	GetStoreBlogByIdQuery,
@@ -42,6 +43,7 @@ import {
 	PublicStoreEntitiesController,
 	PublicStoreExternalApiController,
 	PublicStoreGeolocationController,
+	PublicStoreHeadquartersController,
 	PublicStorePoliciesController,
 	PublicStoreProductCategoryController,
 	PublicStoreProductSubcategoryController,
@@ -56,6 +58,7 @@ import {
 	MySQLStoreEntitiesRepository,
 	MySQLStoreExternalApiRepository,
 	MySQLStoreGeolocationRepository,
+	MySQLStoreHeadquartersRepository,
 	MySQLStoreInfoRepository,
 	MySQLStorePoliciesRepository,
 	MySQLStoreWhatsappCheckoutRepository
@@ -71,6 +74,7 @@ import {
 	MySQLStoreEntitiesService,
 	MySQLStoreExternalApiService,
 	MySQLStoreGeolocationService,
+	MySQLStoreHeadquartersService,
 	MySQLStoreInfoService,
 	MySQLStorePoliciesService,
 	MySQLStoreProductCategoryService,
@@ -127,6 +131,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreEntitiesRepository,
 		useClass: MySQLStoreEntitiesRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreHeadquartersRepository,
+		useClass: MySQLStoreHeadquartersRepository
 	}
 ]
 
@@ -190,6 +198,14 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.GetStoreEntityQuery,
 		useClass: GetStoreEntityQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.FindStoreHeadquartersQuery,
+		useClass: FindStoreHeadquartersQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreHeadquartersService,
+		useClass: MySQLStoreHeadquartersService
 	},
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
@@ -256,7 +272,8 @@ const infrastructure = [
 			Banners,
 			WhatsappCheckout,
 			Entidades,
-			EntidadesTiendas
+			EntidadesTiendas,
+			Geolocalizacion
 		])
 	],
 	controllers: [
@@ -271,7 +288,8 @@ const infrastructure = [
 		PublicStorePoliciesController,
 		PublicStoreBannerController,
 		PublicStoreWhatsappCheckoutController,
-		PublicStoreEntitiesController
+		PublicStoreEntitiesController,
+		PublicStoreHeadquartersController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -291,7 +309,8 @@ export class StoresModule implements NestModule {
 				PublicStorePoliciesController,
 				PublicStoreBannerController,
 				PublicStoreWhatsappCheckoutController,
-				PublicStoreEntitiesController
+				PublicStoreEntitiesController,
+				PublicStoreHeadquartersController
 			)
 	}
 }
