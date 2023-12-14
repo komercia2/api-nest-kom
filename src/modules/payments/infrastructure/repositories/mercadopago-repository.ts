@@ -145,7 +145,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		try {
 			const cart = await this.mercadopagoService.getCartProducts(cartId)
 
-			const { tienda, productosCarritos, usuario2, total, metodoPago } = this.validateCart(cart)
+			const { tienda, usuario2, total } = this.validateCart(cart)
 
 			const storeMercadopagoInfo = await this.mercadopagoService.getMercadopagoInfo(tienda)
 
@@ -164,19 +164,6 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 			if (!id || !init_point || !sandbox_init_point) {
 				throw new MercadopagoException("PREFERENCE_NOT_CREATED")
 			}
-
-			const totalItems = this.getOrderProductsAmount(productosCarritos)
-
-			await this.pusherNotificationsService.trigger(
-				`store-${tienda}`,
-				"preference-created",
-				JSON.stringify({
-					cartId,
-					totalItems,
-					totalPrice: total,
-					paymentMethod: metodoPago
-				})
-			)
 
 			return {
 				preferenceId: id,
