@@ -25,7 +25,7 @@ export class DepartamentController {
 				success: true
 			})
 		} catch (error) {
-			handlerHttpResponse(res, {
+			return handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting departaments",
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
