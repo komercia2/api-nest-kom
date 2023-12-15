@@ -10,6 +10,7 @@ import {
 	Entidades,
 	EntidadesTiendas,
 	Geolocalizacion,
+	MediosEnvios,
 	Politicas,
 	Subcategorias,
 	TiendaBlogs,
@@ -32,11 +33,13 @@ import {
 	GetStorePoliciesQuery,
 	GetStoreProductCategoriesQuery,
 	GetStoreProductSubcategoriesQuery,
+	GetStoreShippingMeansQuery,
 	GetStoresInfoByEntityQuery,
 	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
+	PublicShippingMeansController,
 	PublicStoreBannerController,
 	PublicStoreBlogController,
 	PublicStoreDiscountController,
@@ -65,6 +68,7 @@ import {
 } from "./infrastructure/repositories"
 import { MySQLStoreCustomerAccessCodeRepository } from "./infrastructure/repositories/mysq-store-customer-repository"
 import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositories/mysq-store-product-category-repository"
+import { MySQLStoreShippingMeansRepository } from "./infrastructure/repositories/mysql-store-shipping-means-repository"
 import { MysqlStoreProductSubcategoryRepository } from "./infrastructure/repositories/mysql-store-subcategory-repository"
 import {
 	MySQLStoreBannerService,
@@ -81,6 +85,7 @@ import {
 	MysqlStoreProductSubcategoryService,
 	MySQLStoreWhatsappCheckoutService
 } from "./infrastructure/services"
+import { MysqlStoreShippingMeansService } from "./infrastructure/services/mysql-store-shipping-means-service"
 import { StoresInfrastructureInjectionTokens } from "./infrastructure/store-infrastructure-injection-tokens"
 
 const application = [
@@ -135,6 +140,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreHeadquartersRepository,
 		useClass: MySQLStoreHeadquartersRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreShippingMeansRepository,
+		useClass: MySQLStoreShippingMeansRepository
 	}
 ]
 
@@ -204,6 +213,10 @@ const infrastructure = [
 		useClass: FindStoreHeadquartersQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreShippingMeansQuery,
+		useClass: GetStoreShippingMeansQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreHeadquartersService,
 		useClass: MySQLStoreHeadquartersService
 	},
@@ -254,6 +267,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MysqlStoreEntitiesService,
 		useClass: MySQLStoreEntitiesService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreShippingMeansService,
+		useClass: MysqlStoreShippingMeansService
 	}
 ]
 
@@ -273,7 +290,8 @@ const infrastructure = [
 			WhatsappCheckout,
 			Entidades,
 			EntidadesTiendas,
-			Geolocalizacion
+			Geolocalizacion,
+			MediosEnvios
 		])
 	],
 	controllers: [
@@ -289,7 +307,8 @@ const infrastructure = [
 		PublicStoreBannerController,
 		PublicStoreWhatsappCheckoutController,
 		PublicStoreEntitiesController,
-		PublicStoreHeadquartersController
+		PublicStoreHeadquartersController,
+		PublicShippingMeansController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -310,7 +329,8 @@ export class StoresModule implements NestModule {
 				PublicStoreBannerController,
 				PublicStoreWhatsappCheckoutController,
 				PublicStoreEntitiesController,
-				PublicStoreHeadquartersController
+				PublicStoreHeadquartersController,
+				PublicShippingMeansController
 			)
 	}
 }

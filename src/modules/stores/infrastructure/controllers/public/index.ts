@@ -1,3 +1,4 @@
+export * from "./public-shipping-means-controller"
 export * from "./public-store-banner-controller"
 export * from "./public-store-blogs-controller"
 export * from "./public-store-discount-controller"
