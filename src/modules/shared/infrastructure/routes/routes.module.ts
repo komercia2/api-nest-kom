@@ -8,6 +8,7 @@ import { HooksModule } from "src/modules/hooks/hooks.module"
 import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
 import { StoresModule } from "src/modules/stores/stores.module"
+import { UsersModule } from "src/modules/users/users.module"
 
 const apiVersions = { v1: "v1" }
 
@@ -48,6 +49,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/hooks`,
 		module: HooksModule
+	},
+	{
+		path: `${apiVersions.v1}/users`,
+		module: UsersModule
 	}
 ]
 

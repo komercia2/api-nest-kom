@@ -18,6 +18,7 @@ import { HooksModule } from "./modules/hooks/hooks.module"
 import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
 import { StoresModule } from "./modules/stores/stores.module"
+import { UsersModule } from "./modules/users/users.module"
 
 @Module({
 	imports: [
@@ -45,7 +46,8 @@ import { StoresModule } from "./modules/stores/stores.module"
 		CommonModule,
 		StoresModule,
 		PaymentsModule,
-		HooksModule
+		HooksModule,
+		UsersModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
