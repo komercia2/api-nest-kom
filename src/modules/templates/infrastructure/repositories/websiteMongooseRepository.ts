@@ -20,6 +20,10 @@ export class WebsiteMongooseRepository implements IWebSitesRepository {
 		private readonly mysqlTemplatesService: MysqlTemplatesService
 	) {}
 
+	async incrementViews(storeId: number): Promise<boolean> {
+		return await this.mysqlTemplatesService.incrementViews(storeId)
+	}
+
 	async findMySQLTemplateByCriteria(
 		criteria: string,
 		isDomain: boolean

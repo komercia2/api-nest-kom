@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { IStoreInfo } from "@templates/domain/entities/websites"
-import { Tiendas } from "src/entities"
+import { Tiendas, VisitasTienda } from "src/entities"
 import { TiendasInfo } from "src/entities/TiendasInfo"
 import { Repository } from "typeorm"
 import { Like } from "typeorm"
@@ -10,7 +10,9 @@ import { Like } from "typeorm"
 export class MysqlTemplatesService {
 	constructor(
 		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>,
-		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>
+		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
+		@InjectRepository(VisitasTienda)
+		private readonly visitasTiendaRepository: Repository<VisitasTienda>
 	) {}
 
 	async findMySQLTemplateByCriteria(
@@ -40,5 +42,17 @@ export class MysqlTemplatesService {
 		}
 
 		return null
+	}
+
+	async incrementViews(storeId: number): Promise<boolean> {
+		const store = await this.visitasTiendaRepository.findOne({ where: { tiendaId: storeId } })
+
+		if (!store) return false
+
+		const { numeroVisitas } = store
+
+		await this.visitasTiendaRepository.update({ id: storeId }, { numeroVisitas: numeroVisitas + 1 })
+
+		return true
 	}
 }

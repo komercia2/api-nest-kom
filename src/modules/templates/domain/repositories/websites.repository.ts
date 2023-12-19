@@ -18,4 +18,5 @@ export interface IWebSitesRepository {
 	): Promise<WebSiteEntity>
 	updateSettings(_id: string, templateNumber: number, settings: WebSiteTemplate): Promise<boolean>
 	delete(_id: string, templateId: string): Promise<boolean>
+	incrementViews(storeId: number): Promise<boolean>
 }

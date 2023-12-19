@@ -8,6 +8,7 @@ import {
 	Param,
 	Patch,
 	Post,
+	Put,
 	Query,
 	Req,
 	Res,
@@ -16,6 +17,7 @@ import {
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { CreateWebSiteDto, UpdateWebSiteDto } from "@templates/application/command/dtos"
+import { IncrementViewsCommand } from "@templates/application/command/increment-views-command"
 import {
 	CreateWebSiteCommand,
 	DeleteWebsiteCommand,
@@ -67,8 +69,32 @@ export class WebsitesController {
 		private readonly updateWebsiteSettingsCommand: UpdateWebsiteSettingsCommand,
 
 		@Inject(InfrastructureInjectionTokens.DeleteWebsiteCommand)
-		private readonly deleteWebsiteCommand: DeleteWebsiteCommand
+		private readonly deleteWebsiteCommand: DeleteWebsiteCommand,
+
+		@Inject(InfrastructureInjectionTokens.IncrementViewsCommand)
+		private readonly incrementViewsCommand: IncrementViewsCommand
 	) {}
+
+	@Post("/views/:storeId")
+	async incrementViews(@Param("storeId") storeId: number, @Res() res: Response) {
+		try {
+			const incremented = await this.incrementViewsCommand.execute(storeId)
+
+			return handlerHttpResponse(res, {
+				data: incremented,
+				message: `Views incremented for store ${storeId}`,
+				success: true,
+				statusCode: HttpStatus.OK
+			})
+		} catch (error) {
+			return handlerHttpResponse(res, {
+				message: "Error incrementing views",
+				success: false,
+				data: null,
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR
+			})
+		}
+	}
 
 	@Post()
 	@UsePipes()

@@ -3,7 +3,12 @@ import { MongooseModule } from "@nestjs/mongoose"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
-import { Template_5Settings, TemplateGeneral, TemplateWhatsappSettings } from "src/entities"
+import {
+	Template_5Settings,
+	TemplateGeneral,
+	TemplateWhatsappSettings,
+	VisitasTienda
+} from "src/entities"
 import { Tiendas } from "src/entities/Tiendas"
 import { TiendasInfo } from "src/entities/TiendasInfo"
 
@@ -13,6 +18,7 @@ import {
 	DeleteTemplate15Command,
 	UpdateTemplate15Command
 } from "./application/command"
+import { IncrementViewsCommand } from "./application/command/increment-views-command"
 import {
 	CreateWebSiteCommand,
 	DeleteWebsiteCommand,
@@ -125,6 +131,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.GetTemplate99Query,
 		useClass: GetTemplate99Query
+	},
+	{
+		provide: InfrastructureInjectionTokens.IncrementViewsCommand,
+		useClass: IncrementViewsCommand
 	}
 ]
 
@@ -207,7 +217,8 @@ const infrastructure = [
 			TiendasInfo,
 			Template_5Settings,
 			TemplateWhatsappSettings,
-			TemplateGeneral
+			TemplateGeneral,
+			VisitasTienda
 		])
 	],
 	controllers: [Template15Controller, WebsitesController, PublicStoreTemplateSettingsController],
