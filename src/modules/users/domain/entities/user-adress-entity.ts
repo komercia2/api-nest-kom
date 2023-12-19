@@ -1,5 +1,5 @@
 export interface IUserAdress {
-	id: number
+	id?: number
 	direccion: string
 	tag: string
 	userId: number
@@ -8,13 +8,13 @@ export interface IUserAdress {
 	celular: string
 	barrio: string
 	ciudadId: number
-	createdAt: Date | null
-	updatedAt: Date | null
-	deletedAt: Date | null
+	createdAt?: Date
+	updatedAt?: Date
+	deletedAt?: Date | null
 }
 
 export class UserAdressEntity implements IUserAdress {
-	id: number
+	id?: number
 	direccion: string
 	tag: string
 	userId: number
@@ -23,9 +23,9 @@ export class UserAdressEntity implements IUserAdress {
 	celular: string
 	barrio: string
 	ciudadId: number
-	createdAt: Date | null
-	updatedAt: Date | null
-	deletedAt: Date | null
+	createdAt?: Date
+	updatedAt?: Date
+	deletedAt?: Date | null
 
 	constructor(data: IUserAdress) {
 		this.id = data.id
@@ -37,9 +37,9 @@ export class UserAdressEntity implements IUserAdress {
 		this.celular = data.celular
 		this.barrio = data.barrio
 		this.ciudadId = data.ciudadId
-		this.createdAt = data.createdAt
+		this.createdAt = data.createdAt || new Date()
 		this.updatedAt = data.updatedAt
-		this.deletedAt = data.deletedAt
+		this.deletedAt = data.deletedAt || null
 	}
 
 	static create(data: IUserAdress): UserAdressEntity {

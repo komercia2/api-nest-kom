@@ -3,7 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { DireccionesUsuario } from "src/entities"
 import { Repository } from "typeorm"
 
-import { UserAdressEntity } from "../../domain/entities"
+import { IUserAdress, UserAdressEntity } from "../../domain/entities"
 
 @Injectable()
 export class MysqlUserService {
@@ -15,6 +15,22 @@ export class MysqlUserService {
 	async getUserAdressesByUserId(userId: number) {
 		const addresses = await this.userAdressRepository.find({ where: { userId } })
 		return addresses.map(this.toEntity)
+	}
+
+	createUserAdress(userId: number, adress: IUserAdress) {
+		return this.userAdressRepository.insert({ ...adress, userId })
+	}
+
+	async deleteUserAdress(userId: number, adressId: number) {
+		const adressExistis = await this.userAdressRepository.findOne({
+			where: { userId, id: adressId }
+		})
+
+		if (!adressExistis) {
+			throw new Error(`User adress with id ${adressId} does not exist`)
+		}
+
+		await this.userAdressRepository.delete({ userId, id: adressId })
 	}
 
 	toEntity(data: DireccionesUsuario): UserAdressEntity {

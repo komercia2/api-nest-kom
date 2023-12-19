@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import { DireccionesUsuario } from "src/entities"
 
+import { CreateUserAdressCommand, DeleteUserAdressCommand } from "./application/command"
 import { GetAdressesByUserIdQuery } from "./application/query"
 import { UsersApplicationInjectionTokens } from "./application/users-application-injection-tokens"
 import { PublicUserController } from "./infrastructure/controllers/public"
@@ -25,6 +26,14 @@ const infrastructure = [
 	{
 		provide: UsersInfrastructureInjectionTokens.GetAdressesByUserIdQuery,
 		useClass: GetAdressesByUserIdQuery
+	},
+	{
+		provide: UsersInfrastructureInjectionTokens.DeleteUserAdressCommand,
+		useClass: DeleteUserAdressCommand
+	},
+	{
+		provide: UsersInfrastructureInjectionTokens.CreateUserAdressCommand,
+		useClass: CreateUserAdressCommand
 	}
 ]
 
