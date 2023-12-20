@@ -230,6 +230,7 @@ export class TemplatesModule implements NestModule {
 			.apply(LaravelAuthMiddleware)
 			.exclude({ path: "v1/templates/template15/:storeId", method: RequestMethod.GET })
 			.exclude({ path: "v1/templates/websites/template", method: RequestMethod.GET })
+			.exclude({ path: "v1/templates/websites/views/:storeId", method: RequestMethod.POST })
 			.forRoutes(
 				{ path: "v1/templates/websites", method: RequestMethod.GET },
 				{ path: "v1/templates/*", method: RequestMethod.POST },
