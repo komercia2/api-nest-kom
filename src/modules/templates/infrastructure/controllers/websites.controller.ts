@@ -80,6 +80,15 @@ export class WebsitesController {
 		try {
 			const incremented = await this.incrementViewsCommand.execute(storeId)
 
+			if (!incremented) {
+				return handlerHttpResponse(res, {
+					data: null,
+					message: `Views not incremented for store ${storeId}`,
+					success: false,
+					statusCode: HttpStatus.NOT_FOUND
+				})
+			}
+
 			return handlerHttpResponse(res, {
 				data: incremented,
 				message: `Views incremented for store ${storeId}`,
