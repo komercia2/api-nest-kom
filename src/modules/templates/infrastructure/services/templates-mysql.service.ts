@@ -46,15 +46,31 @@ export class MysqlTemplatesService {
 
 	async incrementViews(storeId: number): Promise<boolean> {
 		try {
-			const store = await this.visitasTiendaRepository.findOne({ where: { tiendaId: storeId } })
+			const storeExistis = await this.tiendasRepository.findOne({ where: { id: storeId } })
 
-			if (!store) return false
+			if (!storeExistis) return false
 
-			const { numeroVisitas } = store
+			const storeViewsInfo = await this.visitasTiendaRepository.findOne({
+				where: { tiendaId: storeId }
+			})
+
+			if (!storeViewsInfo) {
+				await this.visitasTiendaRepository.save({
+					tiendaId: storeId,
+					numeroVisitas: 1,
+					createdAt: new Date()
+				})
+				return true
+			}
+
+			const { numeroVisitas } = storeViewsInfo
 
 			const viewsUpdated = await this.visitasTiendaRepository.update(
 				{ tiendaId: storeId },
-				{ numeroVisitas: () => `${numeroVisitas + 1}` }
+				{
+					numeroVisitas: () => `${numeroVisitas + 1}`,
+					updatedAt: () => `NOW()`
+				}
 			)
 
 			if (!viewsUpdated.affected) return false
