@@ -14,9 +14,9 @@ export class MysqlUserService {
 		@InjectRepository(Users) private readonly userRepository: Repository<Users>
 	) {}
 
-	async searchUserByDocumentAndId(userId: number, document: string) {
+	async searchUserByDocument(document: string) {
 		const user = await this.userRepository.findOne({
-			where: { id: userId, identificacion: document }
+			where: { identificacion: document }
 		})
 		return user
 	}

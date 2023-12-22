@@ -46,12 +46,11 @@ export class PublicUserController {
 	async authenticateCheckoutUser(
 		@Req() _req: Request,
 		@Res() res: Response,
-		@Param("userId") userId: number,
 		@Body() body: { document: string }
 	) {
 		const { document } = body
 		try {
-			const token = await this.authenticateCheckoutUserQuery.execute(userId, document)
+			const token = await this.authenticateCheckoutUserQuery.execute(document)
 
 			return handlerHttpResponse(res, {
 				data: token,

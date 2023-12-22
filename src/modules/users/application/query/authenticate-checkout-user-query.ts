@@ -9,7 +9,7 @@ export class AuthenticateCheckoutUserQuery {
 		@Inject(UsersApplicationInjectionTokens.IUserRepository) private repository: IUserRepository
 	) {}
 
-	execute(userId: number, document: string): Promise<string> {
-		return this.repository.authenticateCheckoutUser(userId, document)
+	execute(document: string): Promise<string> {
+		return this.repository.authenticateCheckoutUser(document)
 	}
 }

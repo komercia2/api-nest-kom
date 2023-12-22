@@ -17,8 +17,8 @@ export class UserRepository implements IUserRepository {
 		private readonly configService: ConfigService
 	) {}
 
-	async authenticateCheckoutUser(userId: number, document: string): Promise<string> {
-		const user = await this.mysqlUserService.searchUserByDocumentAndId(userId, document)
+	async authenticateCheckoutUser(document: string): Promise<string> {
+		const user = await this.mysqlUserService.searchUserByDocument(document)
 
 		if (!user) throw new UnauthorizedException(`User identified with ${document} not found`)
 
