@@ -2,6 +2,7 @@ import { CacheModule } from "@nestjs/cache-manager"
 import { Module } from "@nestjs/common"
 import { ConfigModule } from "@nestjs/config"
 import { EventEmitterModule } from "@nestjs/event-emitter"
+import { JwtModule } from "@nestjs/jwt"
 import { MongooseModule } from "@nestjs/mongoose"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { pinoConfig } from "@shared/infrastructure/configs/logs"
@@ -22,6 +23,10 @@ import { UsersModule } from "./modules/users/users.module"
 
 @Module({
 	imports: [
+		JwtModule.register({
+			secret: process.env.JWT_SECRET,
+			global: true
+		}),
 		LoggerModule.forRoot(pinoConfig),
 		ConfigModule.forRoot({
 			envFilePath: `.env.${process.env.NODE_ENV}`,

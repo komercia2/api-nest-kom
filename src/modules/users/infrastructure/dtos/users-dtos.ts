@@ -7,9 +7,6 @@ export class CreateUserAdressDto {
 	@IsString()
 	tag: string
 
-	@IsNumber()
-	userId: number
-
 	@IsString()
 	nombre: string
 

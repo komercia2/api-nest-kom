@@ -2,7 +2,6 @@ export interface IUserAdress {
 	id?: number
 	direccion: string
 	tag: string
-	userId: number
 	nombre: string
 	apellido: string
 	celular: string
@@ -17,7 +16,6 @@ export class UserAdressEntity implements IUserAdress {
 	id?: number
 	direccion: string
 	tag: string
-	userId: number
 	nombre: string
 	apellido: string
 	celular: string
@@ -31,7 +29,6 @@ export class UserAdressEntity implements IUserAdress {
 		this.id = data.id
 		this.direccion = data.direccion
 		this.tag = data.tag
-		this.userId = data.userId
 		this.nombre = data.nombre
 		this.apellido = data.apellido
 		this.celular = data.celular

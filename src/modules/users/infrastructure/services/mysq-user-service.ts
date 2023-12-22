@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DireccionesUsuario } from "src/entities"
+import { DireccionesUsuario, Users } from "src/entities"
 import { Repository } from "typeorm"
 
 import { IUserAdress, UserAdressEntity } from "../../domain/entities"
@@ -9,8 +9,17 @@ import { IUserAdress, UserAdressEntity } from "../../domain/entities"
 export class MysqlUserService {
 	constructor(
 		@InjectRepository(DireccionesUsuario)
-		private readonly userAdressRepository: Repository<DireccionesUsuario>
+		private readonly userAdressRepository: Repository<DireccionesUsuario>,
+
+		@InjectRepository(Users) private readonly userRepository: Repository<Users>
 	) {}
+
+	async searchUserByDocumentAndId(userId: number, document: string) {
+		const user = await this.userRepository.findOne({
+			where: { id: userId, identificacion: document }
+		})
+		return user
+	}
 
 	async getUserAdressesByUserId(userId: number) {
 		const addresses = await this.userAdressRepository.find({ where: { userId } })
