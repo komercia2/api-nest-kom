@@ -42,7 +42,7 @@ export class PublicUserController {
 		private readonly authenticateCheckoutUserQuery: AuthenticateCheckoutUserQuery
 	) {}
 
-	@Post("users/:userId/authenticate-checkout")
+	@Post("users/authenticate-checkout")
 	async authenticateCheckoutUser(
 		@Req() _req: Request,
 		@Res() res: Response,
