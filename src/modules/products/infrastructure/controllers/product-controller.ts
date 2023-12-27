@@ -1,10 +1,15 @@
-import { HttpStatus, Inject, Param, Query, Req, Res } from "@nestjs/common"
+import { Body, HttpStatus, Inject, Param, Query, Req, Res } from "@nestjs/common"
 import { Get } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
-import { GetPaginatedProductsQuery, GetProductBySlugQuery } from "../../application/query"
+import {
+	GetManyByIdsQuery,
+	GetPaginatedProductsQuery,
+	GetProductBySlugQuery
+} from "../../application/query"
+import { GetManyProductsByIdsDto } from "../dtos"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
 
 @Controller("")
@@ -14,7 +19,10 @@ export class ProductController {
 		private readonly getPaginatedProductsQuery: GetPaginatedProductsQuery,
 
 		@Inject(InfrastructureInjectionTokens.GetProductBySlugQuery)
-		private readonly getProductBySlugQuery: GetProductBySlugQuery
+		private readonly getProductBySlugQuery: GetProductBySlugQuery,
+
+		@Inject(InfrastructureInjectionTokens.GetManyByIdsQuery)
+		private readonly getManyByIdsQuery: GetManyByIdsQuery
 	) {}
 
 	@Get("public/paged")
@@ -103,6 +111,35 @@ export class ProductController {
 			handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting product by id",
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				success: false
+			})
+		}
+	}
+
+	@Get("public/checkout/many")
+	async getManyByIds(
+		@Req() _req: Request,
+		@Res() res: Response,
+		@Body() boody: GetManyProductsByIdsDto
+	) {
+		const { ids, storeId } = boody
+
+		try {
+			const products = await this.getManyByIdsQuery.execute(storeId, ids as number[])
+
+			handlerHttpResponse(res, {
+				data: products,
+				message: "Products found",
+				statusCode: HttpStatus.OK,
+				success: true
+			})
+			return
+		} catch (error) {
+			console.log(error)
+			handlerHttpResponse(res, {
+				data: null,
+				message: "Error getting products by ids",
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
 				success: false
 			})

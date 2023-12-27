@@ -8,7 +8,7 @@ import {
 	ProductosVariantesCombinaciones,
 	VisitaProducto
 } from "src/entities"
-import { Repository } from "typeorm"
+import { In, Repository } from "typeorm"
 
 import { IProductFilterDTO } from "../../domain/repositories"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
@@ -331,6 +331,99 @@ export class MySQLProductService {
 			console.log(`${LOG_IDENTITY}: Release connection`)
 			await queryRunner.release()
 		}
+	}
+
+	async getManyByIds(storeId: number, ids: number[]) {
+		/**
+ *  "id": 12755,
+            "nombre": "Camisa Keep Calm",
+            "precio": 0,
+            "foto_cloudinary": "https://res.cloudinary.com/komercia-store/image/upload/v1576178760/582/products/jfadeoxhfdbyy1xeqaxt.png",
+            "activo": 1,
+            "foto": "",
+            "con_variante": 1,
+            "envio_gratis": 0,
+            "orden": 0,
+            "tag": null,
+            "informacion_producto": [
+                {
+                    "id": 12755,
+                    "garantia": null,
+                    "inventario": 0,
+                    "activar_mensajes": null,
+                    "label_mensaje": null,
+                    "mensaje_obligatorio": null,
+                    "descripcion_corta": null,
+                    "promocion_valor": null,
+                    "tag_promocion": null,
+                    "etiquetas": null,
+                    "dealer_whatsapp": null,
+                    "condicion": 1,
+                    "proveedor": null
+                }
+            ],
+            "variantes": [
+                {
+                    "id": 9906,
+                    "variantes": "[{\"nombre\":\"Talla\",\"valores\":[{\"option\":\"S\",\"parent_index\":0},{\"option\":\"m\",\"parent_index\":0}],\"key\":\"variant1\",\"newVariant\":\"\"}]",
+                    "id_producto": 12755,
+                    "combinaciones": [
+                        {
+                            "id": 9905,
+                            "combinaciones": "[{\"combinacion\":[\"S\"],\"estado\":true,\"precio\":55000,\"unidades\":9,\"sku\":\"sku 450\"},{\"combinacion\":[\"m\"],\"estado\":true,\"precio\":50000,\"unidades\":\"2\",\"sku\":\"\"}]",
+                            "id_productos_variantes": 9906
+                        }
+                    ]
+                }
+            ]
+        }
+ */
+
+		const products = await this.productRepository
+			.createQueryBuilder("products")
+			.select([
+				"products.id",
+				"products.nombre",
+				"products.precio",
+				"products.fotoCloudinary",
+				"products.activo",
+				"products.foto",
+				"products.conVariante",
+				"products.envioGratis",
+				"products.orden",
+				"products.tag",
+				"info.id",
+				"info.garantia",
+				"info.inventario",
+				"info.activarMensajes",
+				"info.labelMensaje",
+				"info.mensajeObligatorio",
+				"info.descripcionCorta",
+				"info.promocionValor",
+				"info.tagPromocion",
+				"info.etiquetas",
+				"info.dealerWhatsapp",
+				"info.condicion",
+				"proveedores",
+				"variantes.id",
+				"variantes.variantes",
+				"variantes.idProducto2",
+				"combinaciones.id",
+				"combinaciones.combinaciones",
+				"combinaciones.idProductosVariantes2"
+			])
+			.innerJoin("products.productosInfo", "info")
+			.leftJoin("info.proveedores", "proveedores")
+			.leftJoin("products.productosVariantes", "variantes")
+			.leftJoin("variantes.productosVariantesCombinaciones", "combinaciones")
+			.where("products.id IN (:...ids)", { ids })
+			.andWhere("products.tienda = :storeId", { storeId })
+			.orderBy("products.precio", "DESC")
+			.orderBy("products.orden", "DESC")
+			.orderBy("products.nombre", "ASC")
+			.getMany()
+
+		return products
 	}
 
 	private getSlug(slug: string) {

@@ -3,5 +3,6 @@ export enum InfrastructureInjectionTokens {
 	XlsxProductService = "XlsxProductService",
 	GetPaginatedProductsQuery = "GetPaginatedProductsQuery",
 	GetProductBySlugQuery = "GetProductByIdQuery",
-	CreateFromFileCommand = "createFromFileCommand"
+	CreateFromFileCommand = "createFromFileCommand",
+	GetManyByIdsQuery = "GetManyByIdsQuery"
 }
