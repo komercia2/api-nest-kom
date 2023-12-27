@@ -95,8 +95,14 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 	 */
 	async proccessPayment(paymentId: number): Promise<void> {
 		try {
-			const { status, external_reference, transaction_amount, currency_id, payment_type_id } =
-				await this.fetchPaymentStatus(paymentId)
+			const {
+				status,
+				external_reference,
+				transaction_amount,
+				currency_id,
+				payment_type_id,
+				status_detail
+			} = await this.fetchPaymentStatus(paymentId)
 
 			const cartId = Number(external_reference)
 
@@ -114,7 +120,8 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 				transaction_amount,
 				mercadopagoStatus,
 				currency_id,
-				payment_type_id
+				payment_type_id,
+				status_detail
 			}
 
 			this.pusherNotificationsService.trigger(
@@ -138,7 +145,7 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 		try {
 			const cart = await this.mercadopagoService.getCartProducts(cartId)
 
-			const { tienda, productosCarritos, usuario2, total, metodoPago } = this.validateCart(cart)
+			const { tienda, usuario2, total } = this.validateCart(cart)
 
 			const storeMercadopagoInfo = await this.mercadopagoService.getMercadopagoInfo(tienda)
 
@@ -157,19 +164,6 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 			if (!id || !init_point || !sandbox_init_point) {
 				throw new MercadopagoException("PREFERENCE_NOT_CREATED")
 			}
-
-			const totalItems = this.getOrderProductsAmount(productosCarritos)
-
-			await this.pusherNotificationsService.trigger(
-				`store-${tienda}`,
-				"preference-created",
-				JSON.stringify({
-					cartId,
-					totalItems,
-					totalPrice: total,
-					paymentMethod: metodoPago
-				})
-			)
 
 			return {
 				preferenceId: id,
@@ -209,9 +203,23 @@ export class MercadopagoRepository implements IMercadopagoRepository {
 					Authorization: `Bearer ${this.configService.get<string>("MERCADOPAGO_ACCESS_TOKEN")}`
 				}
 			})
-			const { status, external_reference, transaction_amount, currency_id, payment_type_id } = data
+			const {
+				status,
+				external_reference,
+				transaction_amount,
+				currency_id,
+				payment_type_id,
+				status_detail
+			} = data
 
-			return { status, external_reference, transaction_amount, currency_id, payment_type_id }
+			return {
+				status,
+				external_reference,
+				transaction_amount,
+				currency_id,
+				payment_type_id,
+				status_detail
+			}
 		} catch (error) {
 			this.logger.error("Error fetching payment status", error)
 			throw new ClientMercadopagoException("PAYMENT_NOT_FOUND")

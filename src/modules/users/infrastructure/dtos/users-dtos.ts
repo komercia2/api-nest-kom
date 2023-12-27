@@ -1,7 +1,24 @@
-import { IsNotEmpty, IsNumber } from "class-validator"
+import { IsNumber, IsString } from "class-validator"
 
-export class UpdateUserRoleDTO {
-	@IsNotEmpty()
+export class CreateUserAdressDto {
+	@IsString()
+	direccion: string
+
+	@IsString()
+	tag: string
+
+	@IsString()
+	nombre: string
+
+	@IsString()
+	apellido: string
+
+	@IsString()
+	barrio: string
+
 	@IsNumber()
-	role: number
+	ciudadId: number
+
+	@IsString()
+	celular: string
 }

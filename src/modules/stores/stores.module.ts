@@ -10,6 +10,7 @@ import {
 	Entidades,
 	EntidadesTiendas,
 	Geolocalizacion,
+	MediosEnvios,
 	Politicas,
 	Subcategorias,
 	TiendaBlogs,
@@ -19,6 +20,7 @@ import {
 
 import {
 	CheckWithoutAuthQuery,
+	FindStoreHeadquartersQuery,
 	GetPagedStoreBlogsQuery,
 	GetStoreBannersQuery,
 	GetStoreBlogByIdQuery,
@@ -31,17 +33,20 @@ import {
 	GetStorePoliciesQuery,
 	GetStoreProductCategoriesQuery,
 	GetStoreProductSubcategoriesQuery,
+	GetStoreShippingMeansQuery,
 	GetStoresInfoByEntityQuery,
 	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
+	PublicShippingMeansController,
 	PublicStoreBannerController,
 	PublicStoreBlogController,
 	PublicStoreDiscountController,
 	PublicStoreEntitiesController,
 	PublicStoreExternalApiController,
 	PublicStoreGeolocationController,
+	PublicStoreHeadquartersController,
 	PublicStorePoliciesController,
 	PublicStoreProductCategoryController,
 	PublicStoreProductSubcategoryController,
@@ -56,12 +61,14 @@ import {
 	MySQLStoreEntitiesRepository,
 	MySQLStoreExternalApiRepository,
 	MySQLStoreGeolocationRepository,
+	MySQLStoreHeadquartersRepository,
 	MySQLStoreInfoRepository,
 	MySQLStorePoliciesRepository,
 	MySQLStoreWhatsappCheckoutRepository
 } from "./infrastructure/repositories"
 import { MySQLStoreCustomerAccessCodeRepository } from "./infrastructure/repositories/mysq-store-customer-repository"
 import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositories/mysq-store-product-category-repository"
+import { MySQLStoreShippingMeansRepository } from "./infrastructure/repositories/mysql-store-shipping-means-repository"
 import { MysqlStoreProductSubcategoryRepository } from "./infrastructure/repositories/mysql-store-subcategory-repository"
 import {
 	MySQLStoreBannerService,
@@ -71,12 +78,14 @@ import {
 	MySQLStoreEntitiesService,
 	MySQLStoreExternalApiService,
 	MySQLStoreGeolocationService,
+	MySQLStoreHeadquartersService,
 	MySQLStoreInfoService,
 	MySQLStorePoliciesService,
 	MySQLStoreProductCategoryService,
 	MysqlStoreProductSubcategoryService,
 	MySQLStoreWhatsappCheckoutService
 } from "./infrastructure/services"
+import { MysqlStoreShippingMeansService } from "./infrastructure/services/mysql-store-shipping-means-service"
 import { StoresInfrastructureInjectionTokens } from "./infrastructure/store-infrastructure-injection-tokens"
 
 const application = [
@@ -127,6 +136,14 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreEntitiesRepository,
 		useClass: MySQLStoreEntitiesRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreHeadquartersRepository,
+		useClass: MySQLStoreHeadquartersRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreShippingMeansRepository,
+		useClass: MySQLStoreShippingMeansRepository
 	}
 ]
 
@@ -192,6 +209,18 @@ const infrastructure = [
 		useClass: GetStoreEntityQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.FindStoreHeadquartersQuery,
+		useClass: FindStoreHeadquartersQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreShippingMeansQuery,
+		useClass: GetStoreShippingMeansQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreHeadquartersService,
+		useClass: MySQLStoreHeadquartersService
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreExternalApiService,
 		useClass: MySQLStoreExternalApiService
 	},
@@ -238,6 +267,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MysqlStoreEntitiesService,
 		useClass: MySQLStoreEntitiesService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreShippingMeansService,
+		useClass: MysqlStoreShippingMeansService
 	}
 ]
 
@@ -256,7 +289,9 @@ const infrastructure = [
 			Banners,
 			WhatsappCheckout,
 			Entidades,
-			EntidadesTiendas
+			EntidadesTiendas,
+			Geolocalizacion,
+			MediosEnvios
 		])
 	],
 	controllers: [
@@ -271,7 +306,9 @@ const infrastructure = [
 		PublicStorePoliciesController,
 		PublicStoreBannerController,
 		PublicStoreWhatsappCheckoutController,
-		PublicStoreEntitiesController
+		PublicStoreEntitiesController,
+		PublicStoreHeadquartersController,
+		PublicShippingMeansController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -291,7 +328,9 @@ export class StoresModule implements NestModule {
 				PublicStorePoliciesController,
 				PublicStoreBannerController,
 				PublicStoreWhatsappCheckoutController,
-				PublicStoreEntitiesController
+				PublicStoreEntitiesController,
+				PublicStoreHeadquartersController,
+				PublicShippingMeansController
 			)
 	}
 }

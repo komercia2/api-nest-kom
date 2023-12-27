@@ -1,1 +1,1 @@
-export * from "./mysql-user-service"
+export * from "./mysq-user-service"

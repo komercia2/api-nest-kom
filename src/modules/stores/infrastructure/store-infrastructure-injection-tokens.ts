@@ -14,6 +14,8 @@ export enum StoresInfrastructureInjectionTokens {
 	MySQLStoreBannerService = "MySQLStoreBannerService",
 	MySQLStoreWhatsAppCheckoutService = "MySQLStoreWhatsAppCheckoutService",
 	MysqlStoreEntitiesService = "MysqlStoreEntitiesService",
+	MySQLStoreHeadquartersService = "MySQLStoreHeadquartersService",
+	MySQLStoreShippingMeansService = "MysqlStoreShippingMeansService",
 
 	/**
 	 * Use cases (queries)
@@ -32,5 +34,7 @@ export enum StoresInfrastructureInjectionTokens {
 	GetStoreWhatsAppCheckoutQuery = "GetStoreWhatsAppCheckoutQuery",
 	GetStoreEntitiesQuery = "GetStoreEntitiesQuery",
 	GetStoresInfoByEntityQuery = "GetStoresInfoByEntityQuery",
-	GetStoreEntityQuery = "GetStoreEntityQuery"
+	GetStoreEntityQuery = "GetStoreEntityQuery",
+	FindStoreHeadquartersQuery = "FindStoreHeadquartersQuery",
+	GetStoreShippingMeansQuery = "GetStoreShippingMeansQuery"
 }

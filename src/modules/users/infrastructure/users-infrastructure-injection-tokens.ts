@@ -1,4 +1,7 @@
 export enum UsersInfrastructureInjectionTokens {
 	MySQLUserService = "MySQLUserService",
-	UpdateRoleCommand = "UpdateRoleCommand"
+	GetAdressesByUserIdQuery = "GetAdressesByUserIdQuery",
+	DeleteUserAdressCommand = "DeleteUserAdressCommand",
+	CreateUserAdressCommand = "CreateUserAdressCommand",
+	AuthenticateCheckoutUserQuery = "AuthenticateCheckoutUserQuery"
 }

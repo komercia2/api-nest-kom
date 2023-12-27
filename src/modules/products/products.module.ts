@@ -7,7 +7,11 @@ import { Productos, VisitaProducto } from "src/entities"
 
 import { ProductsApplicationInjectionTokens } from "./application/application-injection-tokens"
 import { CreateFromFileCommand } from "./application/command"
-import { GetPaginatedProductsQuery, GetProductBySlugQuery } from "./application/query"
+import {
+	GetManyByIdsQuery,
+	GetPaginatedProductsQuery,
+	GetProductBySlugQuery
+} from "./application/query"
 import { AdminProductController, ProductController } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection-tokens"
 import { MySQLProductService, XlsxProductService } from "./infrastructure/services"
@@ -24,6 +28,10 @@ const application = [
 	{
 		provide: InfrastructureInjectionTokens.CreateFromFileCommand,
 		useClass: CreateFromFileCommand
+	},
+	{
+		provide: InfrastructureInjectionTokens.GetManyByIdsQuery,
+		useClass: GetManyByIdsQuery
 	}
 ]
 

@@ -1,3 +1,8 @@
+import { IUserAdress, UserAdressEntity } from "../entities"
+
 export interface IUserRepository {
-	updateRole(userId: string, role: number): Promise<void>
+	createUserAdress(userId: number, adress: IUserAdress): Promise<void>
+	getAdressesByUserId(userId: number): Promise<UserAdressEntity[]>
+	deleteUserAdress(userId: number, adressId: number): Promise<void>
+	authenticateCheckoutUser(document: string): Promise<string>
 }

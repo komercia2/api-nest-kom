@@ -1,3 +1,5 @@
 export enum CommonApplicationInjectionTokens {
-	ICityRepository = "ICityRepository"
+	ICityRepository = "ICityRepository",
+	IDepartamentRepository = "IDepartamentRepository",
+	IBankRepository = "IBankRepository"
 }

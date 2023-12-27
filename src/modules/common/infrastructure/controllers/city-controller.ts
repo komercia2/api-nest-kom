@@ -25,7 +25,7 @@ export class CityController {
 				success: true
 			})
 		} catch (error) {
-			handlerHttpResponse(res, {
+			return handlerHttpResponse(res, {
 				data: null,
 				message: "Error getting product by id",
 				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,

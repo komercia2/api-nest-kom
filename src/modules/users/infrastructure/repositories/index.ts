@@ -1,1 +1,1 @@
-export * from "./mysql-user-repository"
+export * from "./user-repository"
