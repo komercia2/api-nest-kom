@@ -1,5 +1,8 @@
 export const Template6ProductOverviewsSettings = {
+	order: 8,
+	visible: true,
 	slug: "",
+	bg_color: "#FFFFFF",
 	"--background_color_1": "#FFFFFF",
 	color_border: "#868686",
 	color_title: "#1f2021",

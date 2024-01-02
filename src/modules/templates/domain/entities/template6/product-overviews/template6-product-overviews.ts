@@ -1,7 +1,10 @@
 import { Template6ProductOverviewsSettings } from "./template6-product-overviews-settings"
 
 export class Template6ProductOverviews {
+	order: number
+	visible: boolean
 	slug: string
+	bg_color: string
 	"--background_color_1": string
 	color_border: string
 	color_title: string
@@ -17,6 +20,9 @@ export class Template6ProductOverviews {
 	fontWeighPriceDescount: number
 
 	constructor(
+		order = Template6ProductOverviewsSettings.order,
+		visible = Template6ProductOverviewsSettings.visible,
+		bg_color = Template6ProductOverviewsSettings.bg_color,
 		slug = Template6ProductOverviewsSettings.slug,
 		background_color_1 = Template6ProductOverviewsSettings["--background_color_1"],
 		color_border = Template6ProductOverviewsSettings.color_border,
@@ -46,5 +52,8 @@ export class Template6ProductOverviews {
 		this.fontWeighTitle = fontWeighTitle
 		this.fontWeighPrice = fontWeighPrice
 		this.fontWeighPriceDescount = fontWeighPriceDescount
+		this.order = order
+		this.visible = visible
+		this.bg_color = bg_color
 	}
 }
