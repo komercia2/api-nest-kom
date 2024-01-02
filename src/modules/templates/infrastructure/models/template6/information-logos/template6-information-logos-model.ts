@@ -6,13 +6,13 @@ import { Template6InformationLogosValuesModel } from "./template6-information-lo
 @Schema({ _id: false })
 export class Template6InformationLogosModel {
 	@Prop({ required: true })
+	order: number
+
+	@Prop({ required: true })
 	"--background_color_1": string
 
 	@Prop({ required: true })
 	visible: boolean
-
-	@Prop({ required: true })
-	img: string
 
 	@Prop({ required: true })
 	title: string
