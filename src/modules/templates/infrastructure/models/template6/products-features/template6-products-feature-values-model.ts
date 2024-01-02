@@ -16,6 +16,9 @@ export class Template6ProductsFeaturesValuesModel {
 
 	@Prop({ required: true })
 	color_description: string
+
+	@Prop({ required: true })
+	bg_img: string
 }
 
 export const Template6ProductsFeaturesValuesSchema = SchemaFactory.createForClass(

@@ -5,8 +5,14 @@ import { Template6ProductsFeaturesValuesModel } from "./template6-products-featu
 
 @Schema({ _id: false })
 export class Template6ProductsFeatureModel {
-	@Prop({ required: false })
-	subtitle: string
+	@Prop({ required: true })
+	order: number
+
+	@Prop({ required: true })
+	visible: boolean
+
+	@Prop({ required: true })
+	subTitle: string
 
 	@Prop({ required: true })
 	title: string
@@ -22,6 +28,9 @@ export class Template6ProductsFeatureModel {
 
 	@Prop({ required: true })
 	color_description: string
+
+	@Prop({ required: true })
+	bg_color: string
 
 	@Prop({
 		required: true,
