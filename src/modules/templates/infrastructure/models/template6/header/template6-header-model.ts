@@ -3,7 +3,7 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 @Schema({ _id: false })
 export class Template6HeaderModel {
 	@Prop({ required: true })
-	"--background_color_1": string
+	bg_color: string
 
 	@Prop({ required: true })
 	"--color_text": string
