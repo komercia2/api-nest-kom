@@ -12,12 +12,14 @@ import {
 	Geolocalizacion,
 	MediosEnvios,
 	Politicas,
+	StoreAnalytics,
 	Subcategorias,
 	TiendaBlogs,
 	Tiendas,
 	WhatsappCheckout
 } from "src/entities"
 
+import { SaveStoreAnalyticCommand } from "./application/command"
 import {
 	CheckWithoutAuthQuery,
 	FindStoreHeadquartersQuery,
@@ -52,9 +54,11 @@ import {
 	PublicStoreProductSubcategoryController,
 	PublicStoreWhatsappCheckoutController
 } from "./infrastructure/controllers/public"
+import { PublicStoreAnalyticsController } from "./infrastructure/controllers/public/public-store-analytics-controller"
 import { PublicStoreCustomerAccessCodeController } from "./infrastructure/controllers/public/public-store-cutomer-access-code-controller"
 import { PublicStoreInfoController } from "./infrastructure/controllers/public/public-store-info-controller"
 import {
+	MySQLStoreAnalyticsRepository,
 	MySQLStoreBannerRepository,
 	MySQLStoreBlogRepository,
 	MySQLStoreDiscountRepository,
@@ -71,6 +75,7 @@ import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositori
 import { MySQLStoreShippingMeansRepository } from "./infrastructure/repositories/mysql-store-shipping-means-repository"
 import { MysqlStoreProductSubcategoryRepository } from "./infrastructure/repositories/mysql-store-subcategory-repository"
 import {
+	MySQLStoreAnalyticsService,
 	MySQLStoreBannerService,
 	MySQLStoreBlogService,
 	MySQLStoreCustomerAccessCodeService,
@@ -144,10 +149,18 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreShippingMeansRepository,
 		useClass: MySQLStoreShippingMeansRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreAnalyticsRepository,
+		useClass: MySQLStoreAnalyticsRepository
 	}
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.SaveStoreAnalyticCommand,
+		useClass: SaveStoreAnalyticCommand
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.GetStoreExternalApisQuery,
 		useClass: GetStoreExternalApisQuery
@@ -271,6 +284,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreShippingMeansService,
 		useClass: MysqlStoreShippingMeansService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreAnalyticsService,
+		useClass: MySQLStoreAnalyticsService
 	}
 ]
 
@@ -283,6 +300,7 @@ const infrastructure = [
 			CustomerAccessCode,
 			Tiendas,
 			CategoriaProductos,
+			StoreAnalytics,
 			Subcategorias,
 			Geolocalizacion,
 			Politicas,
@@ -308,7 +326,8 @@ const infrastructure = [
 		PublicStoreWhatsappCheckoutController,
 		PublicStoreEntitiesController,
 		PublicStoreHeadquartersController,
-		PublicShippingMeansController
+		PublicShippingMeansController,
+		PublicStoreAnalyticsController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -322,6 +341,7 @@ export class StoresModule implements NestModule {
 				PublicStoreBlogController,
 				PublicStoreCustomerAccessCodeController,
 				PublicStoreInfoController,
+				PublicStoreAnalyticsController,
 				PublicStoreProductCategoryController,
 				PublicStoreProductSubcategoryController,
 				PublicStoreGeolocationController,

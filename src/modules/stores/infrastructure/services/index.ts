@@ -1,4 +1,5 @@
 export * from "./mysq-store-product-subcategory-service"
+export * from "./mysql-store-analytics-service"
 export * from "./mysql-store-banner-service"
 export * from "./mysql-store-blog-service"
 export * from "./mysql-store-customer-access-code-service"

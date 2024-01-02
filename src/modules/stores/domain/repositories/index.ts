@@ -1,4 +1,5 @@
 export * from "./store-access-code-repository"
+export * from "./store-analytics-repository"
 export * from "./store-banner-repository"
 export * from "./store-blog-repository"
 export * from "./store-discount-repository"

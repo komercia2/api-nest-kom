@@ -1,3 +1,4 @@
+export * from "./store-analytics-entity"
 export * from "./store-banner-entity"
 export * from "./store-blog-entity"
 export * from "./store-customer-access-code-entity"

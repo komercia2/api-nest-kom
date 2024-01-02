@@ -1,3 +1,4 @@
+export * from "./mysql-store-analytics-repository"
 export * from "./mysql-store-banner-repository"
 export * from "./mysql-store-blog-repository"
 export * from "./mysql-store-discount-repository"

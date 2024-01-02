@@ -16,6 +16,7 @@ export enum StoresInfrastructureInjectionTokens {
 	MysqlStoreEntitiesService = "MysqlStoreEntitiesService",
 	MySQLStoreHeadquartersService = "MySQLStoreHeadquartersService",
 	MySQLStoreShippingMeansService = "MysqlStoreShippingMeansService",
+	MySQLStoreAnalyticsService = "MySQLStoreAnalyticsService",
 
 	/**
 	 * Use cases (queries)
@@ -36,5 +37,6 @@ export enum StoresInfrastructureInjectionTokens {
 	GetStoresInfoByEntityQuery = "GetStoresInfoByEntityQuery",
 	GetStoreEntityQuery = "GetStoreEntityQuery",
 	FindStoreHeadquartersQuery = "FindStoreHeadquartersQuery",
-	GetStoreShippingMeansQuery = "GetStoreShippingMeansQuery"
+	GetStoreShippingMeansQuery = "GetStoreShippingMeansQuery",
+	SaveStoreAnalyticCommand = "SaveStoreAnalyticCommand"
 }

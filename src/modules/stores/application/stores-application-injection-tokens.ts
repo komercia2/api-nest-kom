@@ -12,5 +12,6 @@ export enum StoresApplicationInjectionTokens {
 	IStoreWhatsAppCheckoutRepository = "IStoreWhatsAppCheckoutRepository",
 	IStoreEntitiesRepository = "IStoreEntitiesRepository",
 	IStoreHeadquartersRepository = "IStoreHeadquartersRepository",
-	IStoreShippingMeansRepository = "IStoreShippingMeansRepository"
+	IStoreShippingMeansRepository = "IStoreShippingMeansRepository",
+	IStoreAnalyticsRepository = "IStoreAnalyticsRepository"
 }

@@ -1,0 +1,44 @@
+import { Body, Controller, Inject, Post, Req, Res } from "@nestjs/common"
+import { handlerHttpResponse } from "@shared/infrastructure/handlers"
+import { Request, Response } from "express"
+import { SaveStoreAnalyticCommand } from "src/modules/stores/application/command"
+
+import { CreateStoreAnalyticsDto } from "../../../domain/dtos"
+import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
+
+@Controller("analytics")
+export class PublicStoreAnalyticsController {
+	constructor(
+		@Inject(StoresInfrastructureInjectionTokens.SaveStoreAnalyticCommand)
+		private readonly saveStoreAnalyticsQuery: SaveStoreAnalyticCommand
+	) {}
+
+	@Post()
+	saveStoreAnalytics(
+		@Req() req: Request,
+		@Body() body: CreateStoreAnalyticsDto,
+		@Res() res: Response
+	) {
+		const device = req.headers["user-agent"]
+
+		const data = { ...body, device }
+
+		try {
+			this.saveStoreAnalyticsQuery.execute(data).then(() => {
+				return handlerHttpResponse(res, {
+					data: null,
+					message: "Store analytics saved successfully",
+					statusCode: 201,
+					success: true
+				})
+			})
+		} catch (error) {
+			return handlerHttpResponse(res, {
+				data: null,
+				message: "Error saving store analytics",
+				statusCode: 400,
+				success: false
+			})
+		}
+	}
+}
