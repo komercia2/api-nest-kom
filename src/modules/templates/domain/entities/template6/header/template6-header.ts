@@ -1,4 +1,4 @@
-import { template6HeaderSettings } from "./template6-banner-settings"
+import { template6HeaderSettings } from "./template6-header-settings"
 
 export class Template6Header {
 	"bg_color": string
