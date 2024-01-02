@@ -1,4 +1,6 @@
 export const template6BannerSettings = {
+	order: 10,
+	visible: true,
 	subTitle: "Machined Kettle",
 	title: "Elegant simplicity",
 	color_subTitle: "#6b7280",
@@ -8,6 +10,8 @@ export const template6BannerSettings = {
 	img_main: "",
 	img_second_1: "",
 	img_second_2: "",
+	color_border: "#e5e7eb",
+	bg_color: "#FFFFFF",
 	values: [
 		{
 			title: "Sleek design",

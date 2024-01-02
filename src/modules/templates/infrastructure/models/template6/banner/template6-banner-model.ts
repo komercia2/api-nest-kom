@@ -5,8 +5,14 @@ import { Template6BannerValuesModel } from "./template6-banner-values-model"
 
 @Schema({ _id: false })
 export class Template6BannerModel {
-	@Prop({ required: false })
-	subtitle: string
+	@Prop({ required: true })
+	order: number
+
+	@Prop({ required: true })
+	visible: boolean
+
+	@Prop({ required: true })
+	subTitle: string
 
 	@Prop({ required: true })
 	title: string
@@ -31,6 +37,12 @@ export class Template6BannerModel {
 
 	@Prop({ required: false })
 	img_second_2: string
+
+	@Prop({ required: true })
+	color_border: string
+
+	@Prop({ required: true })
+	bg_color: string
 
 	@Prop({
 		required: true,
