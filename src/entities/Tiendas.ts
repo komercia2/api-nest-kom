@@ -42,6 +42,7 @@ import { Productos } from "./Productos"
 import { Proveedores } from "./Proveedores"
 import { Redes } from "./Redes"
 import { ReputacionTiendaMarketplace } from "./ReputacionTiendaMarketplace"
+import { StoreAnalytics } from "./StoreAnalytics"
 import { Subcategorias } from "./Subcategorias"
 import { Subscriptions } from "./Subscriptions"
 import { Suscripciones } from "./Suscripciones"
@@ -396,4 +397,7 @@ export class Tiendas {
 
 	@OneToMany(() => Zonas, (zonas) => zonas.tiendas)
 	zonas: Zonas[]
+
+	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.storeId)
+	analytics: StoreAnalytics[]
 }
