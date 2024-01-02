@@ -1,5 +1,5 @@
 export const template6HeaderSettings = {
-	"--background_color_1": "#FFFFFF",
+	bg_color: "#FFFFFF",
 	"--color_text": "#6b7280",
 	"--color_icon": "#111827",
 	"--color_border": "#e5e7eb",
