@@ -1,9 +1,12 @@
 export const Template6InformationSettings = {
+	order: 7,
+	visible: true,
 	title: "Protect your device",
 	description:
 		"As a digital creative, your laptop or tablet is at the center of your work. Keep your device safe with a fabric sleeve that matches in quality and looks.",
 	color_title: "#111827",
 	color_description: "#6b7280",
+	bg_color: "#FFFFFF",
 	values: [
 		{
 			img: "",

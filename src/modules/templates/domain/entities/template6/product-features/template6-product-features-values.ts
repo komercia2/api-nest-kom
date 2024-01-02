@@ -4,4 +4,5 @@ export type Template6ProductFeaturesValues = {
 	description: string
 	color_title: string
 	color_description: string
+	bg_img: string
 }

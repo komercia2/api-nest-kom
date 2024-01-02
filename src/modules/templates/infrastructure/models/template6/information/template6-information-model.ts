@@ -5,6 +5,12 @@ import { Template6InformationValuesModel } from "./template6-information-model-v
 
 @Schema({ _id: false })
 export class Template6InformationModel {
+	@Prop({ required: true })
+	order: number
+
+	@Prop({ required: true })
+	visible: boolean
+
 	@Prop({ required: false })
 	subtitle: string
 
@@ -22,6 +28,9 @@ export class Template6InformationModel {
 
 	@Prop({ required: true })
 	color_description: string
+
+	@Prop({ required: true })
+	bg_color: string
 
 	@Prop({
 		required: true,

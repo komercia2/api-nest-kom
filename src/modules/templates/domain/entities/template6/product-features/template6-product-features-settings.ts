@@ -1,4 +1,6 @@
 export const Template6ProductFeaturesSettings = {
+	order: 9,
+	visible: true,
 	subTitle: "Focus",
 	title: "Simple productivity",
 	description:
@@ -12,7 +14,8 @@ export const Template6ProductFeaturesSettings = {
 			title: "Three card types",
 			description: "Today, Next, and Someday cards allow you to defer your dreams into the future.",
 			color_title: "#111827",
-			color_description: "#6b7280"
+			color_description: "#6b7280",
+			bg_img: "#e5e7eb"
 		},
 		{
 			img: "",
@@ -20,14 +23,16 @@ export const Template6ProductFeaturesSettings = {
 			description:
 				"Each refill pack contains plenty of cards to last you a month of procrastination.",
 			color_title: "#111827",
-			color_description: "#6b7280"
+			color_description: "#6b7280",
+			bg_img: "#e5e7eb"
 		},
 		{
 			img: "",
 			title: "Dot grid backs",
 			description: "Flip a card over to doodle during meetings when you should be listening.",
 			color_title: "#111827",
-			color_description: "#6b7280"
+			color_description: "#6b7280",
+			bg_img: "#e5e7eb"
 		},
 		{
 			img: "",
@@ -35,7 +40,9 @@ export const Template6ProductFeaturesSettings = {
 			description:
 				"Subscribe and save on routine refill packs to keep you productive all year long.",
 			color_title: "#111827",
-			color_description: "#6b7280"
+			color_description: "#6b7280",
+			bg_img: "#e5e7eb"
 		}
-	]
+	],
+	bg_color: "#FFFFFF"
 }

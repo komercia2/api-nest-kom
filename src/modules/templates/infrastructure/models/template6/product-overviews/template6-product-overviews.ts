@@ -2,6 +2,15 @@ import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose"
 
 @Schema({ _id: false })
 export class Template6ProductOverviewsModel {
+	@Prop({ required: true })
+	order: number
+
+	@Prop({ required: true })
+	visible: boolean
+
+	@Prop({ required: true })
+	bg_color: string
+
 	@Prop({ required: false })
 	slug: string
 

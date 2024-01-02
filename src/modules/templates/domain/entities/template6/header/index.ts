@@ -1,1 +1,1 @@
-export * from "./template6-banner"
+export * from "./template6-header"
