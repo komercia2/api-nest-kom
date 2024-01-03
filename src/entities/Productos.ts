@@ -148,6 +148,6 @@ export class Productos {
 	@OneToMany(() => TiendaPromociones, (tiendaPromociones) => tiendaPromociones.idProducto2)
 	tiendaPromociones: TiendaPromociones[]
 
-	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.storeId)
+	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.Productos)
 	analytics: StoreAnalytics[]
 }

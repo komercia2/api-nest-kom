@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import {
 	ApisConexiones,
@@ -23,6 +24,7 @@ import { SaveStoreAnalyticCommand } from "./application/command"
 import {
 	CheckWithoutAuthQuery,
 	FindStoreHeadquartersQuery,
+	GetFilteredStoreAnalyticsQuery,
 	GetPagedStoreBlogsQuery,
 	GetStoreBannersQuery,
 	GetStoreBlogByIdQuery,
@@ -40,6 +42,7 @@ import {
 	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
+import { PrivateStoreAnalyticsController } from "./infrastructure/controllers/private"
 import {
 	PublicShippingMeansController,
 	PublicStoreBannerController,
@@ -157,6 +160,10 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.GetFilteredStoreAnalyticsQuery,
+		useClass: GetFilteredStoreAnalyticsQuery
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.SaveStoreAnalyticCommand,
 		useClass: SaveStoreAnalyticCommand
@@ -327,7 +334,8 @@ const infrastructure = [
 		PublicStoreEntitiesController,
 		PublicStoreHeadquartersController,
 		PublicShippingMeansController,
-		PublicStoreAnalyticsController
+		PublicStoreAnalyticsController,
+		PrivateStoreAnalyticsController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -352,5 +360,7 @@ export class StoresModule implements NestModule {
 				PublicStoreHeadquartersController,
 				PublicShippingMeansController
 			)
+			.apply(LaravelAuthMiddleware)
+			.forRoutes(PrivateStoreAnalyticsController)
 	}
 }
