@@ -1,5 +1,6 @@
 export * from "./check-without-auth-query"
 export * from "./find-store-headquarters-query"
+export * from "./get-all-events-count-query"
 export * from "./get-filtered-store-analytics-query"
 export * from "./get-paged-store-blogs-query"
 export * from "./get-store-banners-query"

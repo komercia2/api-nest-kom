@@ -14,6 +14,31 @@ export class MySQLStoreAnalyticsService {
 		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
 
+	async countAllEvents(storeId: number) {
+		const allEvents = Object.values(StoreAnalyticsEvent)
+
+		const query = this.storeAnalyticsRepository
+			.createQueryBuilder("storeAnalytics")
+			.where("storeAnalytics.storeId = :storeId", { storeId })
+			.groupBy("storeAnalytics.event")
+			.select("storeAnalytics.event", "key")
+			.addSelect("COUNT(storeAnalytics.event)", "value")
+
+		const result = await query.getRawMany()
+
+		const defaultValues: Record<StoreAnalyticsEvent, number> = allEvents.reduce((acc, event) => {
+			acc[event] = 0
+			return acc
+		}, {} as Record<StoreAnalyticsEvent, number>)
+
+		const mergedResult = result.reduce((acc, curr) => {
+			acc[curr.key] = Number(curr.value)
+			return acc
+		}, defaultValues)
+
+		return mergedResult
+	}
+
 	async getFiltered(
 		storeId: number,
 		filter: GetFilteredStoreAnalyticsDto

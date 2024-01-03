@@ -1,5 +1,5 @@
 import { CreateStoreAnalyticsDto, GetFilteredStoreAnalyticsDto } from "../dtos"
-import { StoreAnalyticsEntity } from "../entities"
+import { StoreAnalyticsEntity, StoreAnalyticsEvent } from "../entities"
 
 export interface IStoreAnalyticsRepository {
 	save(storeAnalytics: CreateStoreAnalyticsDto): Promise<void>
@@ -8,4 +8,6 @@ export interface IStoreAnalyticsRepository {
 		storeId: number,
 		filter: GetFilteredStoreAnalyticsDto
 	): Promise<StoreAnalyticsEntity[]>
+
+	countAllEvents(storeId: number): Promise<{ key: StoreAnalyticsEvent; value: number }>
 }
