@@ -23,6 +23,7 @@ import {
 import { SaveStoreAnalyticCommand } from "./application/command"
 import {
 	CheckWithoutAuthQuery,
+	CountDevicesQuery,
 	FindStoreHeadquartersQuery,
 	GetAllEventsCountQuery,
 	GetFilteredStoreAnalyticsQuery,
@@ -161,6 +162,10 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.CountAllDevicesQuery,
+		useClass: CountDevicesQuery
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.GetAllEventsCountQuery,
 		useClass: GetAllEventsCountQuery

@@ -9,6 +9,13 @@ export enum StoreAnalyticsEvent {
 	CLICKED_PAY_CART = "CLICKED_PAY_CART"
 }
 
+export enum Devices {
+	DESKTOP = "DESKTOP",
+	MOBILE = "MOBILE",
+	TABLET = "TABLET",
+	OTHER = "OTHER"
+}
+
 interface IStoreAnalyticsEntity {
 	id?: string
 	storeId: number
@@ -46,7 +53,7 @@ export class StoreAnalyticsEntity implements IStoreAnalyticsEntity {
 	}
 
 	private identifyDevice(userAgent?: string) {
-		if (!userAgent) return "OTHER"
+		if (!userAgent) return Devices.OTHER
 
 		const userAgentLowerCase = userAgent.toLowerCase()
 
@@ -54,12 +61,18 @@ export class StoreAnalyticsEntity implements IStoreAnalyticsEntity {
 		const tabletKeywords = ["tablet", "ipad"]
 		const desktopKeywords = ["windows", "macintosh", "linux", "cros"]
 
-		if (mobileKeywords.some((keyword) => userAgentLowerCase.includes(keyword))) return "MOBILE"
+		if (mobileKeywords.some((keyword) => userAgentLowerCase.includes(keyword))) {
+			return Devices.MOBILE
+		}
 
-		if (tabletKeywords.some((keyword) => userAgentLowerCase.includes(keyword))) return "TABLET"
+		if (tabletKeywords.some((keyword) => userAgentLowerCase.includes(keyword))) {
+			return Devices.TABLET
+		}
 
-		if (desktopKeywords.some((keyword) => userAgentLowerCase.includes(keyword))) return "DESKTOP"
+		if (desktopKeywords.some((keyword) => userAgentLowerCase.includes(keyword))) {
+			return Devices.DESKTOP
+		}
 
-		return "OTHER"
+		return Devices.OTHER
 	}
 }

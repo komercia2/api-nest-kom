@@ -5,7 +5,7 @@ import { StoreAnalytics } from "src/entities"
 import { Repository } from "typeorm"
 
 import { CreateStoreAnalyticsDto, GetFilteredStoreAnalyticsDto } from "../../domain/dtos"
-import { StoreAnalyticsEntity, StoreAnalyticsEvent } from "../../domain/entities"
+import { Devices, StoreAnalyticsEntity, StoreAnalyticsEvent } from "../../domain/entities"
 
 @Injectable()
 export class MySQLStoreAnalyticsService {
@@ -13,6 +13,29 @@ export class MySQLStoreAnalyticsService {
 		@InjectRepository(StoreAnalytics)
 		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
+
+	async countDevices(storeId: number) {
+		const query = this.storeAnalyticsRepository
+			.createQueryBuilder("storeAnalytics")
+			.where("storeAnalytics.storeId = :storeId", { storeId })
+			.groupBy("storeAnalytics.device")
+			.select("storeAnalytics.device", "key")
+			.addSelect("COUNT(storeAnalytics.device)", "value")
+
+		const result = await query.getRawMany()
+
+		const defaultValues = Object.values(Devices).reduce((acc, device) => {
+			acc[device] = 0
+			return acc
+		}, {} as Record<Devices, number>)
+
+		const mergedResult = result.reduce((acc, curr) => {
+			acc[curr.key] = Number(curr.value)
+			return acc
+		}, defaultValues)
+
+		return mergedResult
+	}
 
 	async countAllEvents(storeId: number) {
 		const allEvents = Object.values(StoreAnalyticsEvent)

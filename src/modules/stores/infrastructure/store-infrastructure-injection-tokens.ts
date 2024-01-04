@@ -40,5 +40,6 @@ export enum StoresInfrastructureInjectionTokens {
 	GetStoreShippingMeansQuery = "GetStoreShippingMeansQuery",
 	SaveStoreAnalyticCommand = "SaveStoreAnalyticCommand",
 	GetFilteredStoreAnalyticsQuery = "GetFilteredStoreAnalyticsQuery",
-	GetAllEventsCountQuery = "GetAllEventsCountQuery"
+	GetAllEventsCountQuery = "GetAllEventsCountQuery",
+	CountAllDevicesQuery = "CountAllDevicesQuery"
 }

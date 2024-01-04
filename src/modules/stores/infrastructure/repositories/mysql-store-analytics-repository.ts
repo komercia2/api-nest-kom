@@ -12,6 +12,10 @@ export class MySQLStoreAnalyticsRepository implements IStoreAnalyticsRepository 
 		private readonly storeAnalyticsService: MySQLStoreAnalyticsService
 	) {}
 
+	async countDevices(storeId: number): Promise<{ key: string; value: number }> {
+		return await this.storeAnalyticsService.countDevices(storeId)
+	}
+
 	async countAllEvents(storeId: number): Promise<{ key: StoreAnalyticsEvent; value: number }> {
 		return await this.storeAnalyticsService.countAllEvents(storeId)
 	}
