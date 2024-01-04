@@ -10,4 +10,6 @@ export interface IStoreAnalyticsRepository {
 	): Promise<StoreAnalyticsEntity[]>
 
 	countAllEvents(storeId: number): Promise<{ key: StoreAnalyticsEvent; value: number }>
+
+	countDevices(storeId: number): Promise<{ key: string; value: number }>
 }
