@@ -152,14 +152,46 @@ export class WebsiteMongooseService {
 
 	delete = async (_id: string, templateId: string) => {
 		try {
-			const templateDeleted = await this.websiteModel.findOneAndRemove({ _id }).exec()
-			if (!templateDeleted) return false
+			// const templateDeleted = await this.websiteModel.findOneAndRemove({ _id }).exec()
+			// if (!templateDeleted) return false
 
-			if (templateId) {
-				this.eventEmitter.emit(`website.${templateDeleted.templateNumber}.deleted`, {
-					_id: templateId
-				})
+			// if (templateId) {
+			// 	this.eventEmitter.emit(`website.${templateDeleted.templateNumber}.deleted`, {
+			// 		_id: templateId
+			// 	})
+			// }
+
+			const templateData = await this.websiteModel.findById({ _id }).exec()
+
+			if (!templateData) return false
+
+			const { templateNumber } = templateData
+
+			const isValidTemplateNumber = this.validServices.has(templateNumber)
+
+			if (!isValidTemplateNumber) {
+				const websiteRemoved = await this.websiteModel.findOneAndRemove({ _id }).exec()
+
+				if (!websiteRemoved) return false
+
+				return true
 			}
+
+			const repository = this.getRepositoryByTemplateNumber(templateData.templateNumber)
+
+			if (!repository) return false
+
+			const parsedId = createObjectIdFromHexString(templateId)
+
+			const templateRemoved = await repository.remove2(parsedId)
+
+			const { deleted, count } = templateRemoved
+
+			if (!deleted && count === 0) return false
+
+			const websiteRemoved = await this.websiteModel.findOneAndRemove({ _id }).exec()
+
+			if (!websiteRemoved) return false
 
 			return true
 		} catch (error) {

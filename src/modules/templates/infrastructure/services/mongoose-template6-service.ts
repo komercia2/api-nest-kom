@@ -53,8 +53,8 @@ export class MongooseTemplate6Service {
 		}
 	}
 
-	@OnEvent("website.6.deleted")
-	async remove2(_id: string) {
+	// @OnEvent("website.6.deleted")
+	async remove2(_id: ObjectId) {
 		try {
 			const isDeleted = await this.template6Model.deleteOne({ _id }).exec()
 
