@@ -17,6 +17,7 @@ export enum StoresInfrastructureInjectionTokens {
 	MySQLStoreHeadquartersService = "MySQLStoreHeadquartersService",
 	MySQLStoreShippingMeansService = "MysqlStoreShippingMeansService",
 	MySQLStoreAnalyticsService = "MySQLStoreAnalyticsService",
+	MySQLStorePaymentMethodsService = "MySQLStorePaymentMethodsService",
 
 	/**
 	 * Use cases (queries)
@@ -41,5 +42,6 @@ export enum StoresInfrastructureInjectionTokens {
 	SaveStoreAnalyticCommand = "SaveStoreAnalyticCommand",
 	GetFilteredStoreAnalyticsQuery = "GetFilteredStoreAnalyticsQuery",
 	GetAllEventsCountQuery = "GetAllEventsCountQuery",
-	CountAllDevicesQuery = "CountAllDevicesQuery"
+	CountAllDevicesQuery = "CountAllDevicesQuery",
+	GetPaymentMethodsQueryWithoutAuth = "GetPaymentMethodsQueryWithoutAuth"
 }

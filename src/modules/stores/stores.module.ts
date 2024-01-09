@@ -1,5 +1,7 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
+import { APP_GUARD } from "@nestjs/core"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import { CheckoutJwtGuard } from "@shared/infrastructure/guards"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import {
@@ -11,12 +13,14 @@ import {
 	Entidades,
 	EntidadesTiendas,
 	Geolocalizacion,
+	MedioPagos,
 	MediosEnvios,
 	Politicas,
 	StoreAnalytics,
 	Subcategorias,
 	TiendaBlogs,
 	Tiendas,
+	Users,
 	WhatsappCheckout
 } from "src/entities"
 
@@ -28,6 +32,7 @@ import {
 	GetAllEventsCountQuery,
 	GetFilteredStoreAnalyticsQuery,
 	GetPagedStoreBlogsQuery,
+	GetPaymentMethodsWithoutAuthQuery,
 	GetStoreBannersQuery,
 	GetStoreBlogByIdQuery,
 	GetStoreDiscountsQuery,
@@ -54,6 +59,7 @@ import {
 	PublicStoreExternalApiController,
 	PublicStoreGeolocationController,
 	PublicStoreHeadquartersController,
+	PublicStorePaymentMethodsController,
 	PublicStorePoliciesController,
 	PublicStoreProductCategoryController,
 	PublicStoreProductSubcategoryController,
@@ -72,6 +78,7 @@ import {
 	MySQLStoreGeolocationRepository,
 	MySQLStoreHeadquartersRepository,
 	MySQLStoreInfoRepository,
+	MySQLStorePaymentMethodsRepository,
 	MySQLStorePoliciesRepository,
 	MySQLStoreWhatsappCheckoutRepository
 } from "./infrastructure/repositories"
@@ -90,6 +97,7 @@ import {
 	MySQLStoreGeolocationService,
 	MySQLStoreHeadquartersService,
 	MySQLStoreInfoService,
+	MySQLStorePaymentMethodsService,
 	MySQLStorePoliciesService,
 	MySQLStoreProductCategoryService,
 	MysqlStoreProductSubcategoryService,
@@ -158,10 +166,18 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreAnalyticsRepository,
 		useClass: MySQLStoreAnalyticsRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStroePaymentMethodsRepository,
+		useClass: MySQLStorePaymentMethodsRepository
 	}
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.GetPaymentMethodsQueryWithoutAuth,
+		useClass: GetPaymentMethodsWithoutAuthQuery
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.CountAllDevicesQuery,
 		useClass: CountDevicesQuery
@@ -305,6 +321,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreAnalyticsService,
 		useClass: MySQLStoreAnalyticsService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStorePaymentMethodsService,
+		useClass: MySQLStorePaymentMethodsService
 	}
 ]
 
@@ -326,7 +346,9 @@ const infrastructure = [
 			Entidades,
 			EntidadesTiendas,
 			Geolocalizacion,
-			MediosEnvios
+			MediosEnvios,
+			MedioPagos,
+			Users
 		])
 	],
 	controllers: [
@@ -345,7 +367,8 @@ const infrastructure = [
 		PublicStoreHeadquartersController,
 		PublicShippingMeansController,
 		PublicStoreAnalyticsController,
-		PrivateStoreAnalyticsController
+		PrivateStoreAnalyticsController,
+		PublicStorePaymentMethodsController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -368,7 +391,8 @@ export class StoresModule implements NestModule {
 				PublicStoreWhatsappCheckoutController,
 				PublicStoreEntitiesController,
 				PublicStoreHeadquartersController,
-				PublicShippingMeansController
+				PublicShippingMeansController,
+				PublicStorePaymentMethodsController
 			)
 			.apply(LaravelAuthMiddleware)
 			.forRoutes(PrivateStoreAnalyticsController)
