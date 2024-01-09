@@ -1,7 +1,5 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
-import { APP_GUARD } from "@nestjs/core"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { CheckoutJwtGuard } from "@shared/infrastructure/guards"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import {
