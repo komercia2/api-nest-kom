@@ -17,7 +17,14 @@ import {
 	StoreAnalytics,
 	Subcategorias,
 	TiendaBlogs,
+	TiendaCredibancoInfo,
+	TiendaEpaycoInfo,
+	TiendaPaymentsway,
+	TiendaPayuInfo,
 	Tiendas,
+	TiendaTucompraInfo,
+	TiendaWepay4uInfo,
+	TiendaWompiInfo,
 	Users,
 	WhatsappCheckout
 } from "src/entities"
@@ -26,6 +33,7 @@ import { SaveStoreAnalyticCommand } from "./application/command"
 import {
 	CheckWithoutAuthQuery,
 	CountDevicesQuery,
+	FindPaymentMethodWithCredentialsQuery,
 	FindStoreHeadquartersQuery,
 	GetAllEventsCountQuery,
 	GetFilteredStoreAnalyticsQuery,
@@ -47,7 +55,10 @@ import {
 	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
-import { PrivateStoreAnalyticsController } from "./infrastructure/controllers/private"
+import {
+	PrivateStoreAnalyticsController,
+	PrivateStorePaymentGatewaysController
+} from "./infrastructure/controllers/private"
 import {
 	PublicShippingMeansController,
 	PublicStoreBannerController,
@@ -172,6 +183,10 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.FindPaymentMethodWithCredentialsQuery,
+		useClass: FindPaymentMethodWithCredentialsQuery
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.GetPaymentMethodsQueryWithoutAuth,
 		useClass: GetPaymentMethodsWithoutAuthQuery
@@ -346,7 +361,14 @@ const infrastructure = [
 			Geolocalizacion,
 			MediosEnvios,
 			MedioPagos,
-			Users
+			Users,
+			TiendaPayuInfo,
+			TiendaCredibancoInfo,
+			TiendaEpaycoInfo,
+			TiendaPaymentsway,
+			TiendaTucompraInfo,
+			TiendaWepay4uInfo,
+			TiendaWompiInfo
 		])
 	],
 	controllers: [
@@ -366,7 +388,8 @@ const infrastructure = [
 		PublicShippingMeansController,
 		PublicStoreAnalyticsController,
 		PrivateStoreAnalyticsController,
-		PublicStorePaymentMethodsController
+		PublicStorePaymentMethodsController,
+		PrivateStorePaymentGatewaysController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -393,6 +416,6 @@ export class StoresModule implements NestModule {
 				PublicStorePaymentMethodsController
 			)
 			.apply(LaravelAuthMiddleware)
-			.forRoutes(PrivateStoreAnalyticsController)
+			.forRoutes(PrivateStoreAnalyticsController, PrivateStorePaymentGatewaysController)
 	}
 }

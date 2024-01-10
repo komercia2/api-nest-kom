@@ -43,5 +43,6 @@ export enum StoresInfrastructureInjectionTokens {
 	GetFilteredStoreAnalyticsQuery = "GetFilteredStoreAnalyticsQuery",
 	GetAllEventsCountQuery = "GetAllEventsCountQuery",
 	CountAllDevicesQuery = "CountAllDevicesQuery",
-	GetPaymentMethodsQueryWithoutAuth = "GetPaymentMethodsQueryWithoutAuth"
+	GetPaymentMethodsQueryWithoutAuth = "GetPaymentMethodsQueryWithoutAuth",
+	FindPaymentMethodWithCredentialsQuery = "FindPaymentMethodWithCredentialsQuery"
 }
