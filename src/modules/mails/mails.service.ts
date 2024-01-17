@@ -27,6 +27,7 @@ export class MailsService {
 				templateId,
 				dynamicTemplateData
 			})
+			this.logger.log(`Email sent successfully to ${to}`)
 		} catch (error) {
 			this.logger.error(error)
 		}
