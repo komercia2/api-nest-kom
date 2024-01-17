@@ -1,6 +1,11 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Carritos, SuscriptoresTienda, Tiendas as Store } from "src/entities"
+import {
+	Carritos,
+	SuscriptoresTienda,
+	Tiendas as Store,
+	TiendaSuscripcionStripe
+} from "src/entities"
 import { Repository } from "typeorm"
 
 import { GetFilteredStoresDto } from "./dtos"
@@ -14,8 +19,8 @@ export class SuperService {
 		@InjectRepository(Carritos)
 		private readonly carritosRepository: Repository<Carritos>,
 
-		@InjectRepository(SuscriptoresTienda)
-		private readonly suscriptoresTiendaRepository: Repository<SuscriptoresTienda>
+		@InjectRepository(TiendaSuscripcionStripe)
+		private readonly tiendaSuscripcionStripeRepository: Repository<TiendaSuscripcionStripe>
 	) {}
 
 	async getWeeklyGeneralStats() {
@@ -36,7 +41,7 @@ export class SuperService {
 			.andWhere("carritos.estado = :estado", { estado: "1" })
 			.getCount()
 
-		const getAllSuscriptoresCount = this.suscriptoresTiendaRepository
+		const getAllSuscriptoresCount = this.tiendaSuscripcionStripeRepository
 			.createQueryBuilder("suscriptoresTienda")
 			.where("suscriptoresTienda.createdAt >= :date", {
 				date: new Date(currentDate.setDate(currentDate.getDate() - 7))
@@ -69,6 +74,7 @@ export class SuperService {
 				"store.fechaExpiracion",
 				"store.template",
 				"store.tipo",
+				"store.logo",
 				"ciudad2.nombreCiu",
 				"tiendasInfo.emailTienda",
 				"tiendasInfo.telefono",

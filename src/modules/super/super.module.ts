@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { Carritos, SuscriptoresTienda, Tiendas, Ventas } from "src/entities"
+import { Carritos, Tiendas, TiendaSuscripcionStripe, Ventas } from "src/entities"
 
 import { SuperController } from "./super.controller"
 import { SuperService } from "./super.service"
 
 @Module({
-	imports: [TypeOrmModule.forFeature([Tiendas, Ventas, SuscriptoresTienda, Carritos])],
+	imports: [TypeOrmModule.forFeature([Tiendas, Ventas, TiendaSuscripcionStripe, Carritos])],
 	controllers: [SuperController],
 	providers: [SuperService]
 })
