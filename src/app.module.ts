@@ -17,6 +17,7 @@ import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module
 import { AuthModule } from "./modules/auth/auth.module"
 import { CommonModule } from "./modules/common/common.module"
 import { HooksModule } from "./modules/hooks/hooks.module"
+import { MailsModule } from "./modules/mails/mails.module"
 import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
 import { StoresModule } from "./modules/stores/stores.module"
@@ -57,7 +58,8 @@ import { UsersModule } from "./modules/users/users.module"
 		HooksModule,
 		UsersModule,
 		SuperModule,
-		AuthModule
+		AuthModule,
+		MailsModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

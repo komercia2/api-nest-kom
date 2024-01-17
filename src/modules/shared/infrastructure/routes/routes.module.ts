@@ -6,6 +6,7 @@ import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.modu
 import { AuthModule } from "src/modules/auth/auth.module"
 import { CommonModule } from "src/modules/common/common.module"
 import { HooksModule } from "src/modules/hooks/hooks.module"
+import { MailsModule } from "src/modules/mails/mails.module"
 import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
 import { StoresModule } from "src/modules/stores/stores.module"
@@ -63,6 +64,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/auth`,
 		module: AuthModule
+	},
+	{
+		path: `${apiVersions.v1}/mails`,
+		module: MailsModule
 	}
 ]
 
