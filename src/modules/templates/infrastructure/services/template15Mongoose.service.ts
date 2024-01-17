@@ -99,8 +99,8 @@ export class Template15MongoService {
 		}
 	}
 
-	@OnEvent("website.15.deleted")
-	async remove2(_id: string) {
+	// @OnEvent("website.15.deleted")
+	async remove2(_id: ObjectId) {
 		try {
 			const isDeleted = await this.template15Model.deleteOne({ _id }).exec()
 

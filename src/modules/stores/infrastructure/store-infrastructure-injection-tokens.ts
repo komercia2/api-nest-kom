@@ -16,6 +16,8 @@ export enum StoresInfrastructureInjectionTokens {
 	MysqlStoreEntitiesService = "MysqlStoreEntitiesService",
 	MySQLStoreHeadquartersService = "MySQLStoreHeadquartersService",
 	MySQLStoreShippingMeansService = "MysqlStoreShippingMeansService",
+	MySQLStoreAnalyticsService = "MySQLStoreAnalyticsService",
+	MySQLStorePaymentMethodsService = "MySQLStorePaymentMethodsService",
 
 	/**
 	 * Use cases (queries)
@@ -36,5 +38,11 @@ export enum StoresInfrastructureInjectionTokens {
 	GetStoresInfoByEntityQuery = "GetStoresInfoByEntityQuery",
 	GetStoreEntityQuery = "GetStoreEntityQuery",
 	FindStoreHeadquartersQuery = "FindStoreHeadquartersQuery",
-	GetStoreShippingMeansQuery = "GetStoreShippingMeansQuery"
+	GetStoreShippingMeansQuery = "GetStoreShippingMeansQuery",
+	SaveStoreAnalyticCommand = "SaveStoreAnalyticCommand",
+	GetFilteredStoreAnalyticsQuery = "GetFilteredStoreAnalyticsQuery",
+	GetAllEventsCountQuery = "GetAllEventsCountQuery",
+	CountAllDevicesQuery = "CountAllDevicesQuery",
+	GetPaymentMethodsQueryWithoutAuth = "GetPaymentMethodsQueryWithoutAuth",
+	FindPaymentMethodWithCredentialsQuery = "FindPaymentMethodWithCredentialsQuery"
 }

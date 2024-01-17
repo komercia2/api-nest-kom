@@ -9,6 +9,7 @@ import {
 } from "typeorm"
 
 import { Productos } from "./Productos"
+import { StoreAnalytics } from "./StoreAnalytics"
 import { Subcategorias } from "./Subcategorias"
 import { Tiendas } from "./Tiendas"
 
@@ -54,4 +55,7 @@ export class CategoriaProductos {
 
 	@OneToMany(() => Subcategorias, (subcategorias) => subcategorias.categoria2)
 	subcategorias: Subcategorias[]
+
+	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.storeId)
+	analytics: StoreAnalytics[]
 }

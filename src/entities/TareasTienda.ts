@@ -1,4 +1,6 @@
-import { Column, Entity, Index, PrimaryGeneratedColumn } from "typeorm"
+import { Column, Entity, Index, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm"
+
+import { Tiendas } from "./Tiendas"
 
 @Index("tareas_tienda_id_tienda_foreign", ["idTienda"], {})
 @Index("tareas_tienda_id_tarea_foreign", ["idTarea"], {})
@@ -27,4 +29,11 @@ export class TareasTienda {
 		default: () => "'0000-00-00 00:00:00'"
 	})
 	updatedAt: Date
+
+	@ManyToOne(() => Tiendas, (tiendas) => tiendas.tareasTiendas, {
+		onDelete: "CASCADE",
+		onUpdate: "NO ACTION"
+	})
+	@JoinColumn([{ name: "id_tienda", referencedColumnName: "id" }])
+	idTienda2: Tiendas
 }

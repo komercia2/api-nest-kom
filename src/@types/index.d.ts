@@ -7,6 +7,10 @@ declare global {
 			checkoutUser: {
 				userId: number
 			}
+			superUser: {
+				id: number
+				email: string
+			}
 		}
 	}
 }

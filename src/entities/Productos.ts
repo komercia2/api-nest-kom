@@ -16,6 +16,7 @@ import { ProductosDropshipping } from "./ProductosDropshipping"
 import { ProductosFotos } from "./ProductosFotos"
 import { ProductosInfo } from "./ProductosInfo"
 import { ProductosVariantes } from "./ProductosVariantes"
+import { StoreAnalytics } from "./StoreAnalytics"
 import { Subcategorias } from "./Subcategorias"
 import { TagProduct } from "./TagProduct"
 import { TiendaPromociones } from "./TiendaPromociones"
@@ -146,4 +147,7 @@ export class Productos {
 
 	@OneToMany(() => TiendaPromociones, (tiendaPromociones) => tiendaPromociones.idProducto2)
 	tiendaPromociones: TiendaPromociones[]
+
+	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.Productos)
+	analytics: StoreAnalytics[]
 }

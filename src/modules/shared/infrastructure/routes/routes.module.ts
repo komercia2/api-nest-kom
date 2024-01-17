@@ -3,11 +3,14 @@ import { RouterModule, RouteTree } from "@nestjs/core"
 import { TemplatesModule } from "@templates/templates.module"
 import { AppModule } from "src/app.module"
 import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.module"
+import { AuthModule } from "src/modules/auth/auth.module"
 import { CommonModule } from "src/modules/common/common.module"
 import { HooksModule } from "src/modules/hooks/hooks.module"
+import { MailsModule } from "src/modules/mails/mails.module"
 import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
 import { StoresModule } from "src/modules/stores/stores.module"
+import { SuperModule } from "src/modules/super/super.module"
 import { UsersModule } from "src/modules/users/users.module"
 
 const apiVersions = { v1: "v1" }
@@ -53,6 +56,18 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/users`,
 		module: UsersModule
+	},
+	{
+		path: `${apiVersions.v1}/super`,
+		module: SuperModule
+	},
+	{
+		path: `${apiVersions.v1}/auth`,
+		module: AuthModule
+	},
+	{
+		path: `${apiVersions.v1}/mails`,
+		module: MailsModule
 	}
 ]
 

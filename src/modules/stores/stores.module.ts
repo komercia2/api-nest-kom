@@ -1,5 +1,6 @@
 import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import {
 	ApisConexiones,
@@ -10,18 +11,34 @@ import {
 	Entidades,
 	EntidadesTiendas,
 	Geolocalizacion,
+	MedioPagos,
 	MediosEnvios,
 	Politicas,
+	StoreAnalytics,
 	Subcategorias,
 	TiendaBlogs,
+	TiendaCredibancoInfo,
+	TiendaEpaycoInfo,
+	TiendaPaymentsway,
+	TiendaPayuInfo,
 	Tiendas,
+	TiendaTucompraInfo,
+	TiendaWepay4uInfo,
+	TiendaWompiInfo,
+	Users,
 	WhatsappCheckout
 } from "src/entities"
 
+import { SaveStoreAnalyticCommand } from "./application/command"
 import {
 	CheckWithoutAuthQuery,
+	CountDevicesQuery,
+	FindPaymentMethodWithCredentialsQuery,
 	FindStoreHeadquartersQuery,
+	GetAllEventsCountQuery,
+	GetFilteredStoreAnalyticsQuery,
 	GetPagedStoreBlogsQuery,
+	GetPaymentMethodsWithoutAuthQuery,
 	GetStoreBannersQuery,
 	GetStoreBlogByIdQuery,
 	GetStoreDiscountsQuery,
@@ -39,6 +56,10 @@ import {
 } from "./application/query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
+	PrivateStoreAnalyticsController,
+	PrivateStorePaymentGatewaysController
+} from "./infrastructure/controllers/private"
+import {
 	PublicShippingMeansController,
 	PublicStoreBannerController,
 	PublicStoreBlogController,
@@ -47,14 +68,17 @@ import {
 	PublicStoreExternalApiController,
 	PublicStoreGeolocationController,
 	PublicStoreHeadquartersController,
+	PublicStorePaymentMethodsController,
 	PublicStorePoliciesController,
 	PublicStoreProductCategoryController,
 	PublicStoreProductSubcategoryController,
 	PublicStoreWhatsappCheckoutController
 } from "./infrastructure/controllers/public"
+import { PublicStoreAnalyticsController } from "./infrastructure/controllers/public/public-store-analytics-controller"
 import { PublicStoreCustomerAccessCodeController } from "./infrastructure/controllers/public/public-store-cutomer-access-code-controller"
 import { PublicStoreInfoController } from "./infrastructure/controllers/public/public-store-info-controller"
 import {
+	MySQLStoreAnalyticsRepository,
 	MySQLStoreBannerRepository,
 	MySQLStoreBlogRepository,
 	MySQLStoreDiscountRepository,
@@ -63,6 +87,7 @@ import {
 	MySQLStoreGeolocationRepository,
 	MySQLStoreHeadquartersRepository,
 	MySQLStoreInfoRepository,
+	MySQLStorePaymentMethodsRepository,
 	MySQLStorePoliciesRepository,
 	MySQLStoreWhatsappCheckoutRepository
 } from "./infrastructure/repositories"
@@ -71,6 +96,7 @@ import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositori
 import { MySQLStoreShippingMeansRepository } from "./infrastructure/repositories/mysql-store-shipping-means-repository"
 import { MysqlStoreProductSubcategoryRepository } from "./infrastructure/repositories/mysql-store-subcategory-repository"
 import {
+	MySQLStoreAnalyticsService,
 	MySQLStoreBannerService,
 	MySQLStoreBlogService,
 	MySQLStoreCustomerAccessCodeService,
@@ -80,6 +106,7 @@ import {
 	MySQLStoreGeolocationService,
 	MySQLStoreHeadquartersService,
 	MySQLStoreInfoService,
+	MySQLStorePaymentMethodsService,
 	MySQLStorePoliciesService,
 	MySQLStoreProductCategoryService,
 	MysqlStoreProductSubcategoryService,
@@ -144,10 +171,42 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStoreShippingMeansRepository,
 		useClass: MySQLStoreShippingMeansRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreAnalyticsRepository,
+		useClass: MySQLStoreAnalyticsRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStroePaymentMethodsRepository,
+		useClass: MySQLStorePaymentMethodsRepository
 	}
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.FindPaymentMethodWithCredentialsQuery,
+		useClass: FindPaymentMethodWithCredentialsQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.GetPaymentMethodsQueryWithoutAuth,
+		useClass: GetPaymentMethodsWithoutAuthQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.CountAllDevicesQuery,
+		useClass: CountDevicesQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.GetAllEventsCountQuery,
+		useClass: GetAllEventsCountQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.GetFilteredStoreAnalyticsQuery,
+		useClass: GetFilteredStoreAnalyticsQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.SaveStoreAnalyticCommand,
+		useClass: SaveStoreAnalyticCommand
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.GetStoreExternalApisQuery,
 		useClass: GetStoreExternalApisQuery
@@ -271,6 +330,14 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreShippingMeansService,
 		useClass: MysqlStoreShippingMeansService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreAnalyticsService,
+		useClass: MySQLStoreAnalyticsService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStorePaymentMethodsService,
+		useClass: MySQLStorePaymentMethodsService
 	}
 ]
 
@@ -283,6 +350,7 @@ const infrastructure = [
 			CustomerAccessCode,
 			Tiendas,
 			CategoriaProductos,
+			StoreAnalytics,
 			Subcategorias,
 			Geolocalizacion,
 			Politicas,
@@ -291,7 +359,16 @@ const infrastructure = [
 			Entidades,
 			EntidadesTiendas,
 			Geolocalizacion,
-			MediosEnvios
+			MediosEnvios,
+			MedioPagos,
+			Users,
+			TiendaPayuInfo,
+			TiendaCredibancoInfo,
+			TiendaEpaycoInfo,
+			TiendaPaymentsway,
+			TiendaTucompraInfo,
+			TiendaWepay4uInfo,
+			TiendaWompiInfo
 		])
 	],
 	controllers: [
@@ -308,7 +385,11 @@ const infrastructure = [
 		PublicStoreWhatsappCheckoutController,
 		PublicStoreEntitiesController,
 		PublicStoreHeadquartersController,
-		PublicShippingMeansController
+		PublicShippingMeansController,
+		PublicStoreAnalyticsController,
+		PrivateStoreAnalyticsController,
+		PublicStorePaymentMethodsController,
+		PrivateStorePaymentGatewaysController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -322,6 +403,7 @@ export class StoresModule implements NestModule {
 				PublicStoreBlogController,
 				PublicStoreCustomerAccessCodeController,
 				PublicStoreInfoController,
+				PublicStoreAnalyticsController,
 				PublicStoreProductCategoryController,
 				PublicStoreProductSubcategoryController,
 				PublicStoreGeolocationController,
@@ -330,7 +412,10 @@ export class StoresModule implements NestModule {
 				PublicStoreWhatsappCheckoutController,
 				PublicStoreEntitiesController,
 				PublicStoreHeadquartersController,
-				PublicShippingMeansController
+				PublicShippingMeansController,
+				PublicStorePaymentMethodsController
 			)
+			.apply(LaravelAuthMiddleware)
+			.forRoutes(PrivateStoreAnalyticsController, PrivateStorePaymentGatewaysController)
 	}
 }

@@ -14,18 +14,22 @@ import { LoggerModule } from "nestjs-pino"
 
 import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
+import { AuthModule } from "./modules/auth/auth.module"
 import { CommonModule } from "./modules/common/common.module"
 import { HooksModule } from "./modules/hooks/hooks.module"
+import { MailsModule } from "./modules/mails/mails.module"
 import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
 import { StoresModule } from "./modules/stores/stores.module"
+import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
 
 @Module({
 	imports: [
 		JwtModule.register({
 			secret: process.env.JWT_SECRET,
-			global: true
+			global: true,
+			signOptions: { expiresIn: "2h" }
 		}),
 		LoggerModule.forRoot(pinoConfig),
 		ConfigModule.forRoot({
@@ -52,7 +56,10 @@ import { UsersModule } from "./modules/users/users.module"
 		StoresModule,
 		PaymentsModule,
 		HooksModule,
-		UsersModule
+		UsersModule,
+		SuperModule,
+		AuthModule,
+		MailsModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

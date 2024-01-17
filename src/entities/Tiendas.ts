@@ -42,11 +42,13 @@ import { Productos } from "./Productos"
 import { Proveedores } from "./Proveedores"
 import { Redes } from "./Redes"
 import { ReputacionTiendaMarketplace } from "./ReputacionTiendaMarketplace"
+import { StoreAnalytics } from "./StoreAnalytics"
 import { Subcategorias } from "./Subcategorias"
 import { Subscriptions } from "./Subscriptions"
 import { Suscripciones } from "./Suscripciones"
 import { SuscriptoresTienda } from "./SuscriptoresTienda"
 import { Tag } from "./Tag"
+import { TareasTienda } from "./TareasTienda"
 import { Template_5Settings } from "./Template_5Settings"
 import { Template_6 } from "./Template_6"
 import { TemplateGeneral } from "./TemplateGeneral"
@@ -376,6 +378,9 @@ export class Tiendas {
 	@JoinColumn([{ name: "ciudad", referencedColumnName: "id" }])
 	ciudad2: Ciudades
 
+	@OneToMany(() => TareasTienda, (tareasTienda) => tareasTienda.idTienda2)
+	tareasTiendas: TareasTienda[]
+
 	@OneToOne(() => TiendasInfo, (tiendasInfo) => tiendasInfo.tiendaInfo2)
 	tiendasInfo: TiendasInfo
 
@@ -396,4 +401,7 @@ export class Tiendas {
 
 	@OneToMany(() => Zonas, (zonas) => zonas.tiendas)
 	zonas: Zonas[]
+
+	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.storeId)
+	analytics: StoreAnalytics[]
 }
