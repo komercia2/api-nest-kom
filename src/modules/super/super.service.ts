@@ -1,11 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import {
-	Carritos,
-	SuscriptoresTienda,
-	Tiendas as Store,
-	TiendaSuscripcionStripe
-} from "src/entities"
+import { Carritos, Tiendas as Store, TiendaSuscripcionStripe } from "src/entities"
 import { Repository } from "typeorm"
 
 import { GetFilteredStoresDto } from "./dtos"
@@ -81,10 +76,6 @@ export class SuperService {
 				"tiendasInfo.dominio",
 				"tiendasInfo.paises",
 				"paises.pais",
-				"categoria2.id",
-				"categoria2.nombreCategoria",
-				"entidadesTiendas.id",
-				"entidadesTiendas.entidadId",
 				"users.nombre",
 				"users.email"
 			])
@@ -92,11 +83,6 @@ export class SuperService {
 			.leftJoin("store.users", "users")
 			.leftJoin("tiendasInfo.paises", "paises")
 			.leftJoin("store.ciudad2", "ciudad2")
-			.leftJoin("store.categoria2", "categoria2")
-			.leftJoin("store.entidadesTiendas", "entidadesTiendas")
-			.leftJoinAndMapMany("store.tareasTiendas", "store.tareasTiendas", "tasks")
-			.loadRelationCountAndMap("store.productos", "store.productos")
-			.loadRelationCountAndMap("store.carritos", "store.carritos")
 			.orderBy("store.createdAt", "DESC")
 			.where("store.createdAt >= :date", {
 				date: new Date(currentDate.setDate(currentDate.getDate() - 7))
