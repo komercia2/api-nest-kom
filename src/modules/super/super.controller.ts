@@ -1,6 +1,7 @@
 import { Controller, Get, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
+import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetFilteredStoresDto } from "./dtos"
 import { SuperService } from "./super.service"
 
@@ -16,8 +17,8 @@ export class SuperController {
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("weekly-stores")
-	getWeeklyStores() {
-		return this.superService.getWeeklyStores()
+	getWeeklyStores(@Query() paginationDto: PaginationDto) {
+		return this.superService.getPagedWeeklyStores(paginationDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)

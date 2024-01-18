@@ -3,6 +3,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Carritos, Tiendas as Store, TiendaSuscripcionStripe } from "src/entities"
 import { Repository } from "typeorm"
 
+import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetFilteredStoresDto } from "./dtos"
 
 @Injectable()
@@ -56,10 +57,12 @@ export class SuperService {
 		}
 	}
 
-	async getWeeklyStores() {
+	async getPagedWeeklyStores(paginationDto: PaginationDto) {
+		const { page, limit } = paginationDto
 		const currentDate = new Date()
+		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 7))
 
-		const stores = await this.storeRepository
+		const storesQuery = this.storeRepository
 			.createQueryBuilder("store")
 			.select([
 				"store.id",
@@ -67,7 +70,6 @@ export class SuperService {
 				"store.subdominio",
 				"store.createdAt",
 				"store.fechaExpiracion",
-				"store.template",
 				"store.tipo",
 				"store.logo",
 				"ciudad2.nombreCiu",
@@ -75,21 +77,38 @@ export class SuperService {
 				"tiendasInfo.telefono",
 				"tiendasInfo.dominio",
 				"tiendasInfo.paises",
-				"paises.pais",
-				"users.nombre",
-				"users.email"
+				"paises.pais"
 			])
 			.innerJoin("store.tiendasInfo", "tiendasInfo")
-			.leftJoin("store.users", "users")
 			.leftJoin("tiendasInfo.paises", "paises")
 			.leftJoin("store.ciudad2", "ciudad2")
 			.orderBy("store.createdAt", "DESC")
 			.where("store.createdAt >= :date", {
-				date: new Date(currentDate.setDate(currentDate.getDate() - 7))
+				date: targetDate
 			})
+			.skip((page - 1) * limit)
+			.take(limit)
 			.getMany()
 
-		return stores
+		const totalStoresQuery = this.storeRepository
+			.createQueryBuilder("store")
+			.where("store.createdAt >= :date", {
+				date: targetDate
+			})
+			.getCount()
+
+		const [stores, total] = await Promise.all([storesQuery, totalStoresQuery])
+
+		return {
+			data: stores,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
 	}
 
 	async getFilteredStores(filter: GetFilteredStoresDto) {
