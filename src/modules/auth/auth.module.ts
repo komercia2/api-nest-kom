@@ -2,8 +2,8 @@ import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { Users } from "src/entities"
 
-import { AuthController } from "./super.auth.controller"
 import { AuthService } from "./auth.service"
+import { AuthController } from "./super.auth.controller"
 
 @Module({
 	imports: [TypeOrmModule.forFeature([Users])],
