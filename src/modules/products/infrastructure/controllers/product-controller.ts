@@ -1,6 +1,7 @@
 import { Body, HttpStatus, Inject, Param, Query, Req, Res } from "@nestjs/common"
 import { Get } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
@@ -12,6 +13,7 @@ import {
 import { GetManyProductsByIdsDto } from "../dtos"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
 
+@ApiTags("Products")
 @Controller("")
 export class ProductController {
 	constructor(

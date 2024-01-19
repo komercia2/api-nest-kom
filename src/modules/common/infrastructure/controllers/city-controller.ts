@@ -1,12 +1,13 @@
 import { HttpStatus, Inject, Req, Res } from "@nestjs/common"
 import { Get } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
 import { GetAllCitiesQuery } from "../../application/query"
 import { CommonInfrastructureInjectionTokens } from "../common-infrastructure-injection-tokens"
-
+@ApiTags("Common")
 @Controller("cities")
 export class CityController {
 	constructor(

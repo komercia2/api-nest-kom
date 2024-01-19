@@ -1,4 +1,5 @@
 import { Controller, Get, Inject, Query, Req, Res } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 import {
@@ -10,6 +11,7 @@ import {
 import { GetFilteredStoreAnalyticsDto } from "../../../domain/dtos"
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
+@ApiTags("Stores Analytics")
 @Controller("private/analytics")
 export class PrivateStoreAnalyticsController {
 	constructor(

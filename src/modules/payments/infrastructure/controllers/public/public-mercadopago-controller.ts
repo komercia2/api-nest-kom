@@ -1,6 +1,7 @@
 import { Inject, Post } from "@nestjs/common"
 import { Query, Req, Res } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import axios, { HttpStatusCode } from "axios"
 import { Request, Response } from "express"
@@ -10,6 +11,7 @@ import { CreateMercadopagoPreferenceQuery } from "src/modules/payments/applicati
 import { ClientMercadopagoException, MercadopagoException } from "../../errors"
 import { PaymentsInfrastructureInjectionTokens } from "../../payments-infrastructure-injection-token"
 
+@ApiTags("Payments")
 @Controller("mercadopago")
 export class PublicMercadopagoController {
 	constructor(
