@@ -19,20 +19,54 @@ export class SuperService {
 		private readonly tiendaSuscripcionStripeRepository: Repository<TiendaSuscripcionStripe>
 	) {}
 
+	async getWeeklySubscriptions({ page, limit }: PaginationDto) {
+		const currentDate = new Date()
+		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 15))
+
+		const [subscriptions, total] = await this.tiendaSuscripcionStripeRepository
+			.createQueryBuilder("suscripcion")
+			.select([
+				"users.email",
+				"suscripcion.id",
+				"suscripcion.periodEnd",
+				"suscripcion.customerId",
+				"suscripcion.periodStart",
+				"tiendas.tipo"
+			])
+			.innerJoin("suscripcion.tiendas", "tiendas")
+			.leftJoin("tiendas.users", "users")
+			.where("suscripcion.createdAt >= :date", { date: targetDate })
+			.skip((page - 1) * limit)
+			.take(limit)
+			.getManyAndCount()
+
+		return {
+			data: subscriptions,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
+
 	async getWeeklyGeneralStats() {
 		const currentDate = new Date()
+		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 15))
 
 		const getAllStoresCount = this.storeRepository
 			.createQueryBuilder("store")
 			.where("store.createdAt >= :date", {
-				date: new Date(currentDate.setDate(currentDate.getDate() - 7))
+				date: targetDate
 			})
 			.getCount()
 
 		const getAllSalesCount = this.carritosRepository
 			.createQueryBuilder("carritos")
 			.where("carritos.createdAt >= :date", {
-				date: new Date(currentDate.setDate(currentDate.getDate() - 7))
+				date: targetDate
 			})
 			.andWhere("carritos.estado = :estado", { estado: "1" })
 			.getCount()
@@ -40,7 +74,7 @@ export class SuperService {
 		const getAllSuscriptoresCount = this.tiendaSuscripcionStripeRepository
 			.createQueryBuilder("suscriptoresTienda")
 			.where("suscriptoresTienda.createdAt >= :date", {
-				date: new Date(currentDate.setDate(currentDate.getDate() - 7))
+				date: targetDate
 			})
 			.getCount()
 
@@ -60,7 +94,7 @@ export class SuperService {
 	async getPagedWeeklyStores(paginationDto: PaginationDto) {
 		const { page, limit } = paginationDto
 		const currentDate = new Date()
-		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 7))
+		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 15))
 
 		const storesQuery = this.storeRepository
 			.createQueryBuilder("store")

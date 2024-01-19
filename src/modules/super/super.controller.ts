@@ -10,6 +10,12 @@ export class SuperController {
 	constructor(private readonly superService: SuperService) {}
 
 	@UseGuards(SuperJwtAuthGuard)
+	@Get("weekly-subscriptions")
+	getWeeklySubscriptions(@Query() paginationDto: PaginationDto) {
+		return this.superService.getWeeklySubscriptions(paginationDto)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
 	@Get("general-stats")
 	getWeeklyGeneralStats() {
 		return this.superService.getWeeklyGeneralStats()
