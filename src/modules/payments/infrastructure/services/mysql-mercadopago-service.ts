@@ -16,6 +16,15 @@ export class MySQLMercadopagoService {
 	) {}
 
 	async createIntgration(storeId: number, data: MercadopagoStoreInfoEntity) {
+		const exist = await this.mercadopagoInfoRepository.findOne({
+			where: { idTienda: storeId }
+		})
+
+		if (exist) {
+			await this.mercadopagoInfoRepository.save({ ...data, idTienda: storeId })
+			return
+		}
+
 		await this.mercadopagoInfoRepository.update({ idTienda: storeId }, data)
 	}
 
