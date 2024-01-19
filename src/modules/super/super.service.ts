@@ -29,6 +29,7 @@ export class SuperService {
 				"users.email",
 				"suscripcion.id",
 				"suscripcion.periodEnd",
+				"tiendas.id",
 				"suscripcion.customerId",
 				"suscripcion.periodStart",
 				"tiendas.tipo"
