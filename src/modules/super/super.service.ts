@@ -19,9 +19,9 @@ export class SuperService {
 		private readonly tiendaSuscripcionStripeRepository: Repository<TiendaSuscripcionStripe>
 	) {}
 
-	async getWeeklySubscriptions({ page, limit }: PaginationDto) {
+	async getMonthlySubscriptions({ page, limit }: PaginationDto) {
 		const currentDate = new Date()
-		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 15))
+		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 30))
 
 		const [subscriptions, total] = await this.tiendaSuscripcionStripeRepository
 			.createQueryBuilder("suscripcion")
@@ -53,9 +53,9 @@ export class SuperService {
 		}
 	}
 
-	async getWeeklyGeneralStats() {
+	async getMonthlyGeneralStats() {
 		const currentDate = new Date()
-		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 15))
+		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 30))
 
 		const getAllStoresCount = this.storeRepository
 			.createQueryBuilder("store")
@@ -92,10 +92,10 @@ export class SuperService {
 		}
 	}
 
-	async getPagedWeeklyStores(paginationDto: PaginationDto) {
+	async getPagedMonthlyStores(paginationDto: PaginationDto) {
 		const { page, limit } = paginationDto
 		const currentDate = new Date()
-		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 15))
+		const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 30))
 
 		const storesQuery = this.storeRepository
 			.createQueryBuilder("store")

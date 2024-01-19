@@ -12,21 +12,21 @@ export class SuperController {
 	constructor(private readonly superService: SuperService) {}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Get("weekly-subscriptions")
+	@Get("monthly-subscriptions")
 	getWeeklySubscriptions(@Query() paginationDto: PaginationDto) {
-		return this.superService.getWeeklySubscriptions(paginationDto)
+		return this.superService.getMonthlySubscriptions(paginationDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("general-stats")
 	getWeeklyGeneralStats() {
-		return this.superService.getWeeklyGeneralStats()
+		return this.superService.getMonthlyGeneralStats()
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Get("weekly-stores")
+	@Get("monthly-stores")
 	getWeeklyStores(@Query() paginationDto: PaginationDto) {
-		return this.superService.getPagedWeeklyStores(paginationDto)
+		return this.superService.getPagedMonthlyStores(paginationDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
