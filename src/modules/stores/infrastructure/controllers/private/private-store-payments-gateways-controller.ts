@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Inject, Req, Res } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 import { FindPaymentMethodWithCredentialsQuery } from "src/modules/stores/application/query"
@@ -6,6 +7,7 @@ import { FindPaymentMethodWithCredentialsDto } from "src/modules/stores/domain/d
 
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
+@ApiTags("Stores")
 @Controller("private/payment-gateways")
 export class PrivateStorePaymentGatewaysController {
 	constructor(

@@ -1,4 +1,5 @@
 import { Controller, Get, Inject, Query, Req, Res } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { GetStoreTemplateSettingsDTO } from "@templates/application/query/store-template-settings/dtos"
 import { GetStoreTemplateQuery } from "@templates/application/query/store-template-settings/get-template-setting-query"
@@ -7,6 +8,7 @@ import { Request, Response } from "express"
 
 import { InfrastructureInjectionTokens } from "../infrastructure-injection.tokens"
 
+@ApiTags("Templates")
 @Controller("store-template-settings")
 export class PublicStoreTemplateSettingsController {
 	constructor(

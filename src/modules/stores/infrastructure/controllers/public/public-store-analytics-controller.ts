@@ -1,4 +1,5 @@
 import { Body, Controller, Inject, Post, Req, Res } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 import { SaveStoreAnalyticCommand } from "src/modules/stores/application/command"
@@ -6,6 +7,7 @@ import { SaveStoreAnalyticCommand } from "src/modules/stores/application/command
 import { CreateStoreAnalyticsDto } from "../../../domain/dtos"
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
+@ApiTags("Stores")
 @Controller("analytics")
 export class PublicStoreAnalyticsController {
 	constructor(

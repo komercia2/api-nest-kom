@@ -1,10 +1,12 @@
 import { Controller, Get, HttpStatus, Inject, Param, Req, Res } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 import { FindStoreHeadquartersQuery } from "src/modules/stores/application/query"
 
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
+@ApiTags("Stores")
 @Controller("headquarters")
 export class PublicStoreHeadquartersController {
 	constructor(

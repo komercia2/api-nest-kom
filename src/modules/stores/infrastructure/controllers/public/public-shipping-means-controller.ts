@@ -1,4 +1,5 @@
 import { Controller, Get, Inject, Param, Req, Res } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { HttpStatusCode } from "axios"
 import { Request, Response } from "express"
@@ -6,6 +7,7 @@ import { GetStoreShippingMeansQuery } from "src/modules/stores/application/query
 
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
+@ApiTags("Stores")
 @Controller("shipping-means")
 export class PublicShippingMeansController {
 	constructor(

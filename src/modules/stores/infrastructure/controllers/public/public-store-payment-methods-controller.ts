@@ -1,4 +1,5 @@
 import { Controller, Get, Inject, Param, Req, Res, UseGuards } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { CheckoutJwtGuard } from "@shared/infrastructure/guards"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { HttpStatusCode } from "axios"
@@ -7,6 +8,7 @@ import { GetPaymentMethodsWithoutAuthQuery } from "src/modules/stores/applicatio
 
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
+@ApiTags("Stores")
 @Controller("payment-methods")
 export class PublicStorePaymentMethodsController {
 	constructor(

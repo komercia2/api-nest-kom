@@ -1,4 +1,5 @@
 import { Body, Controller, HttpStatus, Inject, Post, Req, Res } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 import { NotifyOrderCreatedQuery } from "src/modules/hooks/application/query"
@@ -6,6 +7,7 @@ import { NotifyOrderCreatedQuery } from "src/modules/hooks/application/query"
 import { NotifyOrderCreatedDto } from "../../dtos"
 import { HooksInfrastructureInjectionTokens } from "../../hooks-infrastructure-injection-tokens"
 
+@ApiTags("Hooks")
 @Controller("public")
 export class PublicHooksController {
 	constructor(

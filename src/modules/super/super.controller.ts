@@ -1,12 +1,21 @@
 import { Controller, Get, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
+import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetFilteredStoresDto } from "./dtos"
 import { SuperService } from "./super.service"
 
+@ApiTags("Super")
 @Controller("")
 export class SuperController {
 	constructor(private readonly superService: SuperService) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("weekly-subscriptions")
+	getWeeklySubscriptions(@Query() paginationDto: PaginationDto) {
+		return this.superService.getWeeklySubscriptions(paginationDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("general-stats")
@@ -16,8 +25,8 @@ export class SuperController {
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("weekly-stores")
-	getWeeklyStores() {
-		return this.superService.getWeeklyStores()
+	getWeeklyStores(@Query() paginationDto: PaginationDto) {
+		return this.superService.getPagedWeeklyStores(paginationDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)

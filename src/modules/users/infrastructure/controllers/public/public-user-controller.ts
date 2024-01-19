@@ -11,6 +11,7 @@ import {
 	Res,
 	UseGuards
 } from "@nestjs/common"
+import { ApiTags } from "@nestjs/swagger"
 import { CheckoutJwtGuard } from "@shared/infrastructure/guards"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
@@ -26,6 +27,7 @@ import {
 import { CreateUserAdressDto } from "../../dtos"
 import { UsersInfrastructureInjectionTokens } from "../../users-infrastructure-injection-tokens"
 
+@ApiTags("Users")
 @Controller("public")
 export class PublicUserController {
 	constructor(

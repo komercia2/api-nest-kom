@@ -1,12 +1,14 @@
 import { HttpStatus, Inject, Post, Req, Res, UploadedFile, UseInterceptors } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
 import { FileInterceptor } from "@nestjs/platform-express"
+import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
 
 import { CreateFromFileCommand } from "../../application/command"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
 
+@ApiTags("Products")
 @Controller("")
 export class AdminProductController {
 	constructor(
