@@ -36,6 +36,7 @@ export class SuperService {
 			])
 			.innerJoin("suscripcion.tiendas", "tiendas")
 			.leftJoin("tiendas.users", "users")
+			.orderBy("suscripcion.periodStart", "DESC")
 			.where("suscripcion.createdAt >= :date", { date: targetDate })
 			.skip((page - 1) * limit)
 			.take(limit)
