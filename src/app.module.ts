@@ -20,6 +20,7 @@ import { HooksModule } from "./modules/hooks/hooks.module"
 import { MailsModule } from "./modules/mails/mails.module"
 import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
+import { SalesModule } from "./modules/sales/sales.module"
 import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
@@ -59,7 +60,8 @@ import { UsersModule } from "./modules/users/users.module"
 		UsersModule,
 		SuperModule,
 		AuthModule,
-		MailsModule
+		MailsModule,
+		SalesModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

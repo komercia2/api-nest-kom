@@ -9,6 +9,7 @@ import { HooksModule } from "src/modules/hooks/hooks.module"
 import { MailsModule } from "src/modules/mails/mails.module"
 import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
+import { SalesModule } from "src/modules/sales/sales.module"
 import { StoresModule } from "src/modules/stores/stores.module"
 import { SuperModule } from "src/modules/super/super.module"
 import { UsersModule } from "src/modules/users/users.module"
@@ -68,6 +69,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/mails`,
 		module: MailsModule
+	},
+	{
+		path: `${apiVersions.v1}/sales`,
+		module: SalesModule
 	}
 ]
 
