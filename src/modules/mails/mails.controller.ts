@@ -18,6 +18,8 @@ export class MailsController {
 				summary: "Send custom email for contact store with many fields",
 				description: "Example of a body to send custom email for contact store with many fields",
 				value: {
+					userId: null,
+					storeId: 1559,
 					to: "jhondoe@example.com",
 					templateId: "d-57ff9dee8ab14e77bd0b8ce179b6e46e",
 					dynamicTemplateData: {
