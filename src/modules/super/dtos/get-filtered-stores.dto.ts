@@ -19,6 +19,8 @@ export class GetFilteredStoresDto {
 
 	readonly category: string
 
+	readonly city: string
+
 	readonly email: string
 
 	@Type(() => Number)
