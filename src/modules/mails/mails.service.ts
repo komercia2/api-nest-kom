@@ -1,7 +1,10 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
+import { InjectRepository } from "@nestjs/typeorm"
 import { MailService } from "@sendgrid/mail"
 import { Logger } from "nestjs-pino"
+import { MensajesContacto } from "src/entities"
+import { Repository } from "typeorm"
 
 import { CreateMailDto } from "./dto/create-mail.dto"
 
@@ -13,12 +16,14 @@ export class MailsService {
 	constructor(
 		private readonly configService: ConfigService,
 		private readonly mailService: MailService,
-		private readonly logger: Logger
+		private readonly logger: Logger,
+		@InjectRepository(MensajesContacto)
+		private readonly mensajesContactoRepository: Repository<MensajesContacto>
 	) {
 		mailService.setApiKey(this.sendgridApiKey as string)
 	}
 
-	async sendCustomEmail(createMailDto: CreateMailDto): Promise<void> {
+	async sendCustomEmail(createMailDto: CreateMailDto): Promise<{ success: boolean }> {
 		const { to, templateId, dynamicTemplateData } = createMailDto
 		try {
 			await this.mailService.send({
@@ -27,9 +32,27 @@ export class MailsService {
 				templateId,
 				dynamicTemplateData
 			})
+			await this.saveMessageSent(createMailDto)
 			this.logger.log(`Email sent successfully to ${to}`)
+			return { success: true }
 		} catch (error) {
 			this.logger.error(error)
+			return { success: false }
 		}
+	}
+
+	async saveMessageSent(createMailDto: CreateMailDto): Promise<void> {
+		const { to, dynamicTemplateData, storeId, userId } = createMailDto
+
+		const mensajeContacto = this.mensajesContactoRepository.create({
+			email: to,
+			mensaje: dynamicTemplateData.messsage,
+			nombre: dynamicTemplateData.clientName,
+			telefono: dynamicTemplateData.clientPhoneNumber,
+			usuarioId: userId,
+			createdAt: new Date(),
+			tiendaId: storeId
+		})
+		await this.mensajesContactoRepository.save(mensajeContacto)
 	}
 }
