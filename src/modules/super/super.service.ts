@@ -148,8 +148,22 @@ export class SuperService {
 	}
 
 	async getFilteredStores(filter: GetFilteredStoresDto) {
-		const { name, category, date, email, entityId, id, limit, template, page, subdomain, city } =
-			filter
+		const {
+			name,
+			category,
+			date,
+			email,
+			entityId,
+			id,
+			limit,
+			template,
+			page,
+			subdomain,
+			city,
+			expired,
+			withoutExpire,
+			toExpire
+		} = filter
 
 		const queryBuilder = this.storeRepository
 			.createQueryBuilder("store")
@@ -221,6 +235,21 @@ export class SuperService {
 
 		if (city) {
 			queryBuilder.andWhere("ciudad2.nombreCiu LIKE :city", { city: `%${city}%` })
+		}
+
+		if (expired) {
+			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: new Date() })
+		}
+
+		if (withoutExpire) {
+			queryBuilder.andWhere("store.fechaExpiracion > :date", { date: new Date() })
+		}
+
+		if (toExpire) {
+			const currentDate = new Date()
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 15))
+
+			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
 		}
 
 		const [stores, total] = await queryBuilder.getManyAndCount()

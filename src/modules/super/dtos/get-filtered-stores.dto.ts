@@ -31,6 +31,15 @@ export class GetFilteredStoresDto {
 
 	readonly subdomain: string
 
+	@Type(() => Boolean)
+	readonly expired: boolean
+
+	@Type(() => Boolean)
+	readonly withoutExpire: boolean
+
+	@Type(() => Boolean)
+	readonly toExpire: boolean
+
 	@IsString({ each: true })
 	@IsIn(["ASC", "DESC"], { each: true })
 	readonly date: "ASC" | "DESC"
