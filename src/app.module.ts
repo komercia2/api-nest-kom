@@ -24,6 +24,7 @@ import { SalesModule } from "./modules/sales/sales.module"
 import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
+import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
 	imports: [
@@ -61,7 +62,8 @@ import { UsersModule } from "./modules/users/users.module"
 		SuperModule,
 		AuthModule,
 		MailsModule,
-		SalesModule
+		SalesModule,
+		OrdersModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

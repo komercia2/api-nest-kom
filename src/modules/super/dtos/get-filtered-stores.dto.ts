@@ -21,7 +21,11 @@ export class GetFilteredStoresDto {
 
 	readonly city: string
 
+	readonly country: string
+
 	readonly email: string
+
+	readonly suscription: number
 
 	@Type(() => Number)
 	readonly entityId: number
@@ -30,6 +34,15 @@ export class GetFilteredStoresDto {
 	readonly template: number
 
 	readonly subdomain: string
+
+	@Type(() => Boolean)
+	readonly expired: boolean
+
+	@Type(() => Boolean)
+	readonly withoutExpire: boolean
+
+	@Type(() => Boolean)
+	readonly toExpire: boolean
 
 	@IsString({ each: true })
 	@IsIn(["ASC", "DESC"], { each: true })

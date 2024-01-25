@@ -12,6 +12,12 @@ export class SuperController {
 	constructor(private readonly superService: SuperService) {}
 
 	@UseGuards(SuperJwtAuthGuard)
+	@Get("countries")
+	getCountries() {
+		return this.superService.getCountries()
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
 	@Get("monthly-subscriptions")
 	getWeeklySubscriptions(@Query() paginationDto: PaginationDto) {
 		return this.superService.getMonthlySubscriptions(paginationDto)
