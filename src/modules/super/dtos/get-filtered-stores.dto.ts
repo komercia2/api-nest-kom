@@ -21,7 +21,11 @@ export class GetFilteredStoresDto {
 
 	readonly city: string
 
+	readonly country: string
+
 	readonly email: string
+
+	readonly suscription: number
 
 	@Type(() => Number)
 	readonly entityId: number

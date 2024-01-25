@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Carritos, Tiendas as Store, TiendaSuscripcionStripe } from "src/entities"
+import { Carritos, Paises, Tiendas as Store, TiendaSuscripcionStripe } from "src/entities"
 import { Repository } from "typeorm"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
@@ -16,8 +16,15 @@ export class SuperService {
 		private readonly carritosRepository: Repository<Carritos>,
 
 		@InjectRepository(TiendaSuscripcionStripe)
-		private readonly tiendaSuscripcionStripeRepository: Repository<TiendaSuscripcionStripe>
+		private readonly tiendaSuscripcionStripeRepository: Repository<TiendaSuscripcionStripe>,
+
+		@InjectRepository(Paises)
+		private readonly paisesRepository: Repository<Paises>
 	) {}
+
+	async getCountries() {
+		return this.paisesRepository.find()
+	}
 
 	async getMonthlySubscriptions({ page, limit }: PaginationDto) {
 		const currentDate = new Date()
@@ -155,10 +162,12 @@ export class SuperService {
 			email,
 			entityId,
 			id,
+			suscription,
 			limit,
 			template,
 			page,
 			subdomain,
+			country,
 			city,
 			expired,
 			withoutExpire,
@@ -181,8 +190,7 @@ export class SuperService {
 				"tiendasInfo.emailTienda",
 				"tiendasInfo.telefono",
 				"tiendasInfo.dominio",
-				"tiendasInfo.paises",
-				"paises.pais",
+				"paises.id",
 				"categoria2.id",
 				"categoria2.nombreCategoria",
 				"entidadesTiendas.id",
@@ -237,12 +245,20 @@ export class SuperService {
 			queryBuilder.andWhere("ciudad2.nombreCiu LIKE :city", { city: `%${city}%` })
 		}
 
+		if (suscription) {
+			queryBuilder.andWhere("store.tipo = :suscription", { suscription })
+		}
+
 		if (expired) {
 			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: new Date() })
 		}
 
 		if (withoutExpire) {
 			queryBuilder.andWhere("store.fechaExpiracion > :date", { date: new Date() })
+		}
+
+		if (country) {
+			queryBuilder.andWhere("paises.pais LIKE :country", { country: `%${country}%` })
 		}
 
 		if (toExpire) {
