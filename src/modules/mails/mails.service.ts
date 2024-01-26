@@ -32,6 +32,23 @@ export class MailsService {
 				templateId,
 				dynamicTemplateData
 			})
+			this.logger.log(`Email sent successfully to ${to}`)
+			return { success: true }
+		} catch (error) {
+			this.logger.error(error)
+			return { success: false }
+		}
+	}
+
+	async sendContactEmail(createMailDto: CreateMailDto): Promise<{ success: boolean }> {
+		const { to, templateId, dynamicTemplateData } = createMailDto
+		try {
+			await this.mailService.send({
+				to: to,
+				from: this.sendgridFrom as string,
+				templateId,
+				dynamicTemplateData
+			})
 			await this.saveMessageSent(createMailDto)
 			this.logger.log(`Email sent successfully to ${to}`)
 			return { success: true }
