@@ -10,7 +10,8 @@ import { MailsService } from "./mails.service"
 @Module({
 	imports: [TypeOrmModule.forFeature([MensajesContacto])],
 	controllers: [MailsController],
-	providers: [MailsService, MailService]
+	providers: [MailsService, MailService],
+	exports: [MailsService]
 })
 export class MailsModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {

@@ -15,11 +15,16 @@ import {
 	ProductosInfo,
 	ProductosVariantes,
 	ProductosVariantesCombinaciones,
+	Tiendas,
+	TiendasInfo,
 	Users
 } from "src/entities"
-import { DataSource, QueryRunner, Repository } from "typeorm"
+import { DataSource, Repository } from "typeorm"
 
-import { CreateOrderDto, Producto } from "./dtos/create-order-dto"
+import { MailsService } from "../mails/mails.service"
+import logos from "./constants/logos"
+import { CreateOrderDto } from "./dtos/create-order-dto"
+import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
 
 type Combination = {
 	combinacion: string
@@ -57,9 +62,15 @@ export class OrdersService {
 
 		@InjectRepository(Clientes) private readonly clientesRepository: Repository<Clientes>,
 
+		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>,
+
+		@InjectRepository(Tiendas) private readonly tiendas: Repository<Tiendas>,
+
 		private readonly datasource: DataSource,
 
-		private readonly logger: Logger
+		private readonly logger: Logger,
+
+		private readonly mailsService: MailsService
 	) {}
 
 	async createOrder(createOrderDto: CreateOrderDto) {
@@ -177,11 +188,36 @@ export class OrdersService {
 			await this.isClientRegistered(usuario, tienda, CLIENT_ASSIGNATION_METHOD.ORDER)
 
 			this.logger.log("Client registered")
-			// TODO: Send email to client
-			// ?: Send sms to client
+
 			await queryRunner.commitTransaction()
 
 			this.logger.log("Transaction commited")
+
+			const { emailCliente, datosTienda } = createOrderDto
+			const emailTienda = datosTienda.email_tienda
+
+			const storeEmailData: OrderEmailDto = {
+				...this.formatDataForEmail(createOrderDto, cart, false)
+			}
+
+			const clientEmailData: OrderEmailDto = {
+				...this.formatDataForEmail(createOrderDto, cart, true)
+			}
+
+			try {
+				await Promise.all([
+					this.sendOrderEmail(emailTienda, tienda, storeEmailData),
+					this.sendOrderEmail(emailCliente, tienda, clientEmailData)
+				])
+
+				// !IMPORTANT: Send SMS. For reduce coasts, we need to send SMS only to the store if has premium plan
+
+				this.logger.log("Emails sent to store and client")
+			} catch (error) {
+				this.logger.error(`Error sending emails: ${error}`)
+			}
+
+			return cart
 		} catch (error) {
 			await queryRunner.rollbackTransaction()
 			this.logger.error(`Transaction rolled back: ${error}`)
@@ -190,6 +226,46 @@ export class OrdersService {
 			await queryRunner.release()
 			this.logger.log("QueryRunner released")
 		}
+	}
+
+	private async sendOrderEmail(email: string, storeId: number, data: OrderEmailDto) {
+		return await this.mailsService.sendCustomEmail({
+			to: email,
+			storeId,
+			templateId: "d-31bcbff48b1841f29782d02a9904a177",
+			dynamicTemplateData: data
+		})
+	}
+
+	private formatDataForEmail(data: CreateOrderDto, cart: Carritos, isClient: boolean) {
+		const { total, datosTienda, costo_envio, descuento, direccion_entrega } = data
+		const { id: IdOrden, fecha, metodoPago } = cart
+
+		const storeEmailData: OrderEmailDto = {
+			logo: `https://api2.komercia.co/logos/${datosTienda.logo}`,
+			logoKomercia: logos.logoKomercia,
+			logoKomerciaWhite: logos.logoKomerciaWhite,
+			isClient,
+			IdOrden,
+			total: total.toString(),
+			data: {
+				venta: {
+					direccion_entrega: direccion_entrega.value,
+					costo_envio,
+					descuento,
+					fecha: new Date(fecha).toLocaleString(),
+					method_shipping: metodoPago || "",
+					tienda_venta: datosTienda,
+					total: cart.total,
+					usuario: {
+						identificacion: "",
+						nombre: direccion_entrega.value.nombre,
+						tipo_identificacion: ""
+					}
+				}
+			}
+		}
+		return storeEmailData
 	}
 
 	async isClientRegistered(userId: number, tiendaId: number, method: CLIENT_ASSIGNATION_METHOD) {

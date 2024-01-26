@@ -15,7 +15,8 @@ export class CreateMailDto {
 
 	@IsObject()
 	@IsNotEmpty()
-	readonly dynamicTemplateData: ContactMailWithManyFields
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
+	readonly dynamicTemplateData: any
 
 	@IsNumber()
 	@IsNotEmpty()

@@ -15,6 +15,15 @@ export interface CreateOrderDto {
 	descuento: number
 	cupon: string
 	metodo_pago: string
+	emailCliente: string
+	datosTienda: {
+		logo: string
+		nombre: string
+		subdominio: string
+		dominio: string
+		email_tienda: string
+		telefono: string
+	}
 }
 
 export interface DireccionEntrega {
@@ -97,10 +106,10 @@ export interface Variante {
 	id: number
 	variantes: string
 	id_producto: number
-	combinaciones: Combinacione[]
+	combinaciones: Combinacion[]
 }
 
-export interface Combinacione {
+export interface Combinacion {
 	id: number
 	combinaciones: string
 	id_productos_variantes: number

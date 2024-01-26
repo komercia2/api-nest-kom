@@ -43,6 +43,7 @@ import { Proveedores } from "./Proveedores"
 import { Redes } from "./Redes"
 import { ReputacionTiendaMarketplace } from "./ReputacionTiendaMarketplace"
 import { StoreAnalytics } from "./StoreAnalytics"
+import { StoreNotification } from "./StoreNotifications"
 import { Subcategorias } from "./Subcategorias"
 import { Subscriptions } from "./Subscriptions"
 import { Suscripciones } from "./Suscripciones"
@@ -404,4 +405,7 @@ export class Tiendas {
 
 	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.storeId)
 	analytics: StoreAnalytics[]
+
+	@OneToMany(() => StoreNotification, (notification) => notification.store)
+	notifications: StoreNotification[]
 }

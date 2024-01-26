@@ -18,13 +18,14 @@ import { AuthModule } from "./modules/auth/auth.module"
 import { CommonModule } from "./modules/common/common.module"
 import { HooksModule } from "./modules/hooks/hooks.module"
 import { MailsModule } from "./modules/mails/mails.module"
+import { NotificationsModule } from "./modules/notifications/notifications.module"
+import { OrdersModule } from "./modules/orders/orders.module"
 import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
 import { SalesModule } from "./modules/sales/sales.module"
 import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
-import { OrdersModule } from './modules/orders/orders.module';
 
 @Module({
 	imports: [
@@ -63,7 +64,8 @@ import { OrdersModule } from './modules/orders/orders.module';
 		AuthModule,
 		MailsModule,
 		SalesModule,
-		OrdersModule
+		OrdersModule,
+		NotificationsModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

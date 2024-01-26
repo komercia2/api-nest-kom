@@ -34,6 +34,6 @@ export class MailsController {
 		}
 	})
 	create(@Body() createMailDto: CreateMailDto) {
-		return this.mailsService.sendCustomEmail(createMailDto)
+		return this.mailsService.sendContactEmail(createMailDto)
 	}
 }
