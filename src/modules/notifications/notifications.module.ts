@@ -1,5 +1,6 @@
-import { Module } from "@nestjs/common"
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { StoreNotification } from "src/entities"
 
 import { NotificationsController } from "./notifications.controller"
@@ -11,4 +12,8 @@ import { NotificationsService } from "./notifications.service"
 	providers: [NotificationsService],
 	exports: [NotificationsService]
 })
-export class NotificationsModule {}
+export class NotificationsModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(LaravelAuthMiddleware).forRoutes(NotificationsController)
+	}
+}
