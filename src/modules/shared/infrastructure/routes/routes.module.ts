@@ -7,6 +7,7 @@ import { AuthModule } from "src/modules/auth/auth.module"
 import { CommonModule } from "src/modules/common/common.module"
 import { HooksModule } from "src/modules/hooks/hooks.module"
 import { MailsModule } from "src/modules/mails/mails.module"
+import { NotificationsModule } from "src/modules/notifications/notifications.module"
 import { OrdersModule } from "src/modules/orders/orders.module"
 import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
@@ -78,6 +79,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/orders`,
 		module: OrdersModule
+	},
+	{
+		path: `${apiVersions.v1}/notifications`,
+		module: NotificationsModule
 	}
 ]
 
