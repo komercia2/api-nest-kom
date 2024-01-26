@@ -126,7 +126,13 @@ export class OrdersService {
 						const decodedCombinations: Combination[] = JSON.parse(combinations.combinaciones)
 
 						decodedCombinations.forEach((c) => {
-							if (c.combinacion === producto.combinacion && c.precio === producto.precio) {
+							const strProductCombinacion = JSON.stringify(producto.combinacion)
+							const strCurrentCombination = JSON.stringify(c.combinacion)
+
+							if (
+								strCurrentCombination === strProductCombinacion &&
+								+c.precio === +producto.precio
+							) {
 								producto.precio = c.precio
 								producto.combinacion = c.combinacion
 
@@ -221,7 +227,21 @@ export class OrdersService {
 		} catch (error) {
 			await queryRunner.rollbackTransaction()
 			this.logger.error(`Transaction rolled back: ${error}`)
-			throw new InternalServerErrorException("Error creating order")
+			if (error instanceof BadRequestException) {
+				throw error
+			}
+
+			if (error instanceof ConflictException) {
+				throw error
+			}
+
+			if (error instanceof InternalServerErrorException) {
+				throw error
+			}
+
+			if (error instanceof Error) {
+				throw new InternalServerErrorException("Internal server error")
+			}
 		} finally {
 			await queryRunner.release()
 			this.logger.log("QueryRunner released")
