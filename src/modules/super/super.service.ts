@@ -1,7 +1,13 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Carritos, Paises, Tiendas as Store, TiendaSuscripcionStripe } from "src/entities"
-import { Repository } from "typeorm"
+import {
+	Carritos,
+	Entidades,
+	Paises,
+	Tiendas as Store,
+	TiendaSuscripcionStripe
+} from "src/entities"
+import { In, Repository } from "typeorm"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetFilteredStoresDto } from "./dtos"
@@ -19,8 +25,16 @@ export class SuperService {
 		private readonly tiendaSuscripcionStripeRepository: Repository<TiendaSuscripcionStripe>,
 
 		@InjectRepository(Paises)
-		private readonly paisesRepository: Repository<Paises>
+		private readonly paisesRepository: Repository<Paises>,
+
+		@InjectRepository(Entidades)
+		private readonly entidadesRepository: Repository<Entidades>
 	) {}
+
+	async getAvaibleEntities() {
+		const avaibleEntitiesIDs = [20, 6, 23]
+		return this.entidadesRepository.find({ where: { id: In(avaibleEntitiesIDs) } })
+	}
 
 	async getCountries() {
 		return this.paisesRepository.find()
@@ -272,11 +286,13 @@ export class SuperService {
 
 		return {
 			data: stores,
-			total: Math.ceil(total / limit),
-			page,
-			limit,
-			hasPrev: page > 1,
-			hasNext: page < Math.ceil(total / limit)
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
 		}
 	}
 }

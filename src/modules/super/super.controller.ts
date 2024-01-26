@@ -12,6 +12,12 @@ export class SuperController {
 	constructor(private readonly superService: SuperService) {}
 
 	@UseGuards(SuperJwtAuthGuard)
+	@Get("entities")
+	getAvaibleEntities() {
+		return this.superService.getAvaibleEntities()
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
 	@Get("countries")
 	getCountries() {
 		return this.superService.getCountries()
