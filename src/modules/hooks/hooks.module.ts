@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/c
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import { PusherNotificationsService } from "@shared/infrastructure/services"
 
+import { NotificationsModule } from "../notifications/notifications.module"
 import { HooksApplicationInjectionTokens } from "./application/hooks-application-injection-tokens"
 import { NotifyOrderCreatedQuery } from "./application/query"
 import { PublicHooksController } from "./infrastructure/controllers/public"
@@ -27,7 +28,7 @@ const infrastructure = [
 ]
 
 @Module({
-	imports: [],
+	imports: [NotificationsModule],
 	controllers: [PublicHooksController],
 	providers: [...application, ...infrastructure]
 })
