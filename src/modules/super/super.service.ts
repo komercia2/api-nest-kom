@@ -10,7 +10,7 @@ import {
 import { In, Repository } from "typeorm"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
-import { GetFilteredStoresDto } from "./dtos"
+import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
 
 @Injectable()
 export class SuperService {
@@ -30,6 +30,84 @@ export class SuperService {
 		@InjectRepository(Entidades)
 		private readonly entidadesRepository: Repository<Entidades>
 	) {}
+
+	async getSuscriptions(filterSuscriptionDto: FilterSuscriptionDto) {
+		const { page, limit, id, storeId, subscriptionId, customerId, expired, toExpire, email, name } =
+			filterSuscriptionDto
+
+		const queryBuilder = this.tiendaSuscripcionStripeRepository
+			.createQueryBuilder("suscripcion")
+			.select([
+				"users.email",
+				"users.nombre",
+				"suscripcion.id",
+				"suscripcion.periodEnd",
+				"tiendas.id",
+				"tiendas.nombre",
+				"suscripcion.customerId",
+				"suscripcion.suscripcionId",
+				"suscripcion.periodStart",
+				"suscripcion.createdAt",
+				"tiendas.tipo"
+			])
+			.innerJoin("suscripcion.tiendas", "tiendas")
+			.leftJoin("tiendas.users", "users")
+			.orderBy("suscripcion.createdAt", "DESC")
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (id) {
+			queryBuilder.andWhere("suscripcion.id = :id", { id })
+		}
+
+		if (storeId) {
+			queryBuilder.andWhere("tiendas.id = :storeId", { storeId })
+		}
+
+		if (subscriptionId) {
+			queryBuilder.andWhere("suscripcion.suscripcionId LIKE :subscriptionId", {
+				subscriptionId: `%${subscriptionId}%`
+			})
+		}
+
+		if (customerId) {
+			queryBuilder.andWhere("suscripcion.customerId LIKE :customerId", {
+				customerId: `%${customerId}%`
+			})
+		}
+
+		if (email) {
+			queryBuilder.andWhere("users.email LIKE :email", { email: `%${email}%` })
+		}
+
+		if (name) {
+			queryBuilder.andWhere("users.nombre LIKE :name", { name: `%${name}%` })
+		}
+
+		if (expired) {
+			queryBuilder.andWhere("suscripcion.periodEnd <= :date", { date: new Date() })
+		}
+
+		if (toExpire) {
+			const currentDate = new Date()
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 15))
+
+			queryBuilder.andWhere("suscripcion.periodEnd <= :date", { date: targetDate })
+		}
+
+		const [subscriptions, total] = await queryBuilder.getManyAndCount()
+
+		return {
+			data: subscriptions,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
 
 	async getAvaibleEntities() {
 		const avaibleEntitiesIDs = [20, 6, 23]

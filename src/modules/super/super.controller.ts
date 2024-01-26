@@ -3,13 +3,19 @@ import { ApiTags } from "@nestjs/swagger"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
-import { GetFilteredStoresDto } from "./dtos"
+import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
 import { SuperService } from "./super.service"
 
 @ApiTags("Super")
 @Controller("")
 export class SuperController {
 	constructor(private readonly superService: SuperService) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("suscriptions")
+	getSuscriptions(@Query() filterSuscriptionDto: FilterSuscriptionDto) {
+		return this.superService.getSuscriptions(filterSuscriptionDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("entities")
