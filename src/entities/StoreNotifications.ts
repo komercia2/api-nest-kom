@@ -23,6 +23,9 @@ export class StoreNotification {
 	@Column({ type: "tinyint", default: 0 })
 	readed: number
 
+	@Column({ type: "int", unsigned: true, nullable: false })
+	priority: number
+
 	@CreateDateColumn({ type: "datetime", name: "occurredAt" })
 	occurredAt: Date
 

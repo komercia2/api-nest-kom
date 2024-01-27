@@ -25,7 +25,8 @@ export class HooksRepository implements IHookRepository {
 
 			await this.notificationsService.createNotification({
 				notification: { event: "order-created", data: order },
-				storeId: order.storeId
+				storeId: order.storeId,
+				priority: 5
 			})
 
 			this.logger.log(`Notification for store ${storeId} created successfully`)

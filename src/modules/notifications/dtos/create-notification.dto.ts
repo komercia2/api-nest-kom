@@ -1,5 +1,5 @@
 import { Type } from "class-transformer"
-import { IsJSON, IsNumber } from "class-validator"
+import { IsJSON, IsNumber, Max, Min } from "class-validator"
 export class CreateNotificationDto {
 	@IsNumber()
 	@Type(() => Number)
@@ -8,4 +8,10 @@ export class CreateNotificationDto {
 	@IsJSON()
 	@Type(() => Object)
 	notification: Record<string, unknown>
+
+	@IsNumber()
+	@Max(10)
+	@Min(1)
+	@Type(() => Number)
+	priority: number
 }
