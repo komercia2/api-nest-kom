@@ -4,12 +4,19 @@ import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { SuperService } from "./super.service"
 
 @ApiTags("Super")
 @Controller("")
 export class SuperController {
 	constructor(private readonly superService: SuperService) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("users")
+	getUsers(@Query() filterUsersDto: FilterUsersDto) {
+		return this.superService.getUsers(filterUsersDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("suscriptions")

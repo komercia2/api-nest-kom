@@ -5,12 +5,14 @@ import {
 	Entidades,
 	Paises,
 	Tiendas as Store,
-	TiendaSuscripcionStripe
+	TiendaSuscripcionStripe,
+	Users
 } from "src/entities"
 import { In, Repository } from "typeorm"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { FilterUsersDto } from "./dtos/filter-users.dto"
 
 @Injectable()
 export class SuperService {
@@ -28,8 +30,72 @@ export class SuperService {
 		private readonly paisesRepository: Repository<Paises>,
 
 		@InjectRepository(Entidades)
-		private readonly entidadesRepository: Repository<Entidades>
+		private readonly entidadesRepository: Repository<Entidades>,
+
+		@InjectRepository(Users)
+		private readonly usersRepository: Repository<Users>
 	) {}
+
+	async getUsers(filterUsersDTO: FilterUsersDto) {
+		const { page, limit, id, name, email, documentIdentification, phone } = filterUsersDTO
+
+		const queryBuilder = this.usersRepository
+			.createQueryBuilder("users")
+			.select([
+				"users.id",
+				"users.nombre",
+				"users.email",
+				"users.activo",
+				"users.identificacion",
+				"users.tipoIdentificacion",
+				"tienda.id",
+				"tienda.nombre",
+				"users.rol",
+				"users.createdAt",
+				"users.updatedAt",
+				"usersInfo.telefono"
+			])
+			.orderBy("users.createdAt", "DESC")
+			.innerJoin("users.tienda2", "tienda")
+			.innerJoin("users.usersInfo", "usersInfo")
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (id) {
+			queryBuilder.andWhere("users.id = :id", { id })
+		}
+
+		if (name) {
+			queryBuilder.andWhere("users.nombre LIKE :name", { name: `%${name}%` })
+		}
+
+		if (email) {
+			queryBuilder.andWhere("users.email LIKE :email", { email: `%${email}%` })
+		}
+
+		if (documentIdentification) {
+			queryBuilder.andWhere("users.identificacion LIKE :documentIdentification", {
+				documentIdentification: `%${documentIdentification}%`
+			})
+		}
+
+		if (phone) {
+			queryBuilder.andWhere("usersInfo.telefono LIKE :phone", { phone: `%${phone}%` })
+		}
+
+		const [users, total] = await queryBuilder.getManyAndCount()
+
+		return {
+			data: users,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
 
 	async getSuscriptions(filterSuscriptionDto: FilterSuscriptionDto) {
 		const { page, limit, id, storeId, subscriptionId, customerId, expired, toExpire, email, name } =
