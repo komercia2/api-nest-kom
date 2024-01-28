@@ -4,13 +4,17 @@ import {
 	Carritos,
 	Entidades,
 	Paises,
+	Productos,
+	StoreAnalytics,
 	Tiendas as Store,
-	TiendaSuscripcionStripe
+	TiendaSuscripcionStripe,
+	Users
 } from "src/entities"
 import { In, Repository } from "typeorm"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { FilterUsersDto } from "./dtos/filter-users.dto"
 
 @Injectable()
 export class SuperService {
@@ -28,8 +32,130 @@ export class SuperService {
 		private readonly paisesRepository: Repository<Paises>,
 
 		@InjectRepository(Entidades)
-		private readonly entidadesRepository: Repository<Entidades>
+		private readonly entidadesRepository: Repository<Entidades>,
+
+		@InjectRepository(Users)
+		private readonly usersRepository: Repository<Users>,
+
+		@InjectRepository(Productos)
+		private readonly productosRepository: Repository<Productos>,
+
+		@InjectRepository(StoreAnalytics)
+		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
+
+	async getStoreInfo(storeId: number) {
+		const queryBuilder = this.storeRepository
+			.createQueryBuilder("store")
+			.select([
+				"store.id",
+				"store.nombre",
+				"store.subdominio",
+				"store.createdAt",
+				"store.logo",
+				"store.fechaExpiracion",
+				"store.template",
+				"store.tipo",
+				"ciudad2.nombreCiu",
+				"tiendasInfo.emailTienda",
+				"tiendasInfo.telefono",
+				"tiendasInfo.dominio",
+				"tiendasInfo.descripcion",
+				"paises.id",
+				"categoria2.id",
+				"categoria2.nombreCategoria",
+				"entidadesTiendas.id",
+				"entidadesTiendas.entidadId"
+			])
+			.innerJoin("store.tiendasInfo", "tiendasInfo")
+			.leftJoin("tiendasInfo.paises", "paises")
+			.leftJoin("store.ciudad2", "ciudad2")
+			.leftJoin("store.categoria2", "categoria2")
+			.leftJoin("store.entidadesTiendas", "entidadesTiendas")
+			.where("store.id = :storeId", { storeId })
+
+		const store = await queryBuilder.getOne()
+
+		return store
+	}
+
+	async getStoreAnalyticsSummary(storeId: number) {
+		const storeVisitedEvent = "VISITED_PAGE"
+		const totalProducts = this.productosRepository.count({ where: { tienda: storeId } })
+		const totalSales = this.carritosRepository.count({ where: { tienda: storeId } })
+		const totalViews = this.storeAnalyticsRepository.count({
+			where: { storeId, event: storeVisitedEvent }
+		})
+
+		const [products, sales, views] = await Promise.all([totalProducts, totalSales, totalViews])
+
+		return [
+			{ name: "Productos publicados", value: products },
+			{ name: "Ventas Realizadas", value: sales },
+			{ name: "Visitas", value: views }
+		]
+	}
+
+	async getUsers(filterUsersDTO: FilterUsersDto) {
+		const { page, limit, id, name, email, documentIdentification, phone } = filterUsersDTO
+
+		const queryBuilder = this.usersRepository
+			.createQueryBuilder("users")
+			.select([
+				"users.id",
+				"users.nombre",
+				"users.email",
+				"users.activo",
+				"users.identificacion",
+				"users.tipoIdentificacion",
+				"tienda.id",
+				"tienda.nombre",
+				"users.rol",
+				"users.createdAt",
+				"users.updatedAt",
+				"usersInfo.telefono"
+			])
+			.orderBy("users.createdAt", "DESC")
+			.innerJoin("users.tienda2", "tienda")
+			.innerJoin("users.usersInfo", "usersInfo")
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (id) {
+			queryBuilder.andWhere("users.id = :id", { id })
+		}
+
+		if (name) {
+			queryBuilder.andWhere("users.nombre LIKE :name", { name: `%${name}%` })
+		}
+
+		if (email) {
+			queryBuilder.andWhere("users.email LIKE :email", { email: `%${email}%` })
+		}
+
+		if (documentIdentification) {
+			queryBuilder.andWhere("users.identificacion LIKE :documentIdentification", {
+				documentIdentification: `%${documentIdentification}%`
+			})
+		}
+
+		if (phone) {
+			queryBuilder.andWhere("usersInfo.telefono LIKE :phone", { phone: `%${phone}%` })
+		}
+
+		const [users, total] = await queryBuilder.getManyAndCount()
+
+		return {
+			data: users,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
 
 	async getSuscriptions(filterSuscriptionDto: FilterSuscriptionDto) {
 		const { page, limit, id, storeId, subscriptionId, customerId, expired, toExpire, email, name } =

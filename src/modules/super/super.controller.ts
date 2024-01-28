@@ -1,15 +1,34 @@
-import { Controller, Get, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
+import { Controller, Get, Param, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { SuperService } from "./super.service"
 
 @ApiTags("Super")
 @Controller("")
 export class SuperController {
 	constructor(private readonly superService: SuperService) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/:storeId")
+	getStoreInfo(@Param("storeId") storeId: number) {
+		return this.superService.getStoreInfo(storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/:storeId/analytics-summary")
+	getStoreAnalyticsSummary(@Param("id") storeId: number) {
+		return this.superService.getStoreAnalyticsSummary(storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("users")
+	getUsers(@Query() filterUsersDto: FilterUsersDto) {
+		return this.superService.getUsers(filterUsersDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("suscriptions")

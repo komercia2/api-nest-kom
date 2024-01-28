@@ -1,4 +1,4 @@
-import { Controller, Get, Param, Put, Query } from "@nestjs/common"
+import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 
 import { GetNotificationsDto } from "./dtos/get-notifications.dto"
@@ -9,6 +9,12 @@ import { NotificationsService } from "./notifications.service"
 @Controller()
 export class NotificationsController {
 	constructor(private readonly notificationsService: NotificationsService) {}
+
+	@Post("/notify-all-stores")
+	notifyAllStores(@Body() notification: Record<string, string>) {
+		// return this.notificationsService.notifyAllStores(notification)
+		return { message: "For now, this endpoint is disabled for performance and security reasons" }
+	}
 
 	@Put("/mark-all-as-read/:storeId")
 	markAllAsRead(@Param("storeId") storeId: number) {

@@ -1,8 +1,9 @@
 import { BadRequestException, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { UuidUtil } from "@shared/infrastructure/utils"
-import { StoreNotification } from "src/entities"
-import { Repository } from "typeorm"
+import { Logger } from "nestjs-pino"
+import { StoreNotification, Tiendas } from "src/entities"
+import { DataSource, Repository } from "typeorm"
 
 import { CreateNotificationDto } from "./dtos/create-notification.dto"
 import { GetNotificationsDto } from "./dtos/get-notifications.dto"
@@ -12,9 +13,55 @@ import { MaskAsReadedDto } from "./dtos/mask-as-readed.dto"
 export class NotificationsService {
 	constructor(
 		@InjectRepository(StoreNotification)
-		private readonly storeNotificationRepository: Repository<StoreNotification>
+		private readonly storeNotificationRepository: Repository<StoreNotification>,
+
+		@InjectRepository(Tiendas)
+		private readonly tiendasRepository: Repository<Tiendas>,
+
+		private readonly datasource: DataSource,
+
+		private readonly logger: Logger
 	) {}
 
+	async notifyAllStores(notification: Record<string, string>) {
+		const queryRunner = this.datasource.createQueryRunner()
+		await queryRunner.connect()
+		await queryRunner.startTransaction()
+
+		this.logger.log("Massive notification started")
+
+		try {
+			const tiendasRepository = queryRunner.manager.getRepository(Tiendas)
+			const stores = await tiendasRepository.find({ select: ["id"] })
+
+			this.logger.log(`Sending notification to ${stores.length} stores`)
+
+			const notificationsToInsert = stores.map((store) => ({
+				storeId: store.id,
+				notification,
+				occurredAt: new Date(),
+				readed: 0,
+				priority: 10
+			}))
+
+			await queryRunner.manager.insert(StoreNotification, notificationsToInsert)
+
+			this.logger.log("Massive notification finished")
+
+			await queryRunner.commitTransaction()
+
+			this.logger.log("Massive notification committed")
+
+			return { message: "Notifications sent" }
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			this.logger.error("Massive notification failed")
+			throw error
+		} finally {
+			this.logger.log("Massive notification released")
+			await queryRunner.release()
+		}
+	}
 	async markAsRead(maskAsReadedDto: MaskAsReadedDto) {
 		const { storeId, id } = maskAsReadedDto
 		const notification = await this.storeNotificationRepository.findOne({
