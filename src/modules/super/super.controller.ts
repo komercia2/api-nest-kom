@@ -1,4 +1,4 @@
-import { Controller, Get, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
+import { Controller, Get, Param, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
@@ -11,6 +11,18 @@ import { SuperService } from "./super.service"
 @Controller("")
 export class SuperController {
 	constructor(private readonly superService: SuperService) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/:storeId")
+	getStoreInfo(@Param("storeId") storeId: number) {
+		return this.superService.getStoreInfo(storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/:storeId/analytics-summary")
+	getStoreAnalyticsSummary(@Param("id") storeId: number) {
+		return this.superService.getStoreAnalyticsSummary(storeId)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("users")

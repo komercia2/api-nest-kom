@@ -4,6 +4,8 @@ import {
 	Carritos,
 	Entidades,
 	Paises,
+	Productos,
+	StoreAnalytics,
 	Tiendas,
 	TiendaSuscripcionStripe,
 	Users,
@@ -22,7 +24,9 @@ import { SuperService } from "./super.service"
 			Carritos,
 			Paises,
 			Entidades,
-			Users
+			Users,
+			Productos,
+			StoreAnalytics
 		])
 	],
 	controllers: [SuperController],

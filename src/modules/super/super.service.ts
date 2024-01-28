@@ -4,6 +4,8 @@ import {
 	Carritos,
 	Entidades,
 	Paises,
+	Productos,
+	StoreAnalytics,
 	Tiendas as Store,
 	TiendaSuscripcionStripe,
 	Users
@@ -33,8 +35,66 @@ export class SuperService {
 		private readonly entidadesRepository: Repository<Entidades>,
 
 		@InjectRepository(Users)
-		private readonly usersRepository: Repository<Users>
+		private readonly usersRepository: Repository<Users>,
+
+		@InjectRepository(Productos)
+		private readonly productosRepository: Repository<Productos>,
+
+		@InjectRepository(StoreAnalytics)
+		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
+
+	async getStoreInfo(storeId: number) {
+		const queryBuilder = this.storeRepository
+			.createQueryBuilder("store")
+			.select([
+				"store.id",
+				"store.nombre",
+				"store.subdominio",
+				"store.createdAt",
+				"store.logo",
+				"store.fechaExpiracion",
+				"store.template",
+				"store.tipo",
+				"ciudad2.nombreCiu",
+				"tiendasInfo.emailTienda",
+				"tiendasInfo.telefono",
+				"tiendasInfo.dominio",
+				"tiendasInfo.descripcion",
+				"paises.id",
+				"categoria2.id",
+				"categoria2.nombreCategoria",
+				"entidadesTiendas.id",
+				"entidadesTiendas.entidadId"
+			])
+			.innerJoin("store.tiendasInfo", "tiendasInfo")
+			.leftJoin("tiendasInfo.paises", "paises")
+			.leftJoin("store.ciudad2", "ciudad2")
+			.leftJoin("store.categoria2", "categoria2")
+			.leftJoin("store.entidadesTiendas", "entidadesTiendas")
+			.where("store.id = :storeId", { storeId })
+
+		const store = await queryBuilder.getOne()
+
+		return store
+	}
+
+	async getStoreAnalyticsSummary(storeId: number) {
+		const storeVisitedEvent = "VISITED_PAGE"
+		const totalProducts = this.productosRepository.count({ where: { tienda: storeId } })
+		const totalSales = this.carritosRepository.count({ where: { tienda: storeId } })
+		const totalViews = this.storeAnalyticsRepository.count({
+			where: { storeId, event: storeVisitedEvent }
+		})
+
+		const [products, sales, views] = await Promise.all([totalProducts, totalSales, totalViews])
+
+		return [
+			{ name: "Productos publicados", value: products },
+			{ name: "Ventas Realizadas", value: sales },
+			{ name: "Visitas", value: views }
+		]
+	}
 
 	async getUsers(filterUsersDTO: FilterUsersDto) {
 		const { page, limit, id, name, email, documentIdentification, phone } = filterUsersDTO
