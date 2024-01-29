@@ -25,6 +25,7 @@ import { MailsService } from "../mails/mails.service"
 import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
+import { prettifyShippingMethod } from "./utils/prettifyShippingMethod"
 
 type Combination = {
 	combinacion: string
@@ -270,12 +271,13 @@ export class OrdersService {
 			total: total.toString(),
 			data: {
 				venta: {
+					URL_order: `https://panel.komercia.co/ventas/listado/${IdOrden}`,
 					id: IdOrden,
 					direccion_entrega: direccion_entrega.value,
 					costo_envio,
 					descuento,
 					fecha: new Date(fecha).toLocaleString(),
-					method_shipping: metodoPago || "",
+					method_shipping: prettifyShippingMethod(metodoPago),
 					tienda_venta: datosTienda,
 					total: cart.total,
 					usuario: {

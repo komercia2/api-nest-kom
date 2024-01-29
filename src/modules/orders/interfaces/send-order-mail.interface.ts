@@ -14,6 +14,7 @@ export interface Data {
 
 export interface Venta {
 	id: number
+	URL_order: string
 	usuario: Usuario
 	fecha: string
 	total: number
