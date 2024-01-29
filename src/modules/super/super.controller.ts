@@ -13,6 +13,12 @@ export class SuperController {
 	constructor(private readonly superService: SuperService) {}
 
 	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/:storeId/admins")
+	getStoreAdmins(@Param("storeId") storeId: number) {
+		return this.superService.getStoreAdmins(storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
 	@Get("stores/:storeId")
 	getStoreInfo(@Param("storeId") storeId: number) {
 		return this.superService.getStoreInfo(storeId)
