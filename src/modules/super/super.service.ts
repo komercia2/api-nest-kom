@@ -44,6 +44,15 @@ export class SuperService {
 		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
 
+	async getStoreAdmins(storeId: number) {
+		const admins = await this.usersRepository.find({
+			where: { tienda: storeId },
+			select: ["id", "nombre", "email", "activo", "rol"]
+		})
+
+		return admins
+	}
+
 	async getStoreInfo(storeId: number) {
 		const queryBuilder = this.storeRepository
 			.createQueryBuilder("store")

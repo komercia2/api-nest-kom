@@ -13,6 +13,7 @@ export interface Data {
 }
 
 export interface Venta {
+	id: number
 	usuario: Usuario
 	fecha: string
 	total: number
