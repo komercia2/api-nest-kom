@@ -62,6 +62,8 @@ export class NotificationsService {
 				notification
 			)
 
+			this.logger.log("Pusher notification sent")
+
 			return { message: "Notifications sent" }
 		} catch (error) {
 			await queryRunner.rollbackTransaction()
