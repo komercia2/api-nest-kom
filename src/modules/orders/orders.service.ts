@@ -270,6 +270,7 @@ export class OrdersService {
 			total: total.toString(),
 			data: {
 				venta: {
+					id: IdOrden,
 					direccion_entrega: direccion_entrega.value,
 					costo_envio,
 					descuento,
