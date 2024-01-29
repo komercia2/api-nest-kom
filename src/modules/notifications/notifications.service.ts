@@ -1,5 +1,6 @@
 import { BadRequestException, Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
+import { PusherNotificationsService } from "@shared/infrastructure/services"
 import { UuidUtil } from "@shared/infrastructure/utils"
 import { Logger } from "nestjs-pino"
 import { StoreNotification, Tiendas } from "src/entities"
@@ -8,6 +9,7 @@ import { DataSource, Repository } from "typeorm"
 import { CreateNotificationDto } from "./dtos/create-notification.dto"
 import { GetNotificationsDto } from "./dtos/get-notifications.dto"
 import { MaskAsReadedDto } from "./dtos/mask-as-readed.dto"
+import { Notifications } from "./enums/notifications"
 
 @Injectable()
 export class NotificationsService {
@@ -20,7 +22,9 @@ export class NotificationsService {
 
 		private readonly datasource: DataSource,
 
-		private readonly logger: Logger
+		private readonly logger: Logger,
+
+		private readonly pusherNotificationsService: PusherNotificationsService
 	) {}
 
 	async notifyAllStores(notification: Record<string, string>) {
@@ -51,6 +55,12 @@ export class NotificationsService {
 			await queryRunner.commitTransaction()
 
 			this.logger.log("Massive notification committed")
+
+			await this.pusherNotificationsService.trigger(
+				"massive-notification",
+				Notifications.FEATURE,
+				notification
+			)
 
 			return { message: "Notifications sent" }
 		} catch (error) {
