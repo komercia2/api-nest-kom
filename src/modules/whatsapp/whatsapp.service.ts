@@ -1,7 +1,8 @@
-import { Injectable, OnModuleInit } from "@nestjs/common"
+import { BadRequestException, Injectable } from "@nestjs/common"
 import { Logger } from "nestjs-pino"
-import qrcode from "qrcode-terminal"
 import { Client, LocalAuth } from "whatsapp-web.js"
+
+import { NotifyStoreCreationDto } from "./dto/notify-store-creation.dto"
 
 @Injectable()
 export class WhatsappService {
@@ -24,6 +25,30 @@ export class WhatsappService {
 				this.logger.log(`Message sent to ${final_number}`)
 			} else {
 				this.logger.error(`The number ${final_number} is not registered in WhatsApp`)
+			}
+		})
+	}
+
+	notifyStoreCreation = (notifyStoreCreation: NotifyStoreCreationDto) => {
+		const { storeName, storeEmail, storeId, clientFullName, targetGroup } = notifyStoreCreation
+
+		const message = `¡Felicidades! 🎉✨ Se ha creado una nueva tienda en Komercia. 🚀✨\n\n🆔 ID de la tienda: ${storeId}\n🏬 Nombre de la tienda: ${storeName}\n📧 Correo electrónico de la tienda: ${storeEmail}\n🙋 Nombre del cliente: ${clientFullName}`
+
+		this.sendMessageToGroup(message, targetGroup)
+
+		return { message: "Message sent" }
+	}
+
+	sendMessageToGroup = (message: string, targetGroup: string) => {
+		this.instance.getChats().then((chats) => {
+			const group = chats.find((chat) => chat.isGroup && chat.name === targetGroup)
+
+			if (group) {
+				group.sendMessage(message)
+				this.logger.log(`Message sent to ${targetGroup}`)
+			} else {
+				this.logger.error(`Group ${targetGroup} not found`)
+				throw new BadRequestException(`Group ${targetGroup} not found`)
 			}
 		})
 	}
