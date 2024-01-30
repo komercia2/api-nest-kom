@@ -16,12 +16,14 @@ import {
 import { StoreNotification } from "src/entities/StoreNotifications"
 
 import { MailsModule } from "../mails/mails.module"
+import { WhatsappModule } from "../whatsapp/whatsapp.module"
 import { OrdersController } from "./orders.controller"
 import { OrdersService } from "./orders.service"
 
 @Module({
 	imports: [
 		MailsModule,
+		WhatsappModule,
 		TypeOrmModule.forFeature([
 			Carritos,
 			Productos,

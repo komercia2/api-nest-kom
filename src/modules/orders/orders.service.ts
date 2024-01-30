@@ -21,8 +21,9 @@ import {
 } from "src/entities"
 import { DataSource, Repository } from "typeorm"
 
-import { sendWhatsappMessage } from "../common/infrastructure/services/whatsapp-service"
+// import { sendWhatsappMessage } from "../common/infrastructure/services/whatsapp-service"
 import { MailsService } from "../mails/mails.service"
+import { WhatsappService } from "../whatsapp/whatsapp.service"
 import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
@@ -72,7 +73,9 @@ export class OrdersService {
 
 		private readonly logger: Logger,
 
-		private readonly mailsService: MailsService
+		private readonly mailsService: MailsService,
+
+		private readonly whatsappService: WhatsappService
 	) {}
 
 	async createOrder(createOrderDto: CreateOrderDto) {
@@ -218,7 +221,7 @@ export class OrdersService {
 				await Promise.all([
 					this.sendOrderEmail(emailTienda, tienda, storeEmailData),
 					this.sendOrderEmail(emailCliente, tienda, clientEmailData),
-					sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage)
+					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage)
 				])
 
 				// !IMPORTANT: Send SMS. For reduce coasts, we need to send SMS only to the store if has premium plan
