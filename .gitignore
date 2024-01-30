@@ -41,3 +41,7 @@ lerna-debug.log*
 
 # Ngrok
 ngrok.exe
+
+# Whatsapp webjs
+session.json/
+.wwebjs_cache/
