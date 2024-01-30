@@ -7,7 +7,8 @@ const logger = new Logger("WhatsappService")
 const client = new Client({
 	puppeteer: {
 		headless: true,
-		args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-extensions"]
+		args: ["--no-sandbox", "--disable-setuid-sandbox", "--disable-extensions"],
+		ignoreDefaultArgs: ["--disable-extensions"]
 	},
 	authStrategy: new LocalAuth({
 		dataPath: "./session.json"
