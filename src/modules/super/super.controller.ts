@@ -1,16 +1,33 @@
-import { Controller, Get, Param, Query, UseGuards, UsePipes, ValidationPipe } from "@nestjs/common"
+import {
+	Body,
+	Controller,
+	Get,
+	Param,
+	Put,
+	Query,
+	UseGuards,
+	UsePipes,
+	ValidationPipe
+} from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
+import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { SuperService } from "./super.service"
 
 @ApiTags("Super")
 @Controller("")
 export class SuperController {
 	constructor(private readonly superService: SuperService) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("admins/unlink-store")
+	unlinkStoreAdmin(@Body() unlinkStoreAdminDto: UnlinkStoreAdminDto) {
+		return this.superService.unlinkStoreAdmin(unlinkStoreAdminDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("stores/:storeId/admins")
