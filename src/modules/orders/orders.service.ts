@@ -21,6 +21,7 @@ import {
 } from "src/entities"
 import { DataSource, Repository } from "typeorm"
 
+import { sendWhatsappMessage } from "../common/infrastructure/services/whatsapp-service"
 import { MailsService } from "../mails/mails.service"
 import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
@@ -211,10 +212,13 @@ export class OrdersService {
 				...this.formatDataForEmail(createOrderDto, cart, true)
 			}
 
+			const whatsappStoreMessage = `¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. Este mensaje es posible gracias a la tecnología de Komercia. 🚀 ¡A atenderlo con todo! 💪🏼🥳.\nPara más información de tu orden: \n📱: https://mobile.komercia.co/${cart.id} \n💻: https://panel.komercia.co/ventas/listado/${cart.id}`
+
 			try {
 				await Promise.all([
 					this.sendOrderEmail(emailTienda, tienda, storeEmailData),
-					this.sendOrderEmail(emailCliente, tienda, clientEmailData)
+					this.sendOrderEmail(emailCliente, tienda, clientEmailData),
+					sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage)
 				])
 
 				// !IMPORTANT: Send SMS. For reduce coasts, we need to send SMS only to the store if has premium plan
