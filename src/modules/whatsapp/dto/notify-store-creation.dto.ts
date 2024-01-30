@@ -5,13 +5,13 @@ export class NotifyStoreCreationDto {
 	storeName: string
 
 	@IsString()
+	@IsIn(["Testing Stores Created", "Team Komercia"])
 	targetGroup: string
 
 	@IsEmail()
 	storeEmail: string
 
 	@IsString()
-	@IsIn(["Testing Stores Created", "Team Komercia"])
 	clientFullName: string
 
 	@IsNumber()
