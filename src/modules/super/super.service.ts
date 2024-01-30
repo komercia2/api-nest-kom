@@ -1,4 +1,5 @@
-import { Injectable } from "@nestjs/common"
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
 import {
 	Carritos,
@@ -15,6 +16,7 @@ import { In, Repository } from "typeorm"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
+import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 
 @Injectable()
 export class SuperService {
@@ -41,8 +43,34 @@ export class SuperService {
 		private readonly productosRepository: Repository<Productos>,
 
 		@InjectRepository(StoreAnalytics)
-		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
+		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>,
+
+		private readonly configService: ConfigService
 	) {}
+
+	async unlinkStoreAdmin(unlinkStoreAdminDto: UnlinkStoreAdminDto) {
+		const { storeId, adminId, key } = unlinkStoreAdminDto
+
+		if (!key) {
+			throw new UnauthorizedException("Key is required")
+		}
+
+		if (key !== this.configService.get("SUPER_V2_MASTER_KEY")) {
+			throw new UnauthorizedException("Invalid key")
+		}
+
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		const admin = await this.usersRepository.findOne({ where: { id: adminId } })
+
+		if (!admin) throw new BadRequestException("Admin not found")
+
+		await this.usersRepository.update(adminId, { tienda: 0 })
+
+		return { message: "Admin unlinked from store" }
+	}
 
 	async getStoreAdmins(storeId: number) {
 		const admins = await this.usersRepository.find({
