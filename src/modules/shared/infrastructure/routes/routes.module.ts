@@ -15,6 +15,7 @@ import { SalesModule } from "src/modules/sales/sales.module"
 import { StoresModule } from "src/modules/stores/stores.module"
 import { SuperModule } from "src/modules/super/super.module"
 import { UsersModule } from "src/modules/users/users.module"
+import { WhatsappModule } from "src/modules/whatsapp/whatsapp.module"
 
 const apiVersions = { v1: "v1" }
 
@@ -83,6 +84,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/notifications`,
 		module: NotificationsModule
+	},
+	{
+		path: `${apiVersions.v1}/whatsapp`,
+		module: WhatsappModule
 	}
 ]
 

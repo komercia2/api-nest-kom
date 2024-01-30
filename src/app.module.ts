@@ -26,6 +26,7 @@ import { SalesModule } from "./modules/sales/sales.module"
 import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
+import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 
 @Module({
 	imports: [
@@ -65,7 +66,8 @@ import { UsersModule } from "./modules/users/users.module"
 		MailsModule,
 		SalesModule,
 		OrdersModule,
-		NotificationsModule
+		NotificationsModule,
+		WhatsappModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
