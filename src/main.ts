@@ -5,9 +5,11 @@ import { SwaggerModule } from "@nestjs/swagger"
 import { getSwaggerConfig } from "@shared/infrastructure/docs"
 import * as compression from "compression"
 import { Logger } from "nestjs-pino"
+import * as qrcode from "qrcode-terminal"
 import { useNestTreblle } from "treblle"
 
 import { AppModule } from "./app.module"
+import { WhatsappService } from "./modules/whatsapp/whatsapp.service"
 
 async function bootstrap() {
 	const app = (await NestFactory.create(AppModule, { bufferLogs: true })).setGlobalPrefix("api", {
@@ -39,6 +41,22 @@ async function bootstrap() {
 	app.useGlobalPipes(new ValidationPipe())
 	app.useLogger(app.get(Logger))
 	app.use(compression())
+
+	/**
+	 * Whatsapp Service Initialization [Required for QR Code]
+	 */
+	const whatsappService = app.get(WhatsappService)
+	const logger = app.get(Logger)
+	whatsappService.instance.on("qr", (qr) => {
+		logger.log("QR RECEIVED")
+		qrcode.generate(qr, { small: true })
+	})
+
+	whatsappService.instance.on("ready", async () => {
+		logger.log("Client is ready!")
+	})
+
+	whatsappService.instance.initialize()
 
 	await app.listen(configService.get<number>("PORT") || 3000)
 }
