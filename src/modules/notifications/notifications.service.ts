@@ -104,7 +104,7 @@ export class NotificationsService {
 
 		const [notifications, total] = await this.storeNotificationRepository.findAndCount({
 			where: { storeId },
-			order: { readed: "ASC", priority: "DESC", occurredAt: "DESC" },
+			order: { readed: "ASC", occurredAt: "DESC", priority: "DESC" },
 			take: +limit,
 			skip: +((page - 1) * limit)
 		})
