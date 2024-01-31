@@ -120,11 +120,12 @@ export class NotificationsService {
 	}
 
 	async createNotification(createNotificationDto: CreateNotificationDto): Promise<void> {
-		const { storeId, notification } = createNotificationDto
+		const { storeId, notification, priority } = createNotificationDto
 		const newNotification = this.storeNotificationRepository.create({
 			id: UuidUtil.uuid,
 			storeId,
 			notification,
+			priority,
 			occurredAt: new Date()
 		})
 
