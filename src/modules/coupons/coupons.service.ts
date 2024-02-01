@@ -187,11 +187,14 @@ export class CouponsService {
 		const [result, total] = await query.getManyAndCount()
 
 		return {
-			result,
-			currentPage: +page,
-			lastPage: +Math.ceil(total / limit),
-			hasPreviousPage: page > 1,
-			hasNextPage: page < Math.ceil(total / limit)
+			data: result,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
 		}
 	}
 }
