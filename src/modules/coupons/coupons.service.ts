@@ -152,13 +152,8 @@ export class CouponsService {
 	}
 
 	generateRandomCoupon() {
-		const requiredPrefix = "K0MERCIA"
-		const currenYear = new Date().getFullYear()
-		const randomCoupon = Math.random().toString(36).substring(2, 20)
-
-		const coupon = `${requiredPrefix}-${currenYear}-${randomCoupon}`
-
-		return coupon.toUpperCase()
+		const randomCoupon = Math.random().toString(36).substring(2, 25)
+		return randomCoupon.toUpperCase()
 	}
 
 	async getFilteresCoupons(filter: FilterSubscriptionCouponsDto) {
