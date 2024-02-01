@@ -2,7 +2,10 @@ import {
 	Body,
 	Controller,
 	Get,
+	HttpCode,
+	HttpStatus,
 	Param,
+	Post,
 	Put,
 	Query,
 	UseGuards,
@@ -12,6 +15,9 @@ import {
 import { ApiTags } from "@nestjs/swagger"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
+import { CouponsService } from "../coupons/coupons.service"
+import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
+import { FilterSubscriptionCouponsDto } from "../coupons/dtos/filter-subscription-cuopons"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
@@ -21,7 +27,23 @@ import { SuperService } from "./super.service"
 @ApiTags("Super")
 @Controller("")
 export class SuperController {
-	constructor(private readonly superService: SuperService) {}
+	constructor(
+		private readonly superService: SuperService,
+		private readonly couponsService: CouponsService
+	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("subscriptions/coupons")
+	getFilteredSubscriptionsCoupons(@Query() filter: FilterSubscriptionCouponsDto) {
+		return this.couponsService.getFilteresCoupons(filter)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Post("/subscriptions/coupons")
+	@HttpCode(HttpStatus.CREATED)
+	createSubscriptionCoupon(@Body() createCouponDto: CreateSubscriptionCouponDto) {
+		return this.couponsService.createCoupon(createCouponDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Put("admins/unlink-store")
