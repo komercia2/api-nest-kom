@@ -46,6 +46,7 @@ import { StoreAnalytics } from "./StoreAnalytics"
 import { StoreNotification } from "./StoreNotifications"
 import { Subcategorias } from "./Subcategorias"
 import { Subscriptions } from "./Subscriptions"
+import { SubscriptionCoupon } from "./SubscriptionsCoupon"
 import { Suscripciones } from "./Suscripciones"
 import { SuscriptoresTienda } from "./SuscriptoresTienda"
 import { Tag } from "./Tag"
@@ -408,4 +409,7 @@ export class Tiendas {
 
 	@OneToMany(() => StoreNotification, (notification) => notification.store)
 	notifications: StoreNotification[]
+
+	@OneToMany(() => SubscriptionCoupon, (subscriptionCoupon) => subscriptionCoupon.store)
+	subscriptionsCoupons: SubscriptionCoupon[]
 }
