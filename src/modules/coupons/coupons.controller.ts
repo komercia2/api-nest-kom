@@ -28,15 +28,4 @@ export class CouponsController {
 	redeemCoupon(@Body() redeemCouponDto: RedeemCouponDto) {
 		return this.couponsService.redeemCoupon(redeemCouponDto)
 	}
-
-	@Post()
-	@HttpCode(HttpStatus.CREATED)
-	createSubscriptionCoupon(@Body() createCouponDto: CreateSubscriptionCouponDto) {
-		return this.couponsService.createCoupon(createCouponDto)
-	}
-
-	@Get()
-	getFilteredSubscriptionsCoupons(@Query() filter: FilterSubscriptionCouponsDto) {
-		return this.couponsService.getFilteresCoupons(filter)
-	}
 }

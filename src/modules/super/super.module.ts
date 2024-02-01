@@ -12,11 +12,13 @@ import {
 	Ventas
 } from "src/entities"
 
+import { CouponsModule } from "../coupons/coupons.module"
 import { SuperController } from "./super.controller"
 import { SuperService } from "./super.service"
 
 @Module({
 	imports: [
+		CouponsModule,
 		TypeOrmModule.forFeature([
 			Tiendas,
 			Ventas,
