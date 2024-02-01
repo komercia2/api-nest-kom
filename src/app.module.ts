@@ -27,6 +27,7 @@ import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
 import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
+import { CouponsModule } from './modules/coupons/coupons.module';
 
 @Module({
 	imports: [
@@ -67,7 +68,8 @@ import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
 		SalesModule,
 		OrdersModule,
 		NotificationsModule,
-		WhatsappModule
+		WhatsappModule,
+		CouponsModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

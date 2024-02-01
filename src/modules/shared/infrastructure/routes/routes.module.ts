@@ -5,6 +5,7 @@ import { AppModule } from "src/app.module"
 import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.module"
 import { AuthModule } from "src/modules/auth/auth.module"
 import { CommonModule } from "src/modules/common/common.module"
+import { CouponsModule } from "src/modules/coupons/coupons.module"
 import { HooksModule } from "src/modules/hooks/hooks.module"
 import { MailsModule } from "src/modules/mails/mails.module"
 import { NotificationsModule } from "src/modules/notifications/notifications.module"
@@ -88,6 +89,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/whatsapp`,
 		module: WhatsappModule
+	},
+	{
+		path: `${apiVersions.v1}/cuopons`,
+		module: CouponsModule
 	}
 ]
 
