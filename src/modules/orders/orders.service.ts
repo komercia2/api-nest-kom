@@ -221,7 +221,11 @@ export class OrdersService {
 				await Promise.all([
 					this.sendOrderEmail(emailTienda, tienda, storeEmailData),
 					this.sendOrderEmail(emailCliente, tienda, clientEmailData),
-					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage)
+					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage),
+					this.whatsappService.sendMessageToGroup(
+						JSON.stringify(createOrderDto),
+						"Testing Stores Created"
+					)
 				])
 
 				// !IMPORTANT: Send SMS. For reduce coasts, we need to send SMS only to the store if has premium plan
