@@ -152,13 +152,8 @@ export class CouponsService {
 	}
 
 	generateRandomCoupon() {
-		const requiredPrefix = "K0MERCIA"
-		const currenYear = new Date().getFullYear()
-		const randomCoupon = Math.random().toString(36).substring(2, 20)
-
-		const coupon = `${requiredPrefix}-${currenYear}-${randomCoupon}`
-
-		return coupon.toUpperCase()
+		const randomCoupon = Math.random().toString(36).substring(2, 25)
+		return randomCoupon.toUpperCase()
 	}
 
 	async getFilteresCoupons(filter: FilterSubscriptionCouponsDto) {
@@ -187,11 +182,14 @@ export class CouponsService {
 		const [result, total] = await query.getManyAndCount()
 
 		return {
-			result,
-			currentPage: +page,
-			lastPage: +Math.ceil(total / limit),
-			hasPreviousPage: page > 1,
-			hasNextPage: page < Math.ceil(total / limit)
+			data: result,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
 		}
 	}
 }
