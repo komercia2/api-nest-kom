@@ -204,7 +204,7 @@ export class OrdersService {
 
 			const { emailCliente, datosTienda } = createOrderDto
 
-			if (!emailCliente || datosTienda.email_tienda) {
+			if (!emailCliente || !datosTienda.email_tienda) {
 				this.logger.log("Emails not sent")
 				return cart
 			}
