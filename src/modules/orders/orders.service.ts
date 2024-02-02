@@ -91,7 +91,7 @@ export class OrdersService {
 
 		this.logger.log("Transaction started")
 
-		const { productos, tienda, usuario } = createOrderDto
+		const { productos, tienda, usuario, comentario } = createOrderDto
 
 		try {
 			const cart = await this.createCart(createOrderDto)
@@ -189,6 +189,11 @@ export class OrdersService {
 			)
 
 			this.logger.log("Stock verified")
+
+			if (comentario) {
+				const message = await this.createOrderMessage(comentario, cart.id, usuario)
+				await queryRunner.manager.save(message)
+			}
 
 			try {
 				await this.isClientRegistered(usuario, tienda, CLIENT_ASSIGNATION_METHOD.ORDER)
@@ -336,10 +341,10 @@ export class OrdersService {
 		return await this.clientesRepository.save(client)
 	}
 
-	async saveMessageOrder(comment: string, cartId: number, userId: number) {
+	async createOrderMessage(comment: string, cartId: number, userId: number) {
 		const message = new MensajeOrden()
 		message.mensaje = comment
-		message.rol = "cliente"
+		message.rol = "1"
 		message.carritoId = cartId
 		message.userId = userId
 		message.createdAt = new Date()

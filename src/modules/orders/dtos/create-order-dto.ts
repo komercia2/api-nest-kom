@@ -11,7 +11,7 @@ export interface CreateOrderDto {
 	ip: string
 	takeout: boolean
 	estado_entrega: number
-	comentario: string
+	comentario: string | null
 	descuento: number
 	cupon: string
 	metodo_pago: string
