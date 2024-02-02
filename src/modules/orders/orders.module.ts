@@ -36,7 +36,8 @@ import { OrdersService } from "./orders.service"
 			MensajeOrden,
 			Users,
 			Clientes,
-			StoreNotification
+			StoreNotification,
+			MensajeOrden
 		])
 	],
 	controllers: [OrdersController],
