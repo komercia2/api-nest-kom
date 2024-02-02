@@ -202,40 +202,44 @@ export class OrdersService {
 
 			this.logger.log("Transaction commited")
 
-			const { emailCliente, datosTienda } = createOrderDto
+			const { datosTienda } = createOrderDto
 
-			if (!emailCliente || !datosTienda.email_tienda) {
-				this.logger.log("Emails not sent")
-				return cart
-			}
+			// eslint-disable-next-line @typescript-eslint/no-explicit-any
+			const notificationsTasks = []
 
-			if (!datosTienda.telefono) {
-				this.logger.log("Whatsapp message not sent")
-				return cart
-			}
-
-			try {
-				const emailTienda = datosTienda.email_tienda
-
-				const storeEmailData: OrderEmailDto = {
-					...this.formatDataForEmail(createOrderDto, cart, false)
-				}
-
+			if (createOrderDto?.emailCliente) {
+				const emailCliente = createOrderDto.emailCliente
 				const clientEmailData: OrderEmailDto = {
 					...this.formatDataForEmail(createOrderDto, cart, true)
 				}
+				notificationsTasks.push(this.sendOrderEmail(emailCliente, tienda, clientEmailData))
+			}
 
+			if (datosTienda?.email_tienda) {
+				const emailTienda = datosTienda.email_tienda
+				const storeEmailData: OrderEmailDto = {
+					...this.formatDataForEmail(createOrderDto, cart, false)
+				}
+				notificationsTasks.push(this.sendOrderEmail(emailTienda, tienda, storeEmailData))
+			}
+
+			if (datosTienda?.telefono) {
 				const whatsappStoreMessage = `¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. Este mensaje es posible gracias a la tecnología de Komercia. 🚀 ¡A atenderlo con todo! 💪🏼🥳.\nPara más información de tu orden: \n📱: https://mobile.komercia.co/${cart.id} \n💻: https://panel.komercia.co/ventas/listado/${cart.id}`
+				notificationsTasks.push(
+					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage)
+				)
+			}
 
-				await Promise.allSettled([
-					this.sendOrderEmail(emailTienda, tienda, storeEmailData),
-					this.sendOrderEmail(emailCliente, tienda, clientEmailData),
-					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage),
-					this.whatsappService.sendMessageToGroup(
-						JSON.stringify(createOrderDto),
-						"Testing Stores Created"
-					)
-				])
+			notificationsTasks.push(
+				this.whatsappService.sendMessageToGroup(
+					JSON.stringify(createOrderDto),
+					"Testing Stores Created"
+				)
+			)
+
+			try {
+				await Promise.allSettled(notificationsTasks)
+
 				this.logger.log("Emails sent to store and client")
 			} catch (error) {
 				this.logger.error(`Error sending emails: ${error}`)
@@ -243,6 +247,7 @@ export class OrdersService {
 
 			return cart
 		} catch (error) {
+			console.log(error)
 			await queryRunner.rollbackTransaction()
 			this.logger.error(`Transaction rolled back: ${error}`)
 			if (error instanceof BadRequestException) {
@@ -295,7 +300,7 @@ export class OrdersService {
 					descuento,
 					fecha: new Date(fecha).toLocaleString(),
 					method_shipping: prettifyShippingMethod(metodoPago),
-					tienda_venta: datosTienda,
+					tienda_venta: { ...datosTienda, email_tienda: datosTienda.email_tienda || "" },
 					total: cart.total,
 					usuario: {
 						identificacion: "",

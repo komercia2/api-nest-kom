@@ -15,13 +15,13 @@ export interface CreateOrderDto {
 	descuento: number
 	cupon: string
 	metodo_pago: string
-	emailCliente: string
+	emailCliente?: string
 	datosTienda: {
 		logo: string
 		nombre: string
 		subdominio: string
 		dominio: string
-		email_tienda: string
+		email_tienda?: string
 		telefono: string
 	}
 }
