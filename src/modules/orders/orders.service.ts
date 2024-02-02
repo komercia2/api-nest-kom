@@ -91,7 +91,7 @@ export class OrdersService {
 
 		this.logger.log("Transaction started")
 
-		const { productos, tienda, usuario, comentario } = createOrderDto
+		const { productos, tienda, usuario } = createOrderDto
 
 		try {
 			const cart = await this.createCart(createOrderDto)
@@ -190,13 +190,11 @@ export class OrdersService {
 
 			this.logger.log("Stock verified")
 
-			if (comentario && usuario) {
-				await queryRunner.manager.save(this.saveMessageOrder(comentario, cart.id, usuario))
+			try {
+				await this.isClientRegistered(usuario, tienda, CLIENT_ASSIGNATION_METHOD.ORDER)
+			} catch (error) {
+				this.logger.error(`Error registering client: ${error}`)
 			}
-
-			this.logger.log("Message saved")
-
-			await this.isClientRegistered(usuario, tienda, CLIENT_ASSIGNATION_METHOD.ORDER)
 
 			this.logger.log("Client registered")
 
@@ -205,20 +203,31 @@ export class OrdersService {
 			this.logger.log("Transaction commited")
 
 			const { emailCliente, datosTienda } = createOrderDto
-			const emailTienda = datosTienda.email_tienda
 
-			const storeEmailData: OrderEmailDto = {
-				...this.formatDataForEmail(createOrderDto, cart, false)
+			if (!emailCliente || datosTienda.email_tienda) {
+				this.logger.log("Emails not sent")
+				return cart
 			}
 
-			const clientEmailData: OrderEmailDto = {
-				...this.formatDataForEmail(createOrderDto, cart, true)
+			if (!datosTienda.telefono) {
+				this.logger.log("Whatsapp message not sent")
+				return cart
 			}
-
-			const whatsappStoreMessage = `¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. Este mensaje es posible gracias a la tecnología de Komercia. 🚀 ¡A atenderlo con todo! 💪🏼🥳.\nPara más información de tu orden: \n📱: https://mobile.komercia.co/${cart.id} \n💻: https://panel.komercia.co/ventas/listado/${cart.id}`
 
 			try {
-				await Promise.all([
+				const emailTienda = datosTienda.email_tienda
+
+				const storeEmailData: OrderEmailDto = {
+					...this.formatDataForEmail(createOrderDto, cart, false)
+				}
+
+				const clientEmailData: OrderEmailDto = {
+					...this.formatDataForEmail(createOrderDto, cart, true)
+				}
+
+				const whatsappStoreMessage = `¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. Este mensaje es posible gracias a la tecnología de Komercia. 🚀 ¡A atenderlo con todo! 💪🏼🥳.\nPara más información de tu orden: \n📱: https://mobile.komercia.co/${cart.id} \n💻: https://panel.komercia.co/ventas/listado/${cart.id}`
+
+				await Promise.allSettled([
 					this.sendOrderEmail(emailTienda, tienda, storeEmailData),
 					this.sendOrderEmail(emailCliente, tienda, clientEmailData),
 					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage),
@@ -227,9 +236,6 @@ export class OrdersService {
 						"Testing Stores Created"
 					)
 				])
-
-				// !IMPORTANT: Send SMS. For reduce coasts, we need to send SMS only to the store if has premium plan
-
 				this.logger.log("Emails sent to store and client")
 			} catch (error) {
 				this.logger.error(`Error sending emails: ${error}`)
