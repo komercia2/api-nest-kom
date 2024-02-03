@@ -193,6 +193,7 @@ export class OrdersService {
 			if (comentario) {
 				const message = await this.createOrderMessage(comentario, cart.id, usuario)
 				await queryRunner.manager.save(message)
+				this.logger.log("Message created")
 			}
 
 			try {
