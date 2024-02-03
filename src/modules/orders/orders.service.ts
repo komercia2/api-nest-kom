@@ -20,6 +20,7 @@ import {
 	Users
 } from "src/entities"
 import { DataSource, Repository } from "typeorm"
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 
 // import { sendWhatsappMessage } from "../common/infrastructure/services/whatsapp-service"
 import { MailsService } from "../mails/mails.service"
@@ -170,10 +171,14 @@ export class OrdersService {
 						await queryRunner.manager.save(productInfo)
 					}
 
-					const productCart = new ProductosCarritos()
-					productCart.carrito = cart.id
-					productCart.producto = id
-					productCart.unidades = producto.cantidad
+					const productCart: QueryDeepPartialEntity<ProductosCarritos> = {
+						carrito: cart.id,
+						producto: id,
+						unidades: producto.cantidad
+					}
+					// productCart.carrito = cart.id
+					// productCart.producto = id
+					// productCart.unidades = producto.cantidad
 
 					if (producto.combinacion) {
 						productCart.variantes = JSON.stringify(producto.combinacion)
