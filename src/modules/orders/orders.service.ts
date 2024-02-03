@@ -184,7 +184,7 @@ export class OrdersService {
 					} else {
 						productCart.precioProducto = 0
 					}
-					await queryRunner.manager.save(productCart)
+					await queryRunner.manager.insert(ProductosCarritos, productCart)
 				})
 			)
 
