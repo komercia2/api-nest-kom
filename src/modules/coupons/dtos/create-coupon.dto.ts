@@ -1,5 +1,5 @@
 import { Type } from "class-transformer"
-import { IsIn, IsNumber } from "class-validator"
+import { IsIn, IsNumber, Max, Min } from "class-validator"
 
 export class CreateSubscriptionCouponDto {
 	@IsNumber()
@@ -15,4 +15,10 @@ export class CreateSubscriptionCouponDto {
 	@IsNumber()
 	@Type(() => Number)
 	readonly validMonths: number
+
+	@IsNumber()
+	@Type(() => Number)
+	@Max(200)
+	@Min(1)
+	readonly amount: number
 }

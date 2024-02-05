@@ -42,7 +42,7 @@ export class SuperController {
 	@Post("/subscriptions/coupons")
 	@HttpCode(HttpStatus.CREATED)
 	createSubscriptionCoupon(@Body() createCouponDto: CreateSubscriptionCouponDto) {
-		return this.couponsService.createCoupon(createCouponDto)
+		return this.couponsService.createCoupons(createCouponDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
