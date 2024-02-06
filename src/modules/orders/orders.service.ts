@@ -235,7 +235,7 @@ export class OrdersService {
 			}
 
 			if (datosTienda?.telefono) {
-				const whatsappStoreMessage = `¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. Este mensaje es posible gracias a la tecnología de Komercia. 🚀 ¡Revísalo pronto! 💪🏼🥳.\nPara más información de tu orden: \n📱: https://mobile.komercia.co/${cart.id} \n💻: https://panel.komercia.co/ventas/listado/${cart.id}`
+				const whatsappStoreMessage = `¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. ¡Revísalo pronto! 💪🏼🥳.\nPara más información de tu orden: \n📱: https://mobile.komercia.co/${cart.id} \n💻: https://panel.komercia.co/ventas/listado/${cart.id}`
 				notificationsTasks.push(
 					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage)
 				)
