@@ -3,7 +3,8 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { UuidUtil } from "@shared/infrastructure/utils"
 import { Logger } from "nestjs-pino"
 import { SubscriptionCoupon, Tiendas } from "src/entities"
-import { DataSource, Repository } from "typeorm"
+import { DataSource, In, Repository } from "typeorm"
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 
 import { CreateSubscriptionCouponDto } from "./dtos/create-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "./dtos/filter-subscription-cuopons"
@@ -88,23 +89,65 @@ export class CouponsService {
 		return expirationDate
 	}
 
-	async createCoupon(createCouponDto: CreateSubscriptionCouponDto) {
+	async createCoupons(createCouponDto: CreateSubscriptionCouponDto) {
+		const queryRunner = this.datasource.createQueryRunner()
+		await queryRunner.connect()
+		await queryRunner.startTransaction()
+
 		try {
-			const coupon = this.generateRandomCoupon()
-			const couponExists = await this.findCoupon(coupon)
+			const { amount } = createCouponDto
+			const coupons = new Set<string>()
 
-			if (couponExists) throw new ConflictException("Coupon genarated already exists")
+			for (let i = 0; i < amount; i++) {
+				const coupon = this.generateRandomCoupon()
+				coupons.add(coupon)
+			}
 
-			const couponGenerated = await this.createCouponEntity(createCouponDto, coupon)
-			const couponSaved = await this.subscriptionCouponRepository.save(couponGenerated)
+			this.logger.log(`Creating ${amount} coupons`)
 
-			return couponSaved
+			if (coupons.size !== amount) {
+				this.logger.error("Error creating coupon. Duplicated coupons")
+				throw new InternalServerErrorException("Error creating coupon")
+			}
+
+			const couponsArray = Array.from(coupons)
+
+			const existingCoupons = await this.searchForExistingCoupons(couponsArray)
+
+			if (existingCoupons.length > 0) throw new ConflictException("Coupons already exists")
+
+			const couponEntities: QueryDeepPartialEntity<SubscriptionCoupon>[] = couponsArray.map(
+				(coupon) => ({
+					id: UuidUtil.uuid,
+					coupon,
+					available: createCouponDto.available,
+					plan: createCouponDto.plan,
+					validMonths: createCouponDto.validMonths,
+					createdAt: new Date()
+				})
+			)
+
+			await queryRunner.manager.insert(SubscriptionCoupon, couponEntities)
+
+			await queryRunner.commitTransaction()
+			this.logger.log("Coupons created successfully")
+
+			return { message: "Coupons created successfully" }
 		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			this.logger.error("Error creating coupon")
 			throw new InternalServerErrorException("Error creating coupon")
+		} finally {
+			this.logger.log("Create coupon transaction ended")
+			await queryRunner.release()
 		}
 	}
 
-	async createCouponEntity(createCouponDto: CreateSubscriptionCouponDto, coupon: string) {
+	searchForExistingCoupons(coupons: string[]) {
+		return this.subscriptionCouponRepository.find({ where: { coupon: In(coupons) } })
+	}
+
+	createCouponEntity(createCouponDto: CreateSubscriptionCouponDto, coupon: string) {
 		const { plan, validMonths, available } = createCouponDto
 
 		const couponEntity = new SubscriptionCoupon()
