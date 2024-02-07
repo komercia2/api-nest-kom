@@ -42,6 +42,7 @@ import { Productos } from "./Productos"
 import { Proveedores } from "./Proveedores"
 import { Redes } from "./Redes"
 import { ReputacionTiendaMarketplace } from "./ReputacionTiendaMarketplace"
+import { StoreAddiCredentials } from "./StoreAddiCredentials"
 import { StoreAnalytics } from "./StoreAnalytics"
 import { StoreNotification } from "./StoreNotifications"
 import { Subcategorias } from "./Subcategorias"
@@ -412,4 +413,8 @@ export class Tiendas {
 
 	@OneToMany(() => SubscriptionCoupon, (subscriptionCoupon) => subscriptionCoupon.store)
 	subscriptionsCoupons: SubscriptionCoupon[]
+
+	@OneToOne(() => StoreAddiCredentials, (storeAddiCredentials) => storeAddiCredentials.store)
+	@JoinColumn()
+	storeAddiCredentials: StoreAddiCredentials
 }

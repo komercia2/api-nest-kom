@@ -16,18 +16,19 @@ import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
 import { AuthModule } from "./modules/auth/auth.module"
 import { CommonModule } from "./modules/common/common.module"
+import { CouponsModule } from "./modules/coupons/coupons.module"
 import { HooksModule } from "./modules/hooks/hooks.module"
 import { MailsModule } from "./modules/mails/mails.module"
 import { NotificationsModule } from "./modules/notifications/notifications.module"
 import { OrdersModule } from "./modules/orders/orders.module"
+import { PaymentGateawaysModule } from "./modules/payment-gateaways/payment-gateaways.module"
 import { PaymentsModule } from "./modules/payments/payments.module"
 import { ProductModule } from "./modules/products/products.module"
 import { SalesModule } from "./modules/sales/sales.module"
 import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
-import { WhatsappModule } from './modules/whatsapp/whatsapp.module';
-import { CouponsModule } from './modules/coupons/coupons.module';
+import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
 
 @Module({
 	imports: [
@@ -69,7 +70,8 @@ import { CouponsModule } from './modules/coupons/coupons.module';
 		OrdersModule,
 		NotificationsModule,
 		WhatsappModule,
-		CouponsModule
+		CouponsModule,
+		PaymentGateawaysModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
