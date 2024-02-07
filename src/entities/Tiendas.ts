@@ -414,7 +414,7 @@ export class Tiendas {
 	@OneToMany(() => SubscriptionCoupon, (subscriptionCoupon) => subscriptionCoupon.store)
 	subscriptionsCoupons: SubscriptionCoupon[]
 
-	@OneToOne(() => StoreAddiCredentials, (storeAddiCredentials) => storeAddiCredentials.store)
-	@JoinColumn()
-	storeAddiCredentials: StoreAddiCredentials
+	// @OneToOne(() => StoreAddiCredentials, (storeAddiCredentials) => storeAddiCredentials.store)
+	// @JoinColumn()
+	// storeAddiCredentials: StoreAddiCredentials
 }
