@@ -10,6 +10,7 @@ import { HooksModule } from "src/modules/hooks/hooks.module"
 import { MailsModule } from "src/modules/mails/mails.module"
 import { NotificationsModule } from "src/modules/notifications/notifications.module"
 import { OrdersModule } from "src/modules/orders/orders.module"
+import { PaymentGateawaysModule } from "src/modules/payment-gateaways/payment-gateaways.module"
 import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
 import { SalesModule } from "src/modules/sales/sales.module"
@@ -93,6 +94,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/cuopons`,
 		module: CouponsModule
+	},
+	{
+		path: `${apiVersions.v1}/payment-gateaways`,
+		module: PaymentGateawaysModule
 	}
 ]
 

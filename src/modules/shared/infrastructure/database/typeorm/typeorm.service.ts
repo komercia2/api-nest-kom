@@ -77,6 +77,7 @@ import {
 	Redes,
 	ReputacionTiendaMarketplace,
 	Rewards,
+	StoreAddiCredentials,
 	StoreAnalytics,
 	StoreNotification,
 	Subcategorias,
@@ -159,6 +160,7 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
 		logging: this.configService.get<boolean>("DB_LOGGING"),
 		entities: [
 			ApisConexiones,
+			StoreAddiCredentials,
 			Bancos,
 			BancosPse,
 			Banners,
