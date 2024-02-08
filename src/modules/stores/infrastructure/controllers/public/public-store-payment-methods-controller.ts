@@ -16,8 +16,34 @@ export class PublicStorePaymentMethodsController {
 		private readonly getStorePaymentsMethodsWithoutAuthQuery: GetPaymentMethodsWithoutAuthQuery
 	) {}
 
+	@Get("public/:storeId")
+	async getStorePaymentsMethods(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Param("storeId") storeId: number
+	) {
+		try {
+			const paymentMethods = await this.getStorePaymentsMethodsWithoutAuthQuery.execute(storeId)
+
+			return handlerHttpResponse(res, {
+				data: paymentMethods,
+				message: "Store payment methods",
+				statusCode: HttpStatusCode.Ok,
+				success: true
+			})
+		} catch (error) {
+			console.log(error)
+			return handlerHttpResponse(res, {
+				data: null,
+				message: "Error getting store payment methods",
+				statusCode: HttpStatusCode.InternalServerError,
+				success: false
+			})
+		}
+	}
+
 	@UseGuards(CheckoutJwtGuard)
-	@Get(":storeId")
+	@Get("private/:storeId")
 	async getStorePaymentsMethodsWithoutQuery(
 		@Req() req: Request,
 		@Res() res: Response,

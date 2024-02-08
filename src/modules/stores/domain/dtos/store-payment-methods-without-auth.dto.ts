@@ -33,14 +33,14 @@ export class StorePaymentMethodsWithoutAuthDto {
 			data.payco,
 			data.contraentrega,
 			data.payu,
-			data.mercadopago,
+			data.mercadoPago,
 			data.nequi,
 			data.daviplata,
 			data.wompi,
 			data.credibanco,
 			data.flow,
-			data.paymenths_way,
-			data.tu_compra,
+			data.paymentsWay,
+			data.tuCompra,
 			data.wepay4u,
 			data.addi
 		)
