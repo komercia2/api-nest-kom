@@ -5,12 +5,15 @@ import {
 	StoreAddiCredentials,
 	TiendaCredibancoInfo,
 	TiendaEpaycoInfo,
+	TiendaFlowInfo,
+	TiendaMercadoPagoInfo,
 	TiendaPaymentsway,
 	TiendaPayuInfo,
 	TiendaTucompraInfo,
 	TiendaWepay4uInfo,
 	TiendaWompiInfo
 } from "src/entities"
+import { MercadopagoIntegrationStatusEntity } from "src/modules/payments/domain/entities"
 import { Repository } from "typeorm"
 
 import { StorePaymentMethodsWithoutAuthDto } from "../../domain/dtos"
@@ -47,7 +50,13 @@ export class MySQLStorePaymentMethodsService {
 		private readonly tiendaWompiInfoRepository: Repository<TiendaWompiInfo>,
 
 		@InjectRepository(StoreAddiCredentials)
-		private readonly storeAddiCredentialsRepository: Repository<StoreAddiCredentials>
+		private readonly storeAddiCredentialsRepository: Repository<StoreAddiCredentials>,
+
+		@InjectRepository(TiendaFlowInfo)
+		private readonly tiendaFlowInfoRepository: Repository<TiendaFlowInfo>,
+
+		@InjectRepository(TiendaMercadoPagoInfo)
+		private readonly tiendaMercadoPagoInfoRepository: Repository<TiendaMercadoPagoInfo>
 	) {}
 
 	async getMethodWithCredentials(storeId: number, dto: FindPaymentMethodWithCredentialsDto) {
@@ -87,7 +96,57 @@ export class MySQLStorePaymentMethodsService {
 			paymentMethod = (await this.getAddi(storeId)) as StorePaymentGateWay
 		}
 
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.FLOW) {
+			paymentMethod = (await this.getFlow(storeId)) as StorePaymentGateWay
+		}
+
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.MERCADOPAGO) {
+			paymentMethod = (await this.getMercadopago(storeId)) as StorePaymentGateWay
+			const integrationStatus = await this.getIntegrationStatus(storeId)
+
+			console.log(integrationStatus)
+
+			if (paymentMethod && integrationStatus) {
+				paymentMethod = {
+					...paymentMethod,
+					integrationStatus
+				}
+			}
+		}
+
 		return paymentMethod
+	}
+
+	async getIntegrationStatus(storeId: number) {
+		const integrationStatus = await this.getMercadopago(storeId)
+
+		if (!integrationStatus) return null
+
+		const { createdAt, updatedAt, estado, idTienda } = integrationStatus
+		const info = MercadopagoIntegrationStatusEntity.create({
+			createdAt,
+			updatedAt,
+			storeId: idTienda,
+			status: estado
+		})
+
+		return info
+	}
+
+	private async getMercadopago(storeId: number) {
+		const mercadopago = await this.tiendaMercadoPagoInfoRepository.findOne({
+			where: { idTienda: storeId }
+		})
+
+		return mercadopago ? mercadopago : null
+	}
+
+	private async getFlow(storeId: number) {
+		const flow = await this.tiendaFlowInfoRepository.findOne({
+			where: { tiendasId: storeId }
+		})
+
+		return flow ? flow : null
 	}
 
 	private async getAddi(storeId: number) {

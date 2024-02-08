@@ -1,7 +1,13 @@
 import {
+	MercadopagoIntegrationStatusEntity,
+	MercadopagoStoreInfoEntity
+} from "src/modules/payments/domain/entities"
+
+import {
 	StoreAddiEntity,
 	StoreCredibancoEntity,
 	StoreEpaycoEntity,
+	StoreFlowEntity,
 	StorePaymentsWayEntity,
 	StoreTuCompraEntity,
 	StoreWePay4uEntity,
@@ -15,6 +21,8 @@ export type StorePaymentGateWay =
 	| StoreWePay4uEntity
 	| StoreTuCompraEntity
 	| StoreWePay4uEntity
+	| (MercadopagoStoreInfoEntity & { integrationStatus: MercadopagoIntegrationStatusEntity })
 	| StoreWompiEntity
+	| StoreFlowEntity
 	| StoreAddiEntity
 	| null

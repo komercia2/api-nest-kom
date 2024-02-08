@@ -16,7 +16,8 @@ export class MysqlUserService {
 
 	async searchUserByDocument(document: string) {
 		const user = await this.userRepository.findOne({
-			where: { identificacion: document }
+			where: { identificacion: document },
+			relations: { usersInfo: true }
 		})
 		return user
 	}

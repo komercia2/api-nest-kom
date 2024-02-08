@@ -17,15 +17,53 @@ export class UserRepository implements IUserRepository {
 		private readonly configService: ConfigService
 	) {}
 
-	async authenticateCheckoutUser(document: string): Promise<string> {
+	async authenticateCheckoutUser(document: string): Promise<{
+		token: string
+		userData: {
+			id: number
+			activo: boolean
+			ciudad: number
+			create_at: Date | null
+			email: string | null
+			identificacion: string | null
+			nombre: string
+			apellido: string | null
+			rol: number
+			tienda: number
+			tipo_identificacion: string | null
+			telefono: string | null
+			birthday: string | null
+			barrio: string | null
+		}
+	}> {
 		const user = await this.mysqlUserService.searchUserByDocument(document)
 
 		if (!user) throw new UnauthorizedException(`User identified with ${document} not found`)
 
-		return this.jwtService.sign(
+		const token = this.jwtService.sign(
 			{ userId: user.id },
 			{ expiresIn: "1h", privateKey: this.configService.get<string>("JWT_SECRET") }
 		)
+
+		return {
+			token,
+			userData: {
+				id: user.id,
+				activo: user.activo,
+				ciudad: user.ciudad,
+				create_at: user.createdAt,
+				email: user.email,
+				identificacion: user.identificacion,
+				nombre: user.nombre,
+				apellido: user.usersInfo.apellido,
+				rol: user.rol,
+				tienda: user.tienda,
+				tipo_identificacion: user.tipoIdentificacion,
+				telefono: user.usersInfo.telefono,
+				birthday: user.usersInfo.birthday,
+				barrio: user.usersInfo.barrio
+			}
+		}
 	}
 
 	async createUserAdress(userId: number, adress: IUserAdress): Promise<void> {
