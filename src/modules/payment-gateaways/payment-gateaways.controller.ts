@@ -7,6 +7,11 @@ import { SaveAddiCredentialsDto } from "./dtos/save-addi-credentials.dto"
 export class PaymentGateawaysController {
 	constructor(private readonly addiService: AddiService) {}
 
+	@Post("addi/auth/oauth/staging")
+	async getStagingAddiOAut() {
+		return this.addiService.getStagingAddiOAuth()
+	}
+
 	@Put("addi/auth/activate/:storeId")
 	activateAddiIntegration(@Param("storeId") storeId: number) {
 		return this.addiService.activateIntegration(storeId)
