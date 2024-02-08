@@ -220,13 +220,18 @@ export class MySQLStorePaymentMethodsService {
 					politicas: true,
 					tiendaEfectyInfos: true,
 					tiendaNequiInfos: true,
-					tiendaDaviplataInfos: true
+					tiendaDaviplataInfos: true,
+					tiendaContraentregaInfos: true
 				}
 			}
 		})
 
 		return StorePaymentMethodsWithoutAuthDto.fromPersistence({
 			...mediosPagos,
+			contraentrega: {
+				...mediosPagos?.idMedios2.tiendaContraentregaInfos[0],
+				estado: mediosPagos?.contraentrega
+			},
 			consignacion: {
 				...mediosPagos?.idMedios2.tiendaConsignacionInfos[0],
 				estado: mediosPagos?.consignacion
