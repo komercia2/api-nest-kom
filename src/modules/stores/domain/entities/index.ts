@@ -1,3 +1,4 @@
+export * from "./payment-methods/store-addi-entitty"
 export * from "./payment-methods/store-credibanco-entity"
 export * from "./payment-methods/store-epayco-entity"
 export * from "./payment-methods/store-payments-way-entity"

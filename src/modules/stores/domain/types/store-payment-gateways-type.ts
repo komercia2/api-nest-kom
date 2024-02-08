@@ -1,4 +1,5 @@
 import {
+	StoreAddiEntity,
 	StoreCredibancoEntity,
 	StoreEpaycoEntity,
 	StorePaymentsWayEntity,
@@ -15,4 +16,5 @@ export type StorePaymentGateWay =
 	| StoreTuCompraEntity
 	| StoreWePay4uEntity
 	| StoreWompiEntity
+	| StoreAddiEntity
 	| null

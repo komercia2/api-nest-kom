@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import {
 	MedioPagos,
+	StoreAddiCredentials,
 	TiendaCredibancoInfo,
 	TiendaEpaycoInfo,
 	TiendaPaymentsway,
@@ -43,7 +44,10 @@ export class MySQLStorePaymentMethodsService {
 		private readonly tiendaWepay4uInfoRepository: Repository<TiendaWepay4uInfo>,
 
 		@InjectRepository(TiendaWompiInfo)
-		private readonly tiendaWompiInfoRepository: Repository<TiendaWompiInfo>
+		private readonly tiendaWompiInfoRepository: Repository<TiendaWompiInfo>,
+
+		@InjectRepository(StoreAddiCredentials)
+		private readonly storeAddiCredentialsRepository: Repository<StoreAddiCredentials>
 	) {}
 
 	async getMethodWithCredentials(storeId: number, dto: FindPaymentMethodWithCredentialsDto) {
@@ -79,7 +83,19 @@ export class MySQLStorePaymentMethodsService {
 			paymentMethod = (await this.getWompi(storeId)) as StorePaymentGateWay
 		}
 
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.ADDI) {
+			paymentMethod = (await this.getAddi(storeId)) as StorePaymentGateWay
+		}
+
 		return paymentMethod
+	}
+
+	private async getAddi(storeId: number) {
+		const addi = await this.storeAddiCredentialsRepository.findOne({
+			where: { storeId }
+		})
+
+		return addi ? addi : null
 	}
 
 	private async getWepay4u(storeId: number) {

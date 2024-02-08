@@ -5,5 +5,6 @@ export enum StorePaymentGateawayMethods {
 	WOMPI = "WOMPI",
 	PAYMENTS_WAY = "PAYMENTS_WAY",
 	WEPAY4U = "WEPAY4U",
-	TU_COMPRA = "TU_COMPRA"
+	TU_COMPRA = "TU_COMPRA",
+	ADDI = "ADDI"
 }

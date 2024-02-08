@@ -70,6 +70,9 @@ export class MedioPagos {
 	@Column("tinyint", { name: "wepay4u", width: 1 })
 	wepay4u: boolean
 
+	@Column("tinyint", { name: "addi", width: 1, default: () => "'0'" })
+	addi: boolean
+
 	@OneToOne(() => Tiendas, (tiendas) => tiendas.medioPagos, {
 		onDelete: "CASCADE",
 		onUpdate: "NO ACTION"

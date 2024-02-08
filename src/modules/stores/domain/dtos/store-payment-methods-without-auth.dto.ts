@@ -17,7 +17,8 @@ export class StorePaymentMethodsWithoutAuthDto {
 		readonly flow: boolean,
 		readonly paymenths_way: boolean,
 		readonly tu_compra: boolean,
-		readonly wepay4u: boolean
+		readonly wepay4u: boolean,
+		readonly addi: boolean
 	) {}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -40,7 +41,8 @@ export class StorePaymentMethodsWithoutAuthDto {
 			data.flow,
 			data.paymenths_way,
 			data.tu_compra,
-			data.wepay4u
+			data.wepay4u,
+			data.addi
 		)
 	}
 }
