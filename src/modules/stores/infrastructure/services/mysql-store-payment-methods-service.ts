@@ -102,6 +102,16 @@ export class MySQLStorePaymentMethodsService {
 
 		if (paymentGateawayMethod === StorePaymentGateawayMethods.MERCADOPAGO) {
 			paymentMethod = (await this.getMercadopago(storeId)) as StorePaymentGateWay
+			const integrationStatus = await this.getIntegrationStatus(storeId)
+
+			console.log(integrationStatus)
+
+			if (paymentMethod && integrationStatus) {
+				paymentMethod = {
+					...paymentMethod,
+					integrationStatus
+				}
+			}
 		}
 
 		return paymentMethod
