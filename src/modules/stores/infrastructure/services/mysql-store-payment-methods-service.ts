@@ -216,7 +216,7 @@ export class MySQLStorePaymentMethodsService {
 			where: { idMedios2: { id: storeId } },
 			relations: {
 				idMedios2: {
-					tiendaConsignacionInfos: true,
+					tiendaConsignacionInfos: { bancos: true },
 					politicas: true,
 					tiendaEfectyInfos: true,
 					tiendaNequiInfos: true,
@@ -227,12 +227,18 @@ export class MySQLStorePaymentMethodsService {
 
 		return StorePaymentMethodsWithoutAuthDto.fromPersistence({
 			...mediosPagos,
-			consignacion: mediosPagos?.idMedios2.tiendaConsignacionInfos[0] ?? null,
+			consignacion: {
+				...mediosPagos?.idMedios2.tiendaConsignacionInfos[0],
+				estado: mediosPagos?.consignacion
+			},
 			politica_envios: mediosPagos?.idMedios2.politicas.envios ?? null,
 			politica_pagos: mediosPagos?.idMedios2.politicas.pagos ?? null,
-			nequi: mediosPagos?.idMedios2.tiendaNequiInfos[0] ?? null,
-			daviplata: mediosPagos?.idMedios2.tiendaDaviplataInfos[0] ?? null,
-			efecty: mediosPagos?.idMedios2.tiendaEfectyInfos[0] ?? null
+			nequi: { ...mediosPagos?.idMedios2.tiendaNequiInfos[0], estado: mediosPagos?.nequi },
+			daviplata: {
+				...mediosPagos?.idMedios2.tiendaDaviplataInfos[0],
+				estado: mediosPagos?.daviplata
+			},
+			efecty: { ...mediosPagos?.idMedios2.tiendaEfectyInfos[0], estado: mediosPagos?.efecty }
 		})
 	}
 }
