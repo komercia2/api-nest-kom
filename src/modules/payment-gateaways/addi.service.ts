@@ -1,5 +1,12 @@
-import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
+import {
+	ConflictException,
+	Injectable,
+	InternalServerErrorException,
+	NotFoundException
+} from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
+import axios from "axios"
+import { Logger } from "nestjs-pino"
 import { StoreAddiCredentials } from "src/entities"
 import { Repository } from "typeorm"
 
@@ -9,8 +16,26 @@ import { SaveAddiCredentialsDto } from "./dtos/save-addi-credentials.dto"
 export class AddiService {
 	constructor(
 		@InjectRepository(StoreAddiCredentials)
-		private readonly storeAddiCredentialsRepository: Repository<StoreAddiCredentials>
+		private readonly storeAddiCredentialsRepository: Repository<StoreAddiCredentials>,
+
+		private readonly logger: Logger
 	) {}
+
+	async getStagingAddiOAuth() {
+		try {
+			const response = await axios.post("https://auth.addi-staging.com/oauth/token", {
+				audience: "https://api.staging.addi.com",
+				grant_type: "client_credentials",
+				client_id: "y61CPhOS0YB7wxz8BgKBpQt4YcTsW0wi",
+				client_secret: "U6zgGfhZ_F-HLbqyM70fkssviIQ2PDL34phvGIL4wIppfoSXv-z63mrldcrnUZUi"
+			})
+
+			return response.data
+		} catch (error) {
+			this.logger.error(error)
+			throw new InternalServerErrorException("Error getting staging addi oauth")
+		}
+	}
 
 	async activateIntegration(storeId: number) {
 		const credentials = await this.findStoreCredentials(storeId)
