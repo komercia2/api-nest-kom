@@ -2,6 +2,7 @@ import {
 	StoreAddiEntity,
 	StoreCredibancoEntity,
 	StoreEpaycoEntity,
+	StoreFlowEntity,
 	StorePaymentsWayEntity,
 	StoreTuCompraEntity,
 	StoreWePay4uEntity,
@@ -16,5 +17,6 @@ export type StorePaymentGateWay =
 	| StoreTuCompraEntity
 	| StoreWePay4uEntity
 	| StoreWompiEntity
+	| StoreFlowEntity
 	| StoreAddiEntity
 	| null
