@@ -12,6 +12,7 @@ export interface IUserRepository {
 			ciudad: number
 			create_at: Date | null
 			email: string | null
+			direccion: string | null
 			identificacion: string | null
 			nombre: string
 			apellido: string | null

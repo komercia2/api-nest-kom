@@ -27,6 +27,7 @@ export class UserRepository implements IUserRepository {
 			email: string | null
 			identificacion: string | null
 			nombre: string
+			direccion: string | null
 			apellido: string | null
 			rol: number
 			tienda: number
@@ -51,6 +52,7 @@ export class UserRepository implements IUserRepository {
 				id: user.id,
 				activo: user.activo,
 				ciudad: user.ciudad,
+				direccion: user.usersInfo.direccion,
 				create_at: user.createdAt,
 				email: user.email,
 				identificacion: user.identificacion,
