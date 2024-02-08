@@ -13,4 +13,8 @@ export class SaveAddiCredentialsDto {
 	@IsString()
 	@IsNotEmpty()
 	clientSecret: string
+
+	@IsString()
+	@IsNotEmpty()
+	ally_slug: string
 }
