@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Inject, Req, Res } from "@nestjs/common"
+import { Controller, Get, Inject, Query, Req, Res } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
@@ -19,12 +19,12 @@ export class PrivateStorePaymentGatewaysController {
 	getPublic(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() body: FindPaymentMethodWithCredentialsDto
+		@Query() query: FindPaymentMethodWithCredentialsDto
 	) {
 		const { id } = req.params
 
 		this.findPaymentMethoFdWithCredentialsQuery
-			.execute(+id, body)
+			.execute(+id, query)
 			.then((resp) => {
 				return handlerHttpResponse(res, {
 					message: "Payment method found",
@@ -47,12 +47,12 @@ export class PrivateStorePaymentGatewaysController {
 	getPaymentMethods(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Body() body: FindPaymentMethodWithCredentialsDto
+		@Query() query: FindPaymentMethodWithCredentialsDto
 	) {
 		const { id } = req
 
 		this.findPaymentMethoFdWithCredentialsQuery
-			.execute(+id, body)
+			.execute(+id, query)
 			.then((resp) => {
 				return handlerHttpResponse(res, {
 					message: "Payment method found",
