@@ -65,6 +65,7 @@ export class AddiService {
 		credentials.storeId = saveAddiCredentialsDto.storeId
 		credentials.clientID = saveAddiCredentialsDto.clientID
 		credentials.clientSecret = saveAddiCredentialsDto.clientSecret
+		credentials.ally_slug = saveAddiCredentialsDto.ally_slug
 		credentials.createdAt = new Date()
 
 		return credentials

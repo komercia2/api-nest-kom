@@ -6,24 +6,24 @@ import {
 	JoinColumn,
 	OneToOne,
 	PrimaryColumn,
-	Unique,
 	UpdateDateColumn
 } from "typeorm"
 
 import { Tiendas } from "./Tiendas"
 
 @Entity("store_addi_credentials")
-@Unique(["clientID"])
-@Unique(["clientSecret"])
 export class StoreAddiCredentials {
 	@PrimaryColumn({ type: "int", unsigned: true })
 	storeId: number
 
-	@Column({ type: "varchar", length: 255 })
+	@Column({ type: "varchar", length: 255, unique: true })
 	clientID: string
 
-	@Column({ type: "varchar", length: 255 })
+	@Column({ type: "varchar", length: 255, unique: true })
 	clientSecret: string
+
+	@Column({ type: "varchar", length: 64, unique: true })
+	ally_slug: string
 
 	@CreateDateColumn({ type: "datetime" })
 	createdAt: Date

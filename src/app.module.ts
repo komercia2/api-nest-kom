@@ -70,8 +70,8 @@ import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
 		OrdersModule,
 		NotificationsModule,
 		WhatsappModule,
-		CouponsModule
-		// PaymentGateawaysModule
+		CouponsModule,
+		PaymentGateawaysModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
