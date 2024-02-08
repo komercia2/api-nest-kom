@@ -1,4 +1,4 @@
-import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
+import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
@@ -422,6 +422,10 @@ export class StoresModule implements NestModule {
 				PublicStorePaymentMethodsController
 			)
 			.apply(LaravelAuthMiddleware)
+			.exclude({
+				method: RequestMethod.GET,
+				path: "v1/stores/private/payment-gateways/checkout/:id"
+			})
 			.forRoutes(PrivateStoreAnalyticsController, PrivateStorePaymentGatewaysController)
 	}
 }

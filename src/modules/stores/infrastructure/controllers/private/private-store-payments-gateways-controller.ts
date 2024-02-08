@@ -15,6 +15,34 @@ export class PrivateStorePaymentGatewaysController {
 		private readonly findPaymentMethoFdWithCredentialsQuery: FindPaymentMethodWithCredentialsQuery
 	) {}
 
+	@Get("checkout/:id")
+	getPublic(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() body: FindPaymentMethodWithCredentialsDto
+	) {
+		const { id } = req.params
+
+		this.findPaymentMethoFdWithCredentialsQuery
+			.execute(+id, body)
+			.then((resp) => {
+				return handlerHttpResponse(res, {
+					message: "Payment method found",
+					statusCode: 200,
+					data: resp,
+					success: true
+				})
+			})
+			.catch(() => {
+				return handlerHttpResponse(res, {
+					message: "Error while getting payment method",
+					statusCode: 500,
+					data: null,
+					success: false
+				})
+			})
+	}
+
 	@Get()
 	getPaymentMethods(
 		@Req() req: Request,
