@@ -1,4 +1,6 @@
 export enum HooksInfrastructureInjectionTokens {
 	PusherNotificationsService = "PusherNotificationsService",
-	NotifyOrderCreatedQuery = "NotifyOrderCreated"
+	NotifyOrderCreatedQuery = "NotifyOrderCreated",
+	OrdersService = "OrdersService",
+	ProccessAddiApplicationStatusCommand = "ProccessAddiApplicationStatusCommand"
 }
