@@ -16,4 +16,7 @@ export class NotifyStoreCreationDto {
 
 	@IsNumber()
 	storeId: number
+
+	@IsNumber()
+	countryId: number
 }

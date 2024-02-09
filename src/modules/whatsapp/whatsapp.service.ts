@@ -3,6 +3,7 @@ import { Logger } from "nestjs-pino"
 import { Client, LocalAuth } from "whatsapp-web.js"
 
 import { NotifyStoreCreationDto } from "./dto/notify-store-creation.dto"
+import { handleCountryID } from "./utils/handle-country-id"
 
 @Injectable()
 export class WhatsappService {
@@ -30,9 +31,11 @@ export class WhatsappService {
 	}
 
 	notifyStoreCreation = (notifyStoreCreation: NotifyStoreCreationDto) => {
-		const { storeName, storeEmail, storeId, clientFullName, targetGroup } = notifyStoreCreation
+		const { storeName, storeEmail, storeId, clientFullName, targetGroup, countryId } =
+			notifyStoreCreation
 
-		const message = `¡Felicidades! 🎉✨ Se ha creado una nueva tienda en Komercia. 🚀✨\n\n🆔 ID de la tienda: ${storeId}\n🏬 Nombre de la tienda: ${storeName}\n📧 Correo electrónico de la tienda: ${storeEmail}\n🙋 Nombre del cliente: ${clientFullName}`
+		const fullCountry = handleCountryID(countryId)
+		const message = `¡Felicidades! 🎉✨ Se ha creado una nueva tienda en Komercia. 🚀✨\n\n🆔 ID de la tienda: ${storeId}\n🏬 Nombre de la tienda: ${storeName}\n📧 Correo electrónico de la tienda: ${storeEmail}\n🙋 Nombre del cliente: ${clientFullName} (${fullCountry})`
 
 		this.sendMessageToGroup(message, targetGroup)
 
