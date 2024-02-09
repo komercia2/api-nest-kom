@@ -2,7 +2,9 @@ import { Body, Controller, HttpStatus, Inject, Post, Req, Res } from "@nestjs/co
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
+import { ProccessAddiApplicationStatusCommand } from "src/modules/hooks/application/command"
 import { NotifyOrderCreatedQuery } from "src/modules/hooks/application/query"
+import { AddiHookEntity } from "src/modules/hooks/domain/entities"
 
 import { NotifyOrderCreatedDto } from "../../dtos"
 import { HooksInfrastructureInjectionTokens } from "../../hooks-infrastructure-injection-tokens"
@@ -12,8 +14,36 @@ import { HooksInfrastructureInjectionTokens } from "../../hooks-infrastructure-i
 export class PublicHooksController {
 	constructor(
 		@Inject(HooksInfrastructureInjectionTokens.NotifyOrderCreatedQuery)
-		private readonly notifyOrderCreatedQuery: NotifyOrderCreatedQuery
+		private readonly notifyOrderCreatedQuery: NotifyOrderCreatedQuery,
+
+		@Inject(HooksInfrastructureInjectionTokens.ProccessAddiApplicationStatusCommand)
+		private readonly proccessAdiApplicationStatusCommand: ProccessAddiApplicationStatusCommand
 	) {}
+
+	@Post("proccess-adi-application-status")
+	async proccessAdiApplicationStatus(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Body() proccessAdiApp: AddiHookEntity
+	) {
+		try {
+			await this.proccessAdiApplicationStatusCommand.execute(proccessAdiApp)
+			return handlerHttpResponse(res, {
+				data: null,
+				statusCode: HttpStatus.OK,
+				message: "Proccessed successfully",
+				success: true
+			})
+		} catch (error) {
+			console.log(error)
+			return handlerHttpResponse(res, {
+				data: null,
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				message: "Error processing addi application status",
+				success: false
+			})
+		}
+	}
 
 	@Post("notify-order-created")
 	async notifyOrderCreated(
