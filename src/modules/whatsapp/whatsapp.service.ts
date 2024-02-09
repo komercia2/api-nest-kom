@@ -35,7 +35,7 @@ export class WhatsappService {
 			notifyStoreCreation
 
 		const fullCountry = handleCountryID(countryId)
-		const message = `¡Felicidades! 🎉✨ Se ha creado una nueva tienda en Komercia. 🚀✨\n\n🆔 ID de la tienda: ${storeId}\n🏬 Nombre de la tienda: ${storeName}\n📧 Correo electrónico de la tienda: ${storeEmail}\n🙋 Nombre del cliente: ${clientFullName} (${fullCountry})`
+		const message = `¡Felicidades! 🎉✨ Se ha creado una nueva tienda en Komercia. 🚀✨\n\n🆔 ID de la tienda: ${storeId}\n🏬 Nombre de la tienda: ${storeName}\n📧 Correo electrónico de la tienda: ${storeEmail}\n🙋 Nombre del cliente: ${clientFullName} \n🌎 País: ${fullCountry}`
 
 		this.sendMessageToGroup(message, targetGroup)
 
