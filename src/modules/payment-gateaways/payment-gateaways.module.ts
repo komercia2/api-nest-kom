@@ -19,6 +19,10 @@ export class PaymentGateawaysModule implements NestModule {
 				method: RequestMethod.GET,
 				path: "v1/payment-gateaways/addi/auth/credentials/1559"
 			})
+			.exclude({
+				method: RequestMethod.POST,
+				path: "v1/payment-gateaways/addi/auth/oauth/staging"
+			})
 			.forRoutes(PaymentGateawaysController)
 	}
 }
