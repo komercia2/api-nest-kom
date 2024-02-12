@@ -28,7 +28,7 @@ export interface CreateOrderDto {
 
 export interface DireccionEntrega {
 	type: number
-	value: DireccionEntregaInfo
+	value: DireccionEntregaInfo | null
 }
 
 export interface DireccionEntregaInfo {
