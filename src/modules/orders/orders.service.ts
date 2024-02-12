@@ -315,7 +315,7 @@ export class OrdersService {
 					total: cart.total,
 					usuario: {
 						identificacion: "",
-						nombre: direccion_entrega.value.nombre,
+						nombre: direccion_entrega?.value?.nombre ?? "",
 						tipo_identificacion: ""
 					}
 				}

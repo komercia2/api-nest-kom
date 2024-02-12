@@ -18,7 +18,7 @@ export interface Venta {
 	usuario: Usuario
 	fecha: string
 	total: number
-	direccion_entrega: DireccionEntrega
+	direccion_entrega: DireccionEntrega | null
 	costo_envio: string
 	descuento: number
 	method_shipping: string
