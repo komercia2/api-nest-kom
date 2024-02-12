@@ -1,15 +1,20 @@
-import { Body, Controller, Get, Param, Post, Put } from "@nestjs/common"
+import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common"
 
 import { AddiService } from "./addi.service"
+import { CreateAddiApplicationDto } from "./dtos/create-addi-application.dto"
+import { AddiPaymentDto } from "./dtos/env.dto"
 import { SaveAddiCredentialsDto } from "./dtos/save-addi-credentials.dto"
 
 @Controller()
 export class PaymentGateawaysController {
 	constructor(private readonly addiService: AddiService) {}
 
-	@Post("addi/auth/oauth/staging")
-	async getStagingAddiOAut() {
-		return this.addiService.getStagingAddiOAuth()
+	@Post("addi/application")
+	async createAddiApplication(
+		@Body() dto: CreateAddiApplicationDto,
+		@Query() addiPaymentDto: AddiPaymentDto
+	) {
+		return this.addiService.createAddiApplication(dto, addiPaymentDto)
 	}
 
 	@Put("addi/auth/activate/:storeId")
