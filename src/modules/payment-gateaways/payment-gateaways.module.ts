@@ -5,11 +5,12 @@ import { StoreAddiCredentials } from "src/entities"
 
 import { AddiService } from "./addi.service"
 import { PaymentGateawaysController } from "./payment-gateaways.controller"
+import { AddiUtils } from "./utils/addi-utils"
 
 @Module({
 	imports: [TypeOrmModule.forFeature([StoreAddiCredentials])],
 	controllers: [PaymentGateawaysController],
-	providers: [AddiService]
+	providers: [AddiService, AddiUtils]
 })
 export class PaymentGateawaysModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
@@ -17,11 +18,15 @@ export class PaymentGateawaysModule implements NestModule {
 			.apply(LaravelAuthMiddleware)
 			.exclude({
 				method: RequestMethod.GET,
-				path: "v1/payment-gateaways/addi/auth/credentials/1559"
+				path: "v1/payment-gateaways/addi/auth/credentials/:storeId"
 			})
 			.exclude({
 				method: RequestMethod.POST,
 				path: "v1/payment-gateaways/addi/auth/oauth/staging"
+			})
+			.exclude({
+				method: RequestMethod.POST,
+				path: "v1/payment-gateaways/addi/application"
 			})
 			.forRoutes(PaymentGateawaysController)
 	}
