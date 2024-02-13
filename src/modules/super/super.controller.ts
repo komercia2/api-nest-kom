@@ -20,6 +20,7 @@ import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "../coupons/dtos/filter-subscription-cuopons"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { SuperService } from "./super.service"
@@ -31,6 +32,12 @@ export class SuperController {
 		private readonly superService: SuperService,
 		private readonly couponsService: CouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("admins/assign-store")
+	assignStoreToAdmin(@Body() dto: AssignStoreAdminDto) {
+		return this.superService.assignStoreAdmin(dto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("subscriptions/coupons")
