@@ -3,10 +3,15 @@ import { InjectRepository } from "@nestjs/typeorm"
 import {
 	MedioPagos,
 	StoreAddiCredentials,
+	TiendaConsignacionInfo,
+	TiendaContraentregaInfo,
 	TiendaCredibancoInfo,
+	TiendaDaviplataInfo,
+	TiendaEfectyInfo,
 	TiendaEpaycoInfo,
 	TiendaFlowInfo,
 	TiendaMercadoPagoInfo,
+	TiendaNequiInfo,
 	TiendaPaymentsway,
 	TiendaPayuInfo,
 	TiendaTucompraInfo,
@@ -56,7 +61,22 @@ export class MySQLStorePaymentMethodsService {
 		private readonly tiendaFlowInfoRepository: Repository<TiendaFlowInfo>,
 
 		@InjectRepository(TiendaMercadoPagoInfo)
-		private readonly tiendaMercadoPagoInfoRepository: Repository<TiendaMercadoPagoInfo>
+		private readonly tiendaMercadoPagoInfoRepository: Repository<TiendaMercadoPagoInfo>,
+
+		@InjectRepository(TiendaContraentregaInfo)
+		private readonly tiendaContraentregaInfoRepository: Repository<TiendaContraentregaInfo>,
+
+		@InjectRepository(TiendaConsignacionInfo)
+		private readonly tiendaConsignacionInfoRepository: Repository<TiendaConsignacionInfo>,
+
+		@InjectRepository(TiendaEfectyInfo)
+		private readonly tiendaEfectyInfoRepository: Repository<TiendaEfectyInfo>,
+
+		@InjectRepository(TiendaNequiInfo)
+		private readonly tiendaNequiInfoRepository: Repository<TiendaNequiInfo>,
+
+		@InjectRepository(TiendaDaviplataInfo)
+		private readonly tiendaDaviplataInfoRepository: Repository<TiendaDaviplataInfo>
 	) {}
 
 	async getMethodWithCredentials(storeId: number, dto: FindPaymentMethodWithCredentialsDto) {
@@ -112,6 +132,34 @@ export class MySQLStorePaymentMethodsService {
 			}
 		}
 
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.CASH_ON_DELIVERY) {
+			paymentMethod = (await this.getCashOnDelivery(storeId)) as StorePaymentGateWay
+		}
+
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
+			paymentMethod = (await this.getPaymentToBeAgreed(storeId)) as StorePaymentGateWay
+		}
+
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
+			paymentMethod = (await this.getPickupAndPayInStore(storeId)) as StorePaymentGateWay
+		}
+
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
+			paymentMethod = (await this.getBankConsignment(storeId)) as StorePaymentGateWay
+		}
+
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.EFECTY) {
+			paymentMethod = (await this.getEfecty(storeId)) as StorePaymentGateWay
+		}
+
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.NEQUI) {
+			paymentMethod = (await this.getNequi(storeId)) as StorePaymentGateWay
+		}
+
+		if (paymentGateawayMethod === StorePaymentGateawayMethods.DAVIPLATA) {
+			paymentMethod = (await this.getDaviplata(storeId)) as StorePaymentGateWay
+		}
+
 		return paymentMethod
 	}
 
@@ -129,6 +177,62 @@ export class MySQLStorePaymentMethodsService {
 		})
 
 		return info
+	}
+
+	private async getDaviplata(storeId: number) {
+		const daviplata = await this.tiendaDaviplataInfoRepository.findOne({
+			where: { idTienda: storeId }
+		})
+
+		return daviplata ? daviplata : null
+	}
+
+	private async getNequi(storeId: number) {
+		const nequi = await this.tiendaNequiInfoRepository.findOne({
+			where: { idTienda: storeId }
+		})
+
+		return nequi ? nequi : null
+	}
+
+	private async getEfecty(storeId: number) {
+		const efecty = await this.tiendaEfectyInfoRepository.findOne({
+			where: { tiendaId: storeId }
+		})
+
+		return efecty ? efecty : null
+	}
+
+	private async getBankConsignment(storeId: number) {
+		const bankConsignment = await this.tiendaConsignacionInfoRepository.findOne({
+			where: { tiendaId: storeId }
+		})
+
+		return bankConsignment ? bankConsignment : null
+	}
+
+	private async getPickupAndPayInStore(storeId: number) {
+		const pickupAndPayInStore = await this.medioPagosRepository.findOne({
+			where: { idMedios: storeId }
+		})
+
+		return { connected: pickupAndPayInStore?.tienda }
+	}
+
+	private async getPaymentToBeAgreed(storeId: number) {
+		const paymentToBeAgreed = await this.medioPagosRepository.findOne({
+			where: { idMedios: storeId }
+		})
+
+		return { connected: paymentToBeAgreed?.convenir }
+	}
+
+	private async getCashOnDelivery(storeId: number) {
+		const cashOnDelivery = await this.tiendaContraentregaInfoRepository.findOne({
+			where: { idTienda: storeId }
+		})
+
+		return cashOnDelivery ? cashOnDelivery : null
 	}
 
 	private async getMercadopago(storeId: number) {
