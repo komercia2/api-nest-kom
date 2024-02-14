@@ -23,6 +23,7 @@ import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
+import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
 import { SuperService } from "./super.service"
 
 @ApiTags("Super")
@@ -32,6 +33,18 @@ export class SuperController {
 		private readonly superService: SuperService,
 		private readonly couponsService: CouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/plan/:storeId")
+	getStoreCurrentPlan(@Param("storeId") storeId: number) {
+		return this.superService.getStoreCurrentPlan(storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("stores/:storeId/plan")
+	updateStorePlan(@Body() updateStorePlanDto: UpdateStorePlanDto) {
+		return this.superService.updateStorePlan(updateStorePlanDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Put("admins/assign-store")
