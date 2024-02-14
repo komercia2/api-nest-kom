@@ -20,16 +20,16 @@ export class PrivateStorePaymentGatewaysController {
 	) {}
 
 	@Put("deactivate/:id")
-	@Get("checkout/:id")
-	getPublic(
+	deactivate(
 		@Req() req: Request,
 		@Res() res: Response,
 		@Query() query: FindPaymentMethodWithCredentialsDto
 	) {
-		const { id } = req
+		const { id } = req.params
+		const { paymentGateawayMethod } = query
 
 		this.deactivatePaymentGatewayCommand
-			.execute(+id, query.paymentGateawayMethod)
+			.execute(+id, paymentGateawayMethod)
 			.then((resp) => {
 				return handlerHttpResponse(res, {
 					message: "Payment method deactivated",
@@ -41,6 +41,34 @@ export class PrivateStorePaymentGatewaysController {
 			.catch(() => {
 				return handlerHttpResponse(res, {
 					message: "Error while deactivating payment method",
+					statusCode: 500,
+					data: null,
+					success: false
+				})
+			})
+	}
+
+	@Get("checkout/:id")
+	getPublic(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Query() query: FindPaymentMethodWithCredentialsDto
+	) {
+		const { id } = req.params
+
+		this.findPaymentMethoFdWithCredentialsQuery
+			.execute(+id, query)
+			.then((resp) => {
+				return handlerHttpResponse(res, {
+					message: "Payment method found",
+					statusCode: 200,
+					data: resp,
+					success: true
+				})
+			})
+			.catch(() => {
+				return handlerHttpResponse(res, {
+					message: "Error while getting payment method",
 					statusCode: 500,
 					data: null,
 					success: false
