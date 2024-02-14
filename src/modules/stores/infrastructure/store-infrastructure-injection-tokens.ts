@@ -44,5 +44,10 @@ export enum StoresInfrastructureInjectionTokens {
 	GetAllEventsCountQuery = "GetAllEventsCountQuery",
 	CountAllDevicesQuery = "CountAllDevicesQuery",
 	GetPaymentMethodsQueryWithoutAuth = "GetPaymentMethodsQueryWithoutAuth",
-	FindPaymentMethodWithCredentialsQuery = "FindPaymentMethodWithCredentialsQuery"
+	FindPaymentMethodWithCredentialsQuery = "FindPaymentMethodWithCredentialsQuery",
+
+	/**
+	 * Use cases (commands)
+	 */
+	DeactivatePaymentGatewayCommand = "DeactivatePaymentGatewayCommand"
 }

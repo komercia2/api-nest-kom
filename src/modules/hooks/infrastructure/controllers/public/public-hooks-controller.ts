@@ -1,4 +1,4 @@
-import { Body, Controller, HttpStatus, Inject, Post, Req, Res } from "@nestjs/common"
+import { Body, Controller, HttpStatus, Inject, Post, Req, Res, UseGuards } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
@@ -7,6 +7,7 @@ import { NotifyOrderCreatedQuery } from "src/modules/hooks/application/query"
 import { AddiHookEntity } from "src/modules/hooks/domain/entities"
 
 import { NotifyOrderCreatedDto } from "../../dtos"
+import { AddiApplicationCallbackGuard } from "../../guard"
 import { HooksInfrastructureInjectionTokens } from "../../hooks-infrastructure-injection-tokens"
 
 @ApiTags("Hooks")
@@ -20,6 +21,7 @@ export class PublicHooksController {
 		private readonly proccessAdiApplicationStatusCommand: ProccessAddiApplicationStatusCommand
 	) {}
 
+	@UseGuards(AddiApplicationCallbackGuard)
 	@Post("proccess-adi-application-status")
 	async proccessAdiApplicationStatus(
 		@Req() req: Request,

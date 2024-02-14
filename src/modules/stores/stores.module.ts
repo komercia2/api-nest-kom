@@ -18,10 +18,15 @@ import {
 	StoreAnalytics,
 	Subcategorias,
 	TiendaBlogs,
+	TiendaConsignacionInfo,
+	TiendaContraentregaInfo,
 	TiendaCredibancoInfo,
+	TiendaDaviplataInfo,
+	TiendaEfectyInfo,
 	TiendaEpaycoInfo,
 	TiendaFlowInfo,
 	TiendaMercadoPagoInfo,
+	TiendaNequiInfo,
 	TiendaPaymentsway,
 	TiendaPayuInfo,
 	Tiendas,
@@ -32,7 +37,7 @@ import {
 	WhatsappCheckout
 } from "src/entities"
 
-import { SaveStoreAnalyticCommand } from "./application/command"
+import { DeactivatePaymentGatewayCommand, SaveStoreAnalyticCommand } from "./application/command"
 import {
 	CheckWithoutAuthQuery,
 	CountDevicesQuery,
@@ -186,6 +191,10 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.DeactivatePaymentGatewayCommand,
+		useClass: DeactivatePaymentGatewayCommand
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.FindPaymentMethodWithCredentialsQuery,
 		useClass: FindPaymentMethodWithCredentialsQuery
@@ -350,7 +359,9 @@ const infrastructure = [
 			ApisConexiones,
 			DescuentoRango,
 			TiendaBlogs,
+			TiendaDaviplataInfo,
 			CustomerAccessCode,
+			TiendaNequiInfo,
 			Tiendas,
 			CategoriaProductos,
 			StoreAnalytics,
@@ -360,8 +371,11 @@ const infrastructure = [
 			Banners,
 			StoreAddiCredentials,
 			WhatsappCheckout,
+			TiendaConsignacionInfo,
+			TiendaEfectyInfo,
 			Entidades,
 			EntidadesTiendas,
+			TiendaContraentregaInfo,
 			Geolocalizacion,
 			MediosEnvios,
 			MedioPagos,

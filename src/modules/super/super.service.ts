@@ -15,8 +15,10 @@ import { In, Repository } from "typeorm"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
+import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
 
 @Injectable()
 export class SuperService {
@@ -47,6 +49,45 @@ export class SuperService {
 
 		private readonly configService: ConfigService
 	) {}
+
+	async getStoreCurrentPlan(storeId: number) {
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		return { plan: store.tipo, expirationDate: store.fechaExpiracion }
+	}
+
+	async updateStorePlan(updateStorePlanDto: UpdateStorePlanDto) {
+		const { storeId, expirationDate, plan } = updateStorePlanDto
+
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		await this.storeRepository.update(storeId, {
+			fechaExpiracion: expirationDate.toISOString(),
+			tipo: plan
+		})
+
+		return { message: "Store plan updated" }
+	}
+
+	async assignStoreAdmin(assignStoreAdminDto: AssignStoreAdminDto) {
+		const { storeId, adminId } = assignStoreAdminDto
+
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		const admin = await this.usersRepository.findOne({ where: { id: adminId } })
+
+		if (!admin) throw new BadRequestException("Admin not found")
+
+		await this.usersRepository.update(adminId, { tienda: storeId })
+
+		return { message: "Admin linked to store" }
+	}
 
 	async unlinkStoreAdmin(unlinkStoreAdminDto: UnlinkStoreAdminDto) {
 		const { storeId, adminId, key } = unlinkStoreAdminDto
