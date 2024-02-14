@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common"
+import { Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import {
 	MedioPagos,
@@ -78,6 +78,90 @@ export class MySQLStorePaymentMethodsService {
 		@InjectRepository(TiendaDaviplataInfo)
 		private readonly tiendaDaviplataInfoRepository: Repository<TiendaDaviplataInfo>
 	) {}
+
+	async deactivate(storeId: number, method: StorePaymentGateawayMethods) {
+		const storeHasPaymentMethods = await this.medioPagosRepository.findOne({
+			where: { idMedios: storeId }
+		})
+
+		if (!storeHasPaymentMethods) {
+			throw new NotFoundException("Store has no payment methods or does not exist")
+		}
+
+		try {
+			if (method === StorePaymentGateawayMethods.PAYU) {
+				await this.medioPagosRepository.update(storeId, { payu: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.CREDIBANCO) {
+				await this.medioPagosRepository.update(storeId, { credibanco: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.EPAYCO) {
+				await this.medioPagosRepository.update(storeId, { payco: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.PAYMENTS_WAY) {
+				await this.medioPagosRepository.update(storeId, { paymentsWay: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.TU_COMPRA) {
+				await this.medioPagosRepository.update(storeId, { tuCompra: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.WEPAY4U) {
+				await this.medioPagosRepository.update(storeId, { wepay4u: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.WOMPI) {
+				await this.medioPagosRepository.update(storeId, { wompi: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.ADDI) {
+				await this.medioPagosRepository.update(storeId, { addi: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.FLOW) {
+				await this.medioPagosRepository.update(storeId, { flow: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.MERCADOPAGO) {
+				await this.medioPagosRepository.update(storeId, { mercadoPago: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.CASH_ON_DELIVERY) {
+				await this.medioPagosRepository.update(storeId, { contraentrega: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
+				await this.medioPagosRepository.update(storeId, { convenir: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
+				await this.medioPagosRepository.update(storeId, { tienda: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
+				await this.medioPagosRepository.update(storeId, { consignacion: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.EFECTY) {
+				await this.medioPagosRepository.update(storeId, { efecty: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.NEQUI) {
+				await this.medioPagosRepository.update(storeId, { nequi: false })
+			}
+
+			if (method === StorePaymentGateawayMethods.DAVIPLATA) {
+				await this.medioPagosRepository.update(storeId, { daviplata: false })
+			}
+
+			return { success: true }
+		} catch (error) {
+			return { success: false }
+		}
+	}
 
 	async getMethodWithCredentials(storeId: number, dto: FindPaymentMethodWithCredentialsDto) {
 		const { paymentGateawayMethod } = dto

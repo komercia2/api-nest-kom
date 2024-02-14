@@ -1,6 +1,7 @@
 import { Inject, Injectable } from "@nestjs/common"
 
 import { FindPaymentMethodWithCredentialsDto } from "../../domain/dtos/find-payment-method-with-credentials-dto"
+import { StorePaymentGateawayMethods } from "../../domain/enums/store-payment-gateaway-methods"
 import { IStorePaymentMethodsRepository } from "../../domain/repositories"
 import { StorePaymentGateWay } from "../../domain/types/store-payment-gateways-type"
 import { MySQLStorePaymentMethodsService } from "../services"
@@ -12,6 +13,13 @@ export class MySQLStorePaymentMethodsRepository implements IStorePaymentMethodsR
 		@Inject(StoresInfrastructureInjectionTokens.MySQLStorePaymentMethodsService)
 		private readonly storePaymentMethodsService: MySQLStorePaymentMethodsService
 	) {}
+
+	async deactivate(
+		storeId: number,
+		method: StorePaymentGateawayMethods
+	): Promise<{ success: boolean }> {
+		return await this.storePaymentMethodsService.deactivate(storeId, method)
+	}
 
 	async getMethodWithCredentials(
 		storeId: number,
