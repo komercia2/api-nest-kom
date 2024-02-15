@@ -49,5 +49,6 @@ export enum StoresInfrastructureInjectionTokens {
 	/**
 	 * Use cases (commands)
 	 */
-	DeactivatePaymentGatewayCommand = "DeactivatePaymentGatewayCommand"
+	DeactivatePaymentGatewayCommand = "DeactivatePaymentGatewayCommand",
+	UpdatePaymentGatewayCommand = "UpdatePaymentGatewayCommand"
 }

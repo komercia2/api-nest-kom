@@ -1,6 +1,6 @@
 import { StorePaymentMethodsWithoutAuthDto } from "../dtos"
+import { ChangePaymentGatewayStatus } from "../dtos/change-payment-gateway-status.dto"
 import { FindPaymentMethodWithCredentialsDto } from "../dtos/find-payment-method-with-credentials-dto"
-import { StorePaymentGateawayMethods } from "../enums/store-payment-gateaway-methods"
 import { StorePaymentGateWay } from "../types/store-payment-gateways-type"
 
 export interface IStorePaymentMethodsRepository {
@@ -9,5 +9,13 @@ export interface IStorePaymentMethodsRepository {
 		storeId: number,
 		dindPaymentMethodWithCredentialsDto: FindPaymentMethodWithCredentialsDto
 	): Promise<StorePaymentGateWay | null>
-	deactivate(storeId: number, method: StorePaymentGateawayMethods): Promise<{ success: boolean }>
+	changePaymentGatewayStatus(
+		storeId: number,
+		options: ChangePaymentGatewayStatus
+	): Promise<{ success: boolean }>
+	updatePaymentGateway(
+		storeId: number,
+		method: FindPaymentMethodWithCredentialsDto,
+		data: StorePaymentGateWay
+	): Promise<void>
 }

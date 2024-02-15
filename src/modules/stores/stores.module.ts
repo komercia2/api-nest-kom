@@ -37,7 +37,8 @@ import {
 	WhatsappCheckout
 } from "src/entities"
 
-import { DeactivatePaymentGatewayCommand, SaveStoreAnalyticCommand } from "./application/command"
+import { ChangePaymentGatewayStatusCommand, SaveStoreAnalyticCommand } from "./application/command"
+import { UpdatePaymentGatewayCommand } from "./application/command/update-payment-gateway-command"
 import {
 	CheckWithoutAuthQuery,
 	CountDevicesQuery,
@@ -192,8 +193,12 @@ const application = [
 
 const infrastructure = [
 	{
+		provide: StoresInfrastructureInjectionTokens.UpdatePaymentGatewayCommand,
+		useClass: UpdatePaymentGatewayCommand
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.DeactivatePaymentGatewayCommand,
-		useClass: DeactivatePaymentGatewayCommand
+		useClass: ChangePaymentGatewayStatusCommand
 	},
 	{
 		provide: StoresInfrastructureInjectionTokens.FindPaymentMethodWithCredentialsQuery,
