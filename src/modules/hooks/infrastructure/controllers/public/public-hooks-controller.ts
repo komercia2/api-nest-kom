@@ -37,13 +37,7 @@ export class PublicHooksController {
 				success: true
 			})
 		} catch (error) {
-			console.log(error)
-			return handlerHttpResponse(res, {
-				data: null,
-				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-				message: "Error processing addi application status",
-				success: false
-			})
+			throw error
 		}
 	}
 
