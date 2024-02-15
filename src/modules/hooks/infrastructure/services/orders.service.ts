@@ -44,6 +44,7 @@ export class OrdersService {
 			this.logger.log(`Cart with id ${orderId} updated to status ${status}`)
 		} catch (error) {
 			this.logger.error(`Error processing addi application status , ${error}`)
+			throw error
 		}
 	}
 
