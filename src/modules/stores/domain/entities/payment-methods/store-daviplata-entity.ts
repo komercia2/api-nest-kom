@@ -1,6 +1,6 @@
 export class StoreDaviplataEntity {
 	constructor(
-		readonly id: number,
+		readonly id: string,
 		readonly referencia: string,
 		readonly comentario: string,
 		readonly id_tienda: number,

@@ -14,6 +14,14 @@ export class MySQLStorePaymentMethodsRepository implements IStorePaymentMethodsR
 		private readonly storePaymentMethodsService: MySQLStorePaymentMethodsService
 	) {}
 
+	async updatePaymentGateway(
+		storeId: number,
+		method: FindPaymentMethodWithCredentialsDto,
+		data: StorePaymentGateWay
+	): Promise<void> {
+		await this.storePaymentMethodsService.updatePaymentGateway(storeId, method, data)
+	}
+
 	async changePaymentGatewayStatus(
 		storeId: number,
 		options: ChangePaymentGatewayStatus

@@ -13,4 +13,9 @@ export interface IStorePaymentMethodsRepository {
 		storeId: number,
 		options: ChangePaymentGatewayStatus
 	): Promise<{ success: boolean }>
+	updatePaymentGateway(
+		storeId: number,
+		method: FindPaymentMethodWithCredentialsDto,
+		data: StorePaymentGateWay
+	): Promise<void>
 }

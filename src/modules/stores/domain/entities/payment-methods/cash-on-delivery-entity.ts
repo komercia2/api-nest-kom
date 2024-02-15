@@ -1,6 +1,6 @@
 export class CashOnDelivery {
 	constructor(
-		readonly id: number,
+		readonly id: string,
 		readonly valores: string,
 		readonly id_tienda: number,
 		readonly created_at: Date,

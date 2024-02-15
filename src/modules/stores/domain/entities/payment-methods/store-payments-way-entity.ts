@@ -1,6 +1,6 @@
 export class StorePaymentsWayEntity {
 	constructor(
-		readonly id: number,
+		readonly id: string,
 		readonly estado: boolean,
 		readonly formId: string,
 		readonly tiendasId: number,
