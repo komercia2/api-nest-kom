@@ -22,8 +22,10 @@ import { MercadopagoIntegrationStatusEntity } from "src/modules/payments/domain/
 import { Repository } from "typeorm"
 
 import { StorePaymentMethodsWithoutAuthDto } from "../../domain/dtos"
+import { ChangePaymentGatewayStatus } from "../../domain/dtos/change-payment-gateway-status.dto"
 import { FindPaymentMethodWithCredentialsDto } from "../../domain/dtos/find-payment-method-with-credentials-dto"
 import { PayUEntity } from "../../domain/entities"
+import { ChangePaymentGatewayStatusOptions } from "../../domain/enums/change-payment-gateway-status"
 import { StorePaymentGateawayMethods } from "../../domain/enums/store-payment-gateaway-methods"
 import { StorePaymentGateWay } from "../../domain/types/store-payment-gateways-type"
 
@@ -79,7 +81,7 @@ export class MySQLStorePaymentMethodsService {
 		private readonly tiendaDaviplataInfoRepository: Repository<TiendaDaviplataInfo>
 	) {}
 
-	async deactivate(storeId: number, method: StorePaymentGateawayMethods) {
+	async changePaymentGatewayStatus(storeId: number, method: ChangePaymentGatewayStatus) {
 		const storeHasPaymentMethods = await this.medioPagosRepository.findOne({
 			where: { idMedios: storeId }
 		})
@@ -87,74 +89,76 @@ export class MySQLStorePaymentMethodsService {
 		if (!storeHasPaymentMethods) {
 			throw new NotFoundException("Store has no payment methods or does not exist")
 		}
+		const { operation: status, paymentGateawayMethod } = method
+		const parsedStatus = status === ChangePaymentGatewayStatusOptions.ACTIVATE
 
 		try {
-			if (method === StorePaymentGateawayMethods.PAYU) {
-				await this.medioPagosRepository.update(storeId, { payu: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.PAYU) {
+				await this.medioPagosRepository.update(storeId, { payu: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.CREDIBANCO) {
-				await this.medioPagosRepository.update(storeId, { credibanco: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.CREDIBANCO) {
+				await this.medioPagosRepository.update(storeId, { credibanco: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.EPAYCO) {
-				await this.medioPagosRepository.update(storeId, { payco: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.EPAYCO) {
+				await this.medioPagosRepository.update(storeId, { payco: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.PAYMENTS_WAY) {
-				await this.medioPagosRepository.update(storeId, { paymentsWay: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.PAYMENTS_WAY) {
+				await this.medioPagosRepository.update(storeId, { paymentsWay: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.TU_COMPRA) {
-				await this.medioPagosRepository.update(storeId, { tuCompra: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.TU_COMPRA) {
+				await this.medioPagosRepository.update(storeId, { tuCompra: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.WEPAY4U) {
-				await this.medioPagosRepository.update(storeId, { wepay4u: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.WEPAY4U) {
+				await this.medioPagosRepository.update(storeId, { wepay4u: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.WOMPI) {
-				await this.medioPagosRepository.update(storeId, { wompi: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.WOMPI) {
+				await this.medioPagosRepository.update(storeId, { wompi: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.ADDI) {
-				await this.medioPagosRepository.update(storeId, { addi: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.ADDI) {
+				await this.medioPagosRepository.update(storeId, { addi: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.FLOW) {
-				await this.medioPagosRepository.update(storeId, { flow: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.FLOW) {
+				await this.medioPagosRepository.update(storeId, { flow: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.MERCADOPAGO) {
-				await this.medioPagosRepository.update(storeId, { mercadoPago: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.MERCADOPAGO) {
+				await this.medioPagosRepository.update(storeId, { mercadoPago: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.CASH_ON_DELIVERY) {
-				await this.medioPagosRepository.update(storeId, { contraentrega: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.CASH_ON_DELIVERY) {
+				await this.medioPagosRepository.update(storeId, { contraentrega: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
-				await this.medioPagosRepository.update(storeId, { convenir: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
+				await this.medioPagosRepository.update(storeId, { convenir: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
-				await this.medioPagosRepository.update(storeId, { tienda: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
+				await this.medioPagosRepository.update(storeId, { tienda: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
-				await this.medioPagosRepository.update(storeId, { consignacion: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
+				await this.medioPagosRepository.update(storeId, { consignacion: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.EFECTY) {
-				await this.medioPagosRepository.update(storeId, { efecty: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.EFECTY) {
+				await this.medioPagosRepository.update(storeId, { efecty: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.NEQUI) {
-				await this.medioPagosRepository.update(storeId, { nequi: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.NEQUI) {
+				await this.medioPagosRepository.update(storeId, { nequi: parsedStatus })
 			}
 
-			if (method === StorePaymentGateawayMethods.DAVIPLATA) {
-				await this.medioPagosRepository.update(storeId, { daviplata: false })
+			if (paymentGateawayMethod === StorePaymentGateawayMethods.DAVIPLATA) {
+				await this.medioPagosRepository.update(storeId, { daviplata: parsedStatus })
 			}
 
 			return { success: true }

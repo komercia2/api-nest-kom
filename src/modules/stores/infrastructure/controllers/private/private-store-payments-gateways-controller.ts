@@ -2,8 +2,9 @@ import { Controller, Get, Inject, Put, Query, Req, Res } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
-import { DeactivatePaymentGatewayCommand } from "src/modules/stores/application/command"
+import { ChangePaymentGatewayStatusCommand } from "src/modules/stores/application/command"
 import { FindPaymentMethodWithCredentialsQuery } from "src/modules/stores/application/query"
+import { ChangePaymentGatewayStatus } from "src/modules/stores/domain/dtos/change-payment-gateway-status.dto"
 import { FindPaymentMethodWithCredentialsDto } from "src/modules/stores/domain/dtos/find-payment-method-with-credentials-dto"
 
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
@@ -16,20 +17,19 @@ export class PrivateStorePaymentGatewaysController {
 		private readonly findPaymentMethoFdWithCredentialsQuery: FindPaymentMethodWithCredentialsQuery,
 
 		@Inject(StoresInfrastructureInjectionTokens.DeactivatePaymentGatewayCommand)
-		private readonly deactivatePaymentGatewayCommand: DeactivatePaymentGatewayCommand
+		private readonly deactivatePaymentGatewayCommand: ChangePaymentGatewayStatusCommand
 	) {}
 
-	@Put("deactivate/:id")
+	@Put("dynamic-status/:id")
 	deactivate(
 		@Req() req: Request,
 		@Res() res: Response,
-		@Query() query: FindPaymentMethodWithCredentialsDto
+		@Query() query: ChangePaymentGatewayStatus
 	) {
 		const { id } = req.params
-		const { paymentGateawayMethod } = query
 
 		this.deactivatePaymentGatewayCommand
-			.execute(+id, paymentGateawayMethod)
+			.execute(+id, query)
 			.then((resp) => {
 				return handlerHttpResponse(res, {
 					message: "Payment method deactivated",
