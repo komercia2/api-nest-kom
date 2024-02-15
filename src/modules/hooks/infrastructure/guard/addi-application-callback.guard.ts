@@ -30,9 +30,9 @@ export class AddiApplicationCallbackGuard implements CanActivate {
 	}
 
 	decodeBase64Credentials(authHeader: string): ICredentials {
-		const [codedUsername, codedPassword] = authHeader.split(":")
-		const username = Buffer.from(codedUsername, "base64").toString()
-		const password = Buffer.from(codedPassword, "base64").toString()
+		const codedCredentials = authHeader.split(" ")[1]
+		const decodedCredentials = Buffer.from(codedCredentials, "base64").toString()
+		const [username, password] = decodedCredentials.split(":")
 		return { username, password }
 	}
 
