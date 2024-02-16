@@ -27,6 +27,7 @@ export class MySQLStoreExternalApiRepository implements IStoreExternalApiReposit
 		mercadolibre: entity.mercadolibre,
 		pixel_facebook: entity.pixelFacebook,
 		tag_manager: entity.tagManager,
-		tidio_user: entity.tidioUser
+		tidio_user: entity.tidioUser,
+		addiAllySlug: entity.addiAllySlug
 	})
 }

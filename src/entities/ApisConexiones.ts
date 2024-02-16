@@ -48,6 +48,9 @@ export class ApisConexiones {
 	@Column("varchar", { name: "google_merchant", nullable: true, length: 255 })
 	googleMerchant: string | null
 
+	@Column("varchar", { name: "addi_ally_slug", nullable: true, length: 255 })
+	addiAllySlug: string | null
+
 	@ManyToOne(() => Tiendas, (tiendas) => tiendas.apisConexiones, {
 		onDelete: "CASCADE",
 		onUpdate: "NO ACTION"

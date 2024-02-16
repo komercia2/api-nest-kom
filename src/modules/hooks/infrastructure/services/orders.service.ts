@@ -1,5 +1,6 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
+import { PusherNotificationsService } from "@shared/infrastructure/services"
 import { Logger } from "nestjs-pino"
 import { Carritos } from "src/entities"
 import { Repository } from "typeorm"
@@ -11,6 +12,7 @@ import { AddiApplicationStatus } from "../../domain/enums/addi-application-statu
 export class OrdersService {
 	constructor(
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
+		private readonly pusherNotificationsService: PusherNotificationsService,
 		private readonly logger: Logger
 	) {}
 
@@ -39,6 +41,12 @@ export class OrdersService {
 			await this.carritosRepository.update(
 				{ id: orderId },
 				{ estado: normalizedStatus, updatedAt: new Date() }
+			)
+
+			this.pusherNotificationsService.trigger(
+				`store-${carrito.tienda}`,
+				"payment-status",
+				JSON.stringify({ addiOrder, normalizedStatus })
 			)
 
 			this.logger.log(`Cart with id ${orderId} updated to status ${status}`)
