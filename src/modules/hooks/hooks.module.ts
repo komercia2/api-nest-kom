@@ -42,7 +42,7 @@ const infrastructure = [
 @Module({
 	imports: [NotificationsModule, TypeOrmModule.forFeature([Carritos])],
 	controllers: [PublicHooksController],
-	providers: [...application, ...infrastructure]
+	providers: [...application, ...infrastructure, PusherNotificationsService]
 })
 export class HooksModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
