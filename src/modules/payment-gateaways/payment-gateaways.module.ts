@@ -1,14 +1,14 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
-import { StoreAddiCredentials } from "src/entities"
+import { ApisConexiones, StoreAddiCredentials } from "src/entities"
 
 import { AddiService } from "./addi.service"
 import { PaymentGateawaysController } from "./payment-gateaways.controller"
 import { AddiUtils } from "./utils/addi-utils"
 
 @Module({
-	imports: [TypeOrmModule.forFeature([StoreAddiCredentials])],
+	imports: [TypeOrmModule.forFeature([StoreAddiCredentials, ApisConexiones])],
 	controllers: [PaymentGateawaysController],
 	providers: [AddiService, AddiUtils]
 })

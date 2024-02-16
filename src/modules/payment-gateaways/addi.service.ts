@@ -9,7 +9,7 @@ import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
 import axios, { AxiosError } from "axios"
 import { Logger } from "nestjs-pino"
-import { StoreAddiCredentials } from "src/entities"
+import { ApisConexiones, StoreAddiCredentials } from "src/entities"
 import { Repository } from "typeorm"
 
 import { CreateAddiApplicationDto } from "./dtos/create-addi-application.dto"
@@ -26,6 +26,8 @@ export class AddiService {
 	constructor(
 		@InjectRepository(StoreAddiCredentials)
 		private readonly storeAddiCredentialsRepository: Repository<StoreAddiCredentials>,
+		@InjectRepository(ApisConexiones)
+		private readonly apisConexionesRepository: Repository<ApisConexiones>,
 		private readonly logger: Logger,
 		private readonly addiUtils: AddiUtils,
 		private readonly configService: ConfigService
@@ -130,7 +132,17 @@ export class AddiService {
 		if (existingCredentials) throw new ConflictException("Credentials already exist for this store")
 
 		const credentials = this.buildAddiCredentials(saveAddiCredentialsDto)
-		await this.storeAddiCredentialsRepository.save(credentials)
+		const apiConnection = await this.getApiConnection(storeId)
+
+		if (!apiConnection) throw new NotFoundException("No api connection found for this store")
+
+		apiConnection.addiAllySlug = saveAddiCredentialsDto.ally_slug
+		apiConnection.updatedAt = new Date()
+
+		await Promise.all([
+			await this.storeAddiCredentialsRepository.save(credentials),
+			await this.apisConexionesRepository.save(apiConnection)
+		])
 
 		return { message: "Credentials saved successfully" }
 	}
@@ -145,6 +157,10 @@ export class AddiService {
 
 	async findStoreCredentials(storeId: number) {
 		return this.storeAddiCredentialsRepository.findOne({ where: { storeId }, withDeleted: true })
+	}
+
+	async getApiConnection(storeId: number) {
+		return await this.apisConexionesRepository.findOne({ where: { tiendaId: storeId } })
 	}
 
 	buildAddiCredentials(saveAddiCredentialsDto: SaveAddiCredentialsDto) {
