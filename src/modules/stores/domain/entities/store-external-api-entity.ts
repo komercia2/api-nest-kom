@@ -9,6 +9,7 @@ interface IStoreExternalApi {
 	facebook_pixel_metatag_1: string | null
 	facebook_chat: string | null
 	google_merchant: string | null
+	addiAllySlug: string | null
 }
 
 export class StoreExternalApi implements IStoreExternalApi {
@@ -22,6 +23,7 @@ export class StoreExternalApi implements IStoreExternalApi {
 	facebook_pixel_metatag_1: string | null
 	facebook_chat: string | null
 	google_merchant: string | null
+	addiAllySlug: string | null
 
 	constructor(data: IStoreExternalApi) {
 		this.tienda_id = data.tienda_id
@@ -34,5 +36,6 @@ export class StoreExternalApi implements IStoreExternalApi {
 		this.facebook_pixel_metatag_1 = data.facebook_pixel_metatag_1
 		this.facebook_chat = data.facebook_chat
 		this.google_merchant = data.google_merchant
+		this.addiAllySlug = data.addiAllySlug
 	}
 }
