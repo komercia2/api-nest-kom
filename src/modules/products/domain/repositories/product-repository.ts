@@ -33,4 +33,6 @@ export interface IProductRepository {
 	createFromFile(storeId: number, file: Express.Multer.File): Promise<void>
 
 	getManyByIds(storeId: number, ids: number[]): Promise<Productos[]>
+
+	getProductDescription(slug: string): Promise<string | null>
 }

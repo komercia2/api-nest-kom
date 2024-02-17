@@ -11,6 +11,10 @@ export class MySQLProductRepository implements IProductRepository {
 		private readonly mysqlProductService: MySQLProductService
 	) {}
 
+	async getProductDescription(slug: string): Promise<string | null> {
+		return await this.mysqlProductService.getProductDescription(slug)
+	}
+
 	async getManyByIds(storeId: number, ids: number[]): Promise<Productos[]> {
 		return await this.mysqlProductService.getManyByIds(storeId, ids)
 	}

@@ -4,5 +4,6 @@ export enum InfrastructureInjectionTokens {
 	GetPaginatedProductsQuery = "GetPaginatedProductsQuery",
 	GetProductBySlugQuery = "GetProductByIdQuery",
 	CreateFromFileCommand = "createFromFileCommand",
-	GetManyByIdsQuery = "GetManyByIdsQuery"
+	GetManyByIdsQuery = "GetManyByIdsQuery",
+	GetProductDescriptionQuery = "GetProductDescriptionQuery"
 }

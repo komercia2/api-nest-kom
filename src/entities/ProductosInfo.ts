@@ -18,7 +18,7 @@ export class ProductosInfo {
 	@Column("varchar", { name: "peso", nullable: true, length: 255 })
 	peso: string | null
 
-	@Column("longtext", { name: "descripcion", nullable: true })
+	@Column("longtext", { name: "descripcion", nullable: true, select: false })
 	descripcion: string | null
 
 	@Column("int", { name: "inventario", nullable: true })

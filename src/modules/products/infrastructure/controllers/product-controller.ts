@@ -10,6 +10,7 @@ import {
 	GetPaginatedProductsQuery,
 	GetProductBySlugQuery
 } from "../../application/query"
+import { GetProductDescriptionQuery } from "../../application/query/get-product-description.query"
 import { GetManyProductsByIdsDto } from "../dtos"
 import { InfrastructureInjectionTokens } from "../infrastructure-injection-tokens"
 
@@ -24,8 +25,37 @@ export class ProductController {
 		private readonly getProductBySlugQuery: GetProductBySlugQuery,
 
 		@Inject(InfrastructureInjectionTokens.GetManyByIdsQuery)
-		private readonly getManyByIdsQuery: GetManyByIdsQuery
+		private readonly getManyByIdsQuery: GetManyByIdsQuery,
+
+		@Inject(InfrastructureInjectionTokens.GetProductDescriptionQuery)
+		private readonly getProductDescriptionQuery: GetProductDescriptionQuery
 	) {}
+
+	@Get("public/description/:slug")
+	async getProductDescription(
+		@Req() _req: Request,
+		@Res() res: Response,
+		@Param("slug") slug: string
+	) {
+		try {
+			const description = await this.getProductDescriptionQuery.execute(slug)
+
+			handlerHttpResponse(res, {
+				data: description,
+				message: "Product description found",
+				statusCode: HttpStatus.OK,
+				success: true
+			})
+			return
+		} catch (error) {
+			handlerHttpResponse(res, {
+				data: null,
+				message: "Error getting product description",
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				success: false
+			})
+		}
+	}
 
 	@Get("public/paged")
 	async getPaginatedProducts(
