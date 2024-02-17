@@ -21,6 +21,8 @@ export class MySQLProductService {
 
 	constructor(
 		@InjectRepository(Productos) private readonly productRepository: Repository<Productos>,
+		@InjectRepository(ProductosInfo)
+		private readonly productInfoRepository: Repository<ProductosInfo>,
 
 		@InjectRepository(VisitaProducto)
 		private readonly visitProductRepository: Repository<VisitaProducto>,
@@ -28,6 +30,18 @@ export class MySQLProductService {
 		@Inject(InfrastructureInjectionTokens.XlsxProductService)
 		private readonly xlsxService: XlsxProductService
 	) {}
+
+	async getProductDescription(slug: string) {
+		const { productId } = this.getSlug(slug)
+
+		const product = await this.productInfoRepository.findOne({
+			where: { id: productId },
+			select: { descripcion: true }
+		})
+
+		return product?.descripcion || null
+	}
+
 	async getPagedProducts(data: IProductFilterDTO) {
 		const {
 			storeId,
