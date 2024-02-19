@@ -12,6 +12,6 @@ export class ProccessAddiApplicationStatusCommand {
 	) {}
 
 	async execute(order: AddiHookEntity) {
-		await this.hookRepository.proccessAddiApplicationStatus(order)
+		return await this.hookRepository.proccessAddiApplicationStatus(order)
 	}
 }

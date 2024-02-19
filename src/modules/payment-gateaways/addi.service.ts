@@ -9,9 +9,10 @@ import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
 import axios, { AxiosError } from "axios"
 import { Logger } from "nestjs-pino"
-import { ApisConexiones, StoreAddiCredentials } from "src/entities"
+import { ApisConexiones, Carritos, StoreAddiCredentials } from "src/entities"
 import { Repository } from "typeorm"
 
+import { CancelAddiApplicationDto } from "./dtos/cancel-addi-application.dto"
 import { CreateAddiApplicationDto } from "./dtos/create-addi-application.dto"
 import { AddiPaymentDto } from "./dtos/env.dto"
 import { GetAddiOAuthTokenDto } from "./dtos/get-addi-oauth-token.dto"
@@ -22,16 +23,80 @@ import { AddiUtils } from "./utils/addi-utils"
 export class AddiService {
 	private readonly ADDI_V1_STAGING_APP_URL = "https://api.addi-staging.com/v1/online-applications"
 	private readonly ADDI_V1_STAGING_OAUTH_URL = "https://auth.addi-staging.com/oauth/token"
+	private readonly ADDI_V1_PRODUCTION_OAUTH_URL = "https://auth.addi.com/oauth/token"
+	private readonly ADDI_V1_STAGING_CANCEL_URL =
+		"https://api.addi-staging.com/v1/online-applications/cancellations"
+	private readonly ADDI_V1_PRODUCTION_CANCEL_URL =
+		"https://api.addi.com/v1/online-applications/cancellations"
 
 	constructor(
 		@InjectRepository(StoreAddiCredentials)
 		private readonly storeAddiCredentialsRepository: Repository<StoreAddiCredentials>,
 		@InjectRepository(ApisConexiones)
 		private readonly apisConexionesRepository: Repository<ApisConexiones>,
+		@InjectRepository(Carritos) private readonly carritosRepository: Repository<Carritos>,
 		private readonly logger: Logger,
 		private readonly addiUtils: AddiUtils,
 		private readonly configService: ConfigService
 	) {}
+
+	async cancelAddiApplication(cancelAddiApplicationDto: CancelAddiApplicationDto) {
+		const { orderId, amount, environment, storeId } = cancelAddiApplicationDto
+
+		const storeAddiCredentials = await this.getStoreCredentials(storeId)
+
+		const audience = this.addiUtils.getAudience(
+			environment,
+			this.configService.get<string>("ADDI_STAGING_AUDIENCE") ?? "",
+			this.configService.get<string>("ADDI_PRODUCTION_AUDIENCE") ?? ""
+		)
+
+		const credentials = await this.getAddiOAuthToken(
+			{
+				audience: audience as string,
+				client_id: storeAddiCredentials.clientID,
+				client_secret: storeAddiCredentials.clientSecret
+			},
+			environment
+		)
+
+		try {
+			const response = await axios.post(
+				environment === "STAGING"
+					? this.ADDI_V1_STAGING_CANCEL_URL
+					: this.ADDI_V1_PRODUCTION_CANCEL_URL,
+				{ orderId, amount },
+				{
+					headers: {
+						Authorization: `Bearer ${credentials.access_token}`,
+						"Content-Type": "application/json"
+					}
+				}
+			)
+
+			if (response.status === 201) {
+				return { message: "Application canceled successfully" }
+			}
+		} catch (error) {
+			if (error instanceof AxiosError) {
+				const { response } = error
+				if (response?.status && this.addiUtils.isBadRequest(response.status)) {
+					throw new BadRequestException(response.data)
+				}
+				if (response?.status && this.addiUtils.isConflict(response.status)) {
+					throw new ConflictException(response.data)
+				}
+				if (response?.status && this.addiUtils.isServerError(response.status)) {
+					throw new InternalServerErrorException(response.data)
+				}
+
+				this.logger.error(error)
+				throw new InternalServerErrorException("Error canceling addi application")
+			}
+			this.logger.error(error)
+			throw new InternalServerErrorException("Error canceling addi application")
+		}
+	}
 
 	async createAddiApplication(
 		createAddiApplicationDto: CreateAddiApplicationDto,
@@ -46,11 +111,14 @@ export class AddiService {
 			this.configService.get<string>("ADDI_PRODUCTION_AUDIENCE") ?? ""
 		)
 
-		const credentials = await this.getAddiOAuthToken({
-			audience: audience as string,
-			client_id: storeAddiCredentials.clientID,
-			client_secret: storeAddiCredentials.clientSecret
-		})
+		const credentials = await this.getAddiOAuthToken(
+			{
+				audience: audience as string,
+				client_id: storeAddiCredentials.clientID,
+				client_secret: storeAddiCredentials.clientSecret
+			},
+			env
+		)
 
 		try {
 			const response = await axios.post(this.ADDI_V1_STAGING_APP_URL, createAddiApplicationDto, {
@@ -87,12 +155,15 @@ export class AddiService {
 		}
 	}
 
-	async getAddiOAuthToken(getAddiOAuthTokenDto: GetAddiOAuthTokenDto) {
+	async getAddiOAuthToken(getAddiOAuthTokenDto: GetAddiOAuthTokenDto, env: string) {
 		try {
-			const response = await axios.post<{ access_token: string }>(this.ADDI_V1_STAGING_OAUTH_URL, {
-				grant_type: "client_credentials",
-				...getAddiOAuthTokenDto
-			})
+			const response = await axios.post<{ access_token: string }>(
+				env === "STAGING" ? this.ADDI_V1_STAGING_OAUTH_URL : this.ADDI_V1_PRODUCTION_OAUTH_URL,
+				{
+					grant_type: "client_credentials",
+					...getAddiOAuthTokenDto
+				}
+			)
 
 			return response.data
 		} catch (error) {
@@ -145,6 +216,14 @@ export class AddiService {
 		])
 
 		return { message: "Credentials saved successfully" }
+	}
+
+	async getStoreIdFromCartId(cartId: number) {
+		const cart = await this.carritosRepository.findOne({ where: { id: cartId } })
+
+		if (!cart) throw new NotFoundException("Cart not found")
+
+		return cart.tienda
 	}
 
 	async getStoreCredentials(storeId: number) {

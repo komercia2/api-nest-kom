@@ -16,7 +16,7 @@ export class OrdersService {
 		private readonly logger: Logger
 	) {}
 
-	async processAddiApplicationStatus(addiOrder: AddiHookEntity): Promise<void> {
+	async processAddiApplicationStatus(addiOrder: AddiHookEntity) {
 		const { orderId, status } = addiOrder
 		try {
 			const carrito = await this.carritosRepository.findOne({ where: { id: orderId } })
@@ -43,13 +43,15 @@ export class OrdersService {
 				{ estado: normalizedStatus, updatedAt: new Date() }
 			)
 
-			this.pusherNotificationsService.trigger(
+			await this.pusherNotificationsService.trigger(
 				`store-${carrito.tienda}`,
 				"payment-status",
 				JSON.stringify({ addiOrder, normalizedStatus })
 			)
 
 			this.logger.log(`Cart with id ${orderId} updated to status ${status}`)
+
+			return addiOrder
 		} catch (error) {
 			this.logger.error(`Error processing addi application status , ${error}`)
 			throw error

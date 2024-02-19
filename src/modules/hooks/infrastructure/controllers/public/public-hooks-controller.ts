@@ -23,19 +23,9 @@ export class PublicHooksController {
 
 	@UseGuards(AddiApplicationCallbackGuard)
 	@Post("proccess-adi-application-status")
-	async proccessAdiApplicationStatus(
-		@Req() req: Request,
-		@Res() res: Response,
-		@Body() proccessAdiApp: AddiHookEntity
-	) {
+	async proccessAdiApplicationStatus(@Body() proccessAdiApp: AddiHookEntity) {
 		try {
-			await this.proccessAdiApplicationStatusCommand.execute(proccessAdiApp)
-			return handlerHttpResponse(res, {
-				data: null,
-				statusCode: HttpStatus.OK,
-				message: "Proccessed successfully",
-				success: true
-			})
+			return await this.proccessAdiApplicationStatusCommand.execute(proccessAdiApp)
 		} catch (error) {
 			throw error
 		}
