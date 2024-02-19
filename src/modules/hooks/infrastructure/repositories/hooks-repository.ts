@@ -21,8 +21,8 @@ export class HooksRepository implements IHookRepository {
 		private readonly ordersService: OrdersService
 	) {}
 
-	async proccessAddiApplicationStatus(order: AddiHookEntity): Promise<void> {
-		await this.ordersService.processAddiApplicationStatus(order)
+	async proccessAddiApplicationStatus(order: AddiHookEntity): Promise<AddiHookEntity> {
+		return await this.ordersService.processAddiApplicationStatus(order)
 	}
 
 	async notifyOrderCreated(order: OrderHookEntity): Promise<void> {
