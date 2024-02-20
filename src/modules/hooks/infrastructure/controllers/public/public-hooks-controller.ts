@@ -1,4 +1,14 @@
-import { Body, Controller, HttpStatus, Inject, Post, Req, Res, UseGuards } from "@nestjs/common"
+import {
+	Body,
+	Controller,
+	HttpCode,
+	HttpStatus,
+	Inject,
+	Post,
+	Req,
+	Res,
+	UseGuards
+} from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
@@ -23,6 +33,7 @@ export class PublicHooksController {
 
 	@UseGuards(AddiApplicationCallbackGuard)
 	@Post("proccess-adi-application-status")
+	@HttpCode(HttpStatus.OK)
 	async proccessAdiApplicationStatus(@Body() proccessAdiApp: AddiHookEntity) {
 		try {
 			return await this.proccessAdiApplicationStatusCommand.execute(proccessAdiApp)
