@@ -7,6 +7,7 @@ import {
 } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
+import { PusherNotificationsService } from "@shared/infrastructure/services"
 import axios, { AxiosError } from "axios"
 import { Logger } from "nestjs-pino"
 import { ApisConexiones, Carritos, StoreAddiCredentials } from "src/entities"
@@ -37,7 +38,8 @@ export class AddiService {
 		@InjectRepository(Carritos) private readonly carritosRepository: Repository<Carritos>,
 		private readonly logger: Logger,
 		private readonly addiUtils: AddiUtils,
-		private readonly configService: ConfigService
+		private readonly configService: ConfigService,
+		private readonly pusherNotificationService: PusherNotificationsService
 	) {}
 
 	async cancelAddiApplication(cancelAddiApplicationDto: CancelAddiApplicationDto) {
@@ -75,7 +77,13 @@ export class AddiService {
 			)
 
 			if (response.status === 201) {
-				await this.carritosRepository.update({ id: orderId }, { estado: "3" })
+				await Promise.all([
+					this.carritosRepository.update({ id: orderId }, { estado: "3" }),
+					this.pusherNotificationService.trigger(`store-${storeId}`, "payment-status", {
+						orderId,
+						amount
+					})
+				])
 				return { message: "Application canceled successfully" }
 			}
 		} catch (error) {
