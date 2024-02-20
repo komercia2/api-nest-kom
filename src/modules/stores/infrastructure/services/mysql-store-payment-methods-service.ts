@@ -541,21 +541,21 @@ export class MySQLStorePaymentMethodsService {
 		return StorePaymentMethodsWithoutAuthDto.fromPersistence({
 			...mediosPagos,
 			contraentrega: {
-				...mediosPagos?.idMedios2.tiendaContraentregaInfos[0],
+				...mediosPagos?.idMedios2?.tiendaContraentregaInfos[0],
 				estado: mediosPagos?.contraentrega
 			},
 			consignacion: {
-				...mediosPagos?.idMedios2.tiendaConsignacionInfos[0],
+				...mediosPagos?.idMedios2?.tiendaConsignacionInfos[0],
 				estado: mediosPagos?.consignacion
 			},
-			politica_envios: mediosPagos?.idMedios2.politicas.envios ?? null,
-			politica_pagos: mediosPagos?.idMedios2.politicas.pagos ?? null,
-			nequi: { ...mediosPagos?.idMedios2.tiendaNequiInfos[0], estado: mediosPagos?.nequi },
+			politica_envios: mediosPagos?.idMedios2.politicas?.envios ?? null,
+			politica_pagos: mediosPagos?.idMedios2.politicas?.pagos ?? null,
+			nequi: { ...mediosPagos?.idMedios2?.tiendaNequiInfos[0], estado: mediosPagos?.nequi },
 			daviplata: {
-				...mediosPagos?.idMedios2.tiendaDaviplataInfos[0],
+				...mediosPagos?.idMedios2?.tiendaDaviplataInfos[0],
 				estado: mediosPagos?.daviplata
 			},
-			efecty: { ...mediosPagos?.idMedios2.tiendaEfectyInfos[0], estado: mediosPagos?.efecty }
+			efecty: { ...mediosPagos?.idMedios2?.tiendaEfectyInfos[0], estado: mediosPagos?.efecty }
 		})
 	}
 }

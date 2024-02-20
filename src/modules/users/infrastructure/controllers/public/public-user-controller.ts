@@ -133,11 +133,12 @@ export class PublicUserController {
 		const { userId } = req.checkoutUser
 
 		try {
-			await this.createUserAdressCommand.execute(userId, { ...body })
+			const address = await this.createUserAdressCommand.execute(userId, { ...body })
+			console.log(address)
 			return handlerHttpResponse(res, {
-				data: null,
-				message: `User adress with id ${userId} created successfully`,
-				statusCode: HttpStatus.OK,
+				data: address,
+				message: "User adress created successfully",
+				statusCode: HttpStatus.CREATED,
 				success: true
 			})
 		} catch (error) {

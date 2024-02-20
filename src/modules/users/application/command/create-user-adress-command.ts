@@ -13,6 +13,6 @@ export class CreateUserAdressCommand {
 
 	async execute(userId: number, adress: IUserAdress) {
 		const userAdress = new UserAdressEntity(adress)
-		await this.userRepository.createUserAdress(userId, userAdress)
+		return await this.userRepository.createUserAdress(userId, userAdress)
 	}
 }
