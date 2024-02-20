@@ -24,7 +24,8 @@ export class MysqlUserService {
 
 	async getUserAdressesByUserId(userId: number) {
 		const addresses = await this.userAdressRepository.find({ where: { userId } })
-		return addresses.map(this.toEntity)
+		const filteredAddresses = addresses.filter(({ deletedAt }) => !deletedAt)
+		return filteredAddresses.map(this.toEntity)
 	}
 
 	createUserAdress(userId: number, adress: IUserAdress) {
