@@ -75,6 +75,7 @@ export class AddiService {
 			)
 
 			if (response.status === 201) {
+				await this.carritosRepository.update({ id: orderId }, { estado: "3" })
 				return { message: "Application canceled successfully" }
 			}
 		} catch (error) {
