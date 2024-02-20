@@ -28,8 +28,59 @@ export class MysqlUserService {
 		return filteredAddresses.map(this.toEntity)
 	}
 
-	createUserAdress(userId: number, adress: IUserAdress) {
-		return this.userAdressRepository.insert({ ...adress, userId })
+	async createUserAdress(
+		userId: number,
+		adress: IUserAdress
+	): Promise<{
+		apellido: string
+		barrio: string
+		celular: string
+		ciudad: {
+			codigo_dane: string | null
+			dep: number
+			departamento: { id: number; nombre_dep: string; paises_id: number }
+			id: number
+			nombre_ciu: string
+		}
+		created_at: Date
+		delete_at: Date | null
+		id: number
+		nombre: string
+		tag: string
+		update_at: Date | null
+		user_id: number
+	} | null> {
+		const address = await this.userAdressRepository.save({ ...adress, userId })
+		const savedAddress = await this.userAdressRepository.findOne({
+			where: { id: address.id },
+			relations: { ciudad: { departamento: true } }
+		})
+
+		if (!savedAddress) return null
+
+		return {
+			apellido: savedAddress.apellido,
+			barrio: savedAddress.barrio,
+			celular: savedAddress.celular,
+			ciudad: {
+				codigo_dane: savedAddress.ciudad?.codigoDane,
+				dep: savedAddress.ciudad?.dep,
+				departamento: {
+					id: savedAddress.ciudad?.departamento.id,
+					nombre_dep: savedAddress.ciudad?.departamento.nombreDep,
+					paises_id: savedAddress.ciudad?.departamento.paisesId
+				},
+				id: savedAddress?.ciudad?.id,
+				nombre_ciu: savedAddress?.ciudad?.nombreCiu
+			},
+			created_at: savedAddress.createdAt,
+			delete_at: savedAddress?.deletedAt,
+			id: savedAddress?.id,
+			nombre: savedAddress?.nombre,
+			tag: savedAddress?.tag,
+			update_at: savedAddress?.updatedAt,
+			user_id: savedAddress?.userId
+		}
 	}
 
 	async deleteUserAdress(userId: number, adressId: number) {

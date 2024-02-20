@@ -68,8 +68,29 @@ export class UserRepository implements IUserRepository {
 		}
 	}
 
-	async createUserAdress(userId: number, adress: IUserAdress): Promise<void> {
-		await this.mysqlUserService.createUserAdress(userId, adress)
+	async createUserAdress(
+		userId: number,
+		adress: IUserAdress
+	): Promise<{
+		apellido: string
+		barrio: string
+		celular: string
+		ciudad: {
+			codigo_dane: string | null
+			dep: number
+			departamento: { id: number; nombre_dep: string; paises_id: number }
+			id: number
+			nombre_ciu: string
+		}
+		created_at: Date
+		delete_at: Date | null
+		id: number
+		nombre: string
+		tag: string
+		update_at: Date | null
+		user_id: number
+	} | null> {
+		return await this.mysqlUserService.createUserAdress(userId, adress)
 	}
 
 	async deleteUserAdress(userId: number, adressId: number): Promise<void> {
