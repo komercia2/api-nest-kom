@@ -106,14 +106,14 @@ export class OrdersService {
 
 			await Promise.all(
 				productos.map(async (producto) => {
-					const { id, nombre, activo, con_variante } = producto
+					const { id, nombre, activo } = producto
 
 					const product = await this.productosRepository.findOne({ where: { id, tienda } })
 
 					if (!product) throw new BadRequestException("Product not found")
-					if (!activo) throw new BadRequestException(`Product ${nombre} is not active`)
+					if (activo === 0) throw new BadRequestException(`Product ${nombre} is not active`)
 
-					if (con_variante) {
+					if (product.conVariante) {
 						const variant = await this.productosVariantesRepository.findOne({
 							where: { idProducto: id }
 						})
