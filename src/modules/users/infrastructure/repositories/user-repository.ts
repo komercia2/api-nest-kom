@@ -82,6 +82,8 @@ export class UserRepository implements IUserRepository {
 			id: number
 			nombre_ciu: string
 		}
+		ciudad_id: number
+		direccion: string
 		created_at: Date
 		delete_at: Date | null
 		id: number
