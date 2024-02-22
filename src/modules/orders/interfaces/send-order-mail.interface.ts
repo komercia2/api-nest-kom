@@ -10,6 +10,7 @@ export interface OrderEmailDto {
 
 export interface Data {
 	venta: Venta
+	productos: Producto[]
 }
 
 export interface Venta {
@@ -45,4 +46,13 @@ export interface TiendaVenta {
 	dominio: string
 	email_tienda: string
 	telefono: string
+}
+
+export interface Producto {
+	cantidad: number
+	id: number
+	nombre: string
+	precio: number
+	foto_cloudinary: string
+	combinacion: string
 }

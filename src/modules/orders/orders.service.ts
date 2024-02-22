@@ -318,7 +318,15 @@ export class OrdersService {
 						nombre: direccion_entrega?.value?.nombre ?? "",
 						tipo_identificacion: ""
 					}
-				}
+				},
+				productos: data.productos.map((p) => ({
+					cantidad: p.cantidad,
+					combinacion: p.combinacion,
+					foto_cloudinary: p.foto_cloudinary,
+					id: p.id,
+					nombre: p.nombre,
+					precio: p.precio
+				}))
 			}
 		}
 		return storeEmailData
