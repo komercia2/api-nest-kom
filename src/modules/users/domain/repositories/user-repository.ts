@@ -15,7 +15,7 @@ export interface IUserRepository {
 			id: number
 			nombre_ciu: string
 		}
-		ciudad_id: number
+		ciudadId: number
 		direccion: string
 		created_at: Date
 		delete_at: Date | null
