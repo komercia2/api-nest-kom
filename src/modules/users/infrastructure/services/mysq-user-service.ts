@@ -42,7 +42,7 @@ export class MysqlUserService {
 			id: number
 			nombre_ciu: string
 		}
-		ciudad_id: number
+		ciudadId: number
 		direccion: string
 		created_at: Date
 		delete_at: Date | null
@@ -75,7 +75,7 @@ export class MysqlUserService {
 				id: savedAddress?.ciudad?.id,
 				nombre_ciu: savedAddress?.ciudad?.nombreCiu
 			},
-			ciudad_id: savedAddress?.ciudadId,
+			ciudadId: savedAddress?.ciudadId,
 			direccion: savedAddress?.direccion,
 			created_at: savedAddress.createdAt,
 			delete_at: savedAddress?.deletedAt,
