@@ -20,6 +20,9 @@ export interface Venta {
 	fecha: string
 	total: number
 	direccion_entrega: DireccionEntrega | null
+	isDataShipping: boolean
+	URL_store: string
+	canal: string
 	costo_envio: string
 	descuento: number
 	method_shipping: string

@@ -221,7 +221,7 @@ export class OrdersService {
 			if (createOrderDto?.emailCliente) {
 				const emailCliente = createOrderDto.emailCliente
 				const clientEmailData: OrderEmailDto = {
-					...this.formatDataForEmail(createOrderDto, cart, true)
+					...(await this.formatDataForEmail(createOrderDto, cart, true))
 				}
 				notificationsTasks.push(this.sendOrderEmail(emailCliente, tienda, clientEmailData))
 			}
@@ -229,7 +229,7 @@ export class OrdersService {
 			if (datosTienda?.email_tienda) {
 				const emailTienda = datosTienda.email_tienda
 				const storeEmailData: OrderEmailDto = {
-					...this.formatDataForEmail(createOrderDto, cart, false)
+					...(await this.formatDataForEmail(createOrderDto, cart, false))
 				}
 				notificationsTasks.push(this.sendOrderEmail(emailTienda, tienda, storeEmailData))
 			}
@@ -291,9 +291,12 @@ export class OrdersService {
 		})
 	}
 
-	private formatDataForEmail(data: CreateOrderDto, cart: Carritos, isClient: boolean) {
+	private async formatDataForEmail(data: CreateOrderDto, cart: Carritos, isClient: boolean) {
 		const { total, datosTienda, costo_envio, descuento, direccion_entrega } = data
-		const { id: IdOrden, fecha, metodoPago } = cart
+		const { id: IdOrden, fecha, metodoPago, usuario } = cart
+
+		const URL_store = await this.getStoreURL(data, IdOrden, usuario)
+		const isDataShipping = this.isDataShipping(direccion_entrega.type)
 
 		const storeEmailData: OrderEmailDto = {
 			logo: `https://api2.komercia.co/logos/${datosTienda.logo}`,
@@ -305,7 +308,9 @@ export class OrdersService {
 			data: {
 				venta: {
 					URL_order: `https://panel.komercia.co/ventas/listado/${IdOrden}`,
+					URL_store,
 					id: IdOrden,
+					canal: data.canal === 1 ? "WhatsApp" : "Checkout",
 					direccion_entrega: direccion_entrega.value,
 					costo_envio,
 					descuento,
@@ -317,8 +322,10 @@ export class OrdersService {
 						identificacion: "",
 						nombre: direccion_entrega?.value?.nombre ?? "",
 						tipo_identificacion: ""
-					}
+					},
+					isDataShipping
 				},
+
 				productos: data.productos.map((p) => ({
 					cantidad: p.cantidad,
 					combinacion: p.combinacion,
@@ -330,6 +337,37 @@ export class OrdersService {
 			}
 		}
 		return storeEmailData
+	}
+
+	private isDataShipping(shippingAddressType: number) {
+		return shippingAddressType === 1
+	}
+
+	private async getStoreURL(orderData: CreateOrderDto, orderId: number, userId: number) {
+		const domain = orderData.datosTienda.dominio
+		const subdomain = orderData.datosTienda.subdominio
+
+		if (orderData.usuario === 1003915188) {
+			return `https://wapi.me/wa/${orderData.tienda}/micompra?orden=${orderId}&usuario=1003915188`
+		}
+
+		const identification = await this.getUserIdentificacion(userId)
+
+		if (orderData.datosTienda.dominio) {
+			return `${domain}/micompra?orden=${orderId}&usuario=${identification}`
+		}
+
+		return `https://${subdomain}.komercia.store/micompra?orden=${orderId}&usuario=${identification}`
+	}
+
+	async getUserIdentificacion(userId: number) {
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) {
+			throw new BadRequestException("User not found")
+		}
+
+		return user.identificacion
 	}
 
 	async isClientRegistered(userId: number, tiendaId: number, method: CLIENT_ASSIGNATION_METHOD) {
@@ -378,8 +416,8 @@ export class OrdersService {
 		cart.total = data.total
 		cart.costoEnvio = data.costo_envio
 		cart.metodoPago = data.metodo_pago
-		cart.estado = this.getOrderStatus(data.tipo, data.metodo_pago, data.canal)
-		cart.canal = data.canal
+		cart.estado = this.getOrderStatus(data.tipo, data.metodo_pago, String(data.canal))
+		cart.canal = String(data.canal)
 		cart.direccionEntrega = JSON.stringify(data.direccion_entrega)
 		cart.takeout = data.takeout
 		cart.estadoEntrega = data.estado_entrega
