@@ -81,6 +81,7 @@ export class MySQLStoreInfoService {
 				"medios_pago.paymentsWay",
 				"medios_pago.tuCompra",
 				"medios_pago.wepay4u",
+				"medios_pago.addi",
 				"medios_envios.id",
 				"medios_envios.valores",
 				"medios_envios.estado",

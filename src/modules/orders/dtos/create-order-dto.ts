@@ -1,5 +1,5 @@
 export interface CreateOrderDto {
-	canal: string
+	canal: number
 	usuario: number
 	tipo: boolean
 	tienda: number
