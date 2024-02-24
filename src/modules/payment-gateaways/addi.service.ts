@@ -14,6 +14,7 @@ import { ApisConexiones, Carritos, StoreAddiCredentials } from "src/entities"
 import { Repository } from "typeorm"
 
 import { CancelAddiApplicationDto } from "./dtos/cancel-addi-application.dto"
+import { ChangeAddiModeDto } from "./dtos/change-addi-mode.dto"
 import { CreateAddiApplicationDto } from "./dtos/create-addi-application.dto"
 import { AddiPaymentDto } from "./dtos/env.dto"
 import { GetAddiOAuthTokenDto } from "./dtos/get-addi-oauth-token.dto"
@@ -42,10 +43,36 @@ export class AddiService {
 		private readonly pusherNotificationService: PusherNotificationsService
 	) {}
 
+	async changeAddiProductionMode(changeAddiModeDto: ChangeAddiModeDto) {
+		const { storeId, productionMode } = changeAddiModeDto
+		const credentials = await this.findStoreCredentials(storeId)
+
+		if (!credentials) throw new NotFoundException("No credentials found for this store")
+
+		credentials.productionMode = productionMode
+		credentials.updatedAt = new Date()
+
+		await this.storeAddiCredentialsRepository.save(credentials)
+
+		return { message: "Production mode changed successfully" }
+	}
+
 	async cancelAddiApplication(cancelAddiApplicationDto: CancelAddiApplicationDto) {
 		const { orderId, amount, environment, storeId } = cancelAddiApplicationDto
 
 		const storeAddiCredentials = await this.getStoreCredentials(storeId)
+		const isProduction = await this.isAddiOnProductionMode(storeAddiCredentials)
+
+		let clientID = ""
+		let clientSecret = ""
+
+		if (isProduction) {
+			clientID = storeAddiCredentials.clientID
+			clientSecret = storeAddiCredentials.clientSecret
+		} else {
+			clientID = this.configService.get<string>("ADDI_CLIENT_ID_STAGING") ?? ""
+			clientSecret = this.configService.get<string>("ADDI_CLIENT_SECRET_STAGING") ?? ""
+		}
 
 		const audience = this.addiUtils.getAudience(
 			environment,
@@ -56,8 +83,8 @@ export class AddiService {
 		const credentials = await this.getAddiOAuthToken(
 			{
 				audience: audience as string,
-				client_id: storeAddiCredentials.clientID,
-				client_secret: storeAddiCredentials.clientSecret
+				client_id: clientID,
+				client_secret: clientSecret
 			},
 			environment
 		)
@@ -114,6 +141,19 @@ export class AddiService {
 		const { env, storeId } = addiPaymentDto
 
 		const storeAddiCredentials = await this.getStoreCredentials(storeId)
+		const isProduction = await this.isAddiOnProductionMode(storeAddiCredentials)
+
+		let clientID = ""
+		let clientSecret = ""
+
+		if (isProduction) {
+			clientID = storeAddiCredentials.clientID
+			clientSecret = storeAddiCredentials.clientSecret
+		} else {
+			clientID = this.configService.get<string>("ADDI_CLIENT_ID_STAGING") ?? ""
+			clientSecret = this.configService.get<string>("ADDI_CLIENT_SECRET_STAGING") ?? ""
+		}
+
 		const audience = this.addiUtils.getAudience(
 			env,
 			this.configService.get<string>("ADDI_STAGING_AUDIENCE") ?? "",
@@ -123,8 +163,8 @@ export class AddiService {
 		const credentials = await this.getAddiOAuthToken(
 			{
 				audience: audience as string,
-				client_id: storeAddiCredentials.clientID,
-				client_secret: storeAddiCredentials.clientSecret
+				client_id: clientID,
+				client_secret: clientSecret
 			},
 			env
 		)
@@ -251,12 +291,17 @@ export class AddiService {
 		return await this.apisConexionesRepository.findOne({ where: { tiendaId: storeId } })
 	}
 
+	async isAddiOnProductionMode(credentials: StoreAddiCredentials) {
+		return credentials.productionMode === 1
+	}
+
 	buildAddiCredentials(saveAddiCredentialsDto: SaveAddiCredentialsDto) {
 		const credentials = new StoreAddiCredentials()
 		credentials.storeId = saveAddiCredentialsDto.storeId
 		credentials.clientID = saveAddiCredentialsDto.clientID
 		credentials.clientSecret = saveAddiCredentialsDto.clientSecret
 		credentials.ally_slug = saveAddiCredentialsDto.ally_slug
+		credentials.productionMode = 1
 		credentials.createdAt = new Date()
 
 		return credentials

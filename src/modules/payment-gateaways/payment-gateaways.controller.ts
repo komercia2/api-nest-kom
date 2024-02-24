@@ -2,6 +2,7 @@ import { Body, Controller, Get, Param, Post, Put, Query } from "@nestjs/common"
 
 import { AddiService } from "./addi.service"
 import { CancelAddiApplicationDto } from "./dtos/cancel-addi-application.dto"
+import { ChangeAddiModeDto } from "./dtos/change-addi-mode.dto"
 import { CreateAddiApplicationDto } from "./dtos/create-addi-application.dto"
 import { AddiPaymentDto } from "./dtos/env.dto"
 import { SaveAddiCredentialsDto } from "./dtos/save-addi-credentials.dto"
@@ -9,6 +10,11 @@ import { SaveAddiCredentialsDto } from "./dtos/save-addi-credentials.dto"
 @Controller()
 export class PaymentGateawaysController {
 	constructor(private readonly addiService: AddiService) {}
+
+	@Put("addi/credentials/mode")
+	changeAddiProductionMode(@Body() dto: ChangeAddiModeDto) {
+		return this.addiService.changeAddiProductionMode(dto)
+	}
 
 	@Post("addi/application/cancel")
 	async cancelAddiApplication(@Body() dto: CancelAddiApplicationDto) {
