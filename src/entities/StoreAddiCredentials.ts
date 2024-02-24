@@ -34,6 +34,9 @@ export class StoreAddiCredentials {
 	@DeleteDateColumn({ type: "datetime", nullable: true })
 	deletedAt: Date | null
 
+	@Column({ type: "tinyint", default: 1 })
+	productionMode: number
+
 	@OneToOne(() => Tiendas)
 	@JoinColumn({ name: "storeId" })
 	store: Tiendas
