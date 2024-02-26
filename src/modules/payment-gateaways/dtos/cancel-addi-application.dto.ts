@@ -7,9 +7,6 @@ export class CancelAddiApplicationDto {
 	@IsString()
 	amount: number
 
-	@IsString()
-	environment: string
-
 	@IsNumber()
 	storeId: number
 }
