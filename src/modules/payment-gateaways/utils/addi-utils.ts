@@ -5,8 +5,8 @@ export class AddiUtils {
 	isBadRequest = (status: number) => status >= 400 && status < 500
 	isConflict = (status: number) => status === 409
 	isServerError = (status: number) => status >= 500 && status
-	getAudience = (env: string, staging: string, production: string) => {
-		if (env === "STAGING") return staging
-		if (env === "PRODUCTION") return production
+	getAudience = (isProdMode: number, staging: string, production: string) => {
+		if (isProdMode === 0) return staging
+		if (isProdMode === 1) return production
 	}
 }

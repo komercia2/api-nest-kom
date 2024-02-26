@@ -59,7 +59,7 @@ export class AddiService {
 	}
 
 	async cancelAddiApplication(cancelAddiApplicationDto: CancelAddiApplicationDto) {
-		const { orderId, amount, environment, storeId } = cancelAddiApplicationDto
+		const { orderId, amount, storeId } = cancelAddiApplicationDto
 
 		const storeAddiCredentials = await this.getStoreCredentials(storeId)
 		const isProduction = await this.isAddiOnProductionMode(storeAddiCredentials)
@@ -76,7 +76,7 @@ export class AddiService {
 		}
 
 		const audience = this.addiUtils.getAudience(
-			environment,
+			isProduction ? 1 : 0,
 			this.configService.get<string>("ADDI_STAGING_AUDIENCE") ?? "",
 			this.configService.get<string>("ADDI_PRODUCTION_AUDIENCE") ?? ""
 		)
@@ -87,14 +87,12 @@ export class AddiService {
 				client_id: clientID,
 				client_secret: clientSecret
 			},
-			environment
+			isProduction
 		)
 
 		try {
 			const response = await axios.post(
-				environment === "STAGING"
-					? this.ADDI_V1_STAGING_CANCEL_URL
-					: this.ADDI_V1_PRODUCTION_CANCEL_URL,
+				isProduction ? this.ADDI_V1_PRODUCTION_CANCEL_URL : this.ADDI_V1_STAGING_CANCEL_URL,
 				{ orderId, amount },
 				{
 					headers: {
@@ -139,7 +137,7 @@ export class AddiService {
 		createAddiApplicationDto: CreateAddiApplicationDto,
 		addiPaymentDto: AddiPaymentDto
 	) {
-		const { env, storeId } = addiPaymentDto
+		const { storeId } = addiPaymentDto
 
 		const storeAddiCredentials = await this.getStoreCredentials(storeId)
 		const isProduction = await this.isAddiOnProductionMode(storeAddiCredentials)
@@ -156,7 +154,7 @@ export class AddiService {
 		}
 
 		const audience = this.addiUtils.getAudience(
-			env,
+			isProduction ? 1 : 0,
 			this.configService.get<string>("ADDI_STAGING_AUDIENCE") ?? "",
 			this.configService.get<string>("ADDI_PRODUCTION_AUDIENCE") ?? ""
 		)
@@ -167,12 +165,12 @@ export class AddiService {
 				client_id: clientID,
 				client_secret: clientSecret
 			},
-			env
+			isProduction
 		)
 
 		try {
 			const response = await axios.post(
-				env === "STAGING" ? this.ADDI_V1_STAGING_APP_URL : this.ADDI_V1_PRODUCTION_APP_URL,
+				isProduction ? this.ADDI_V1_PRODUCTION_APP_URL : this.ADDI_V1_STAGING_APP_URL,
 				createAddiApplicationDto,
 				{
 					maxRedirects: this.addiUtils.maxRedirects,
@@ -209,10 +207,10 @@ export class AddiService {
 		}
 	}
 
-	async getAddiOAuthToken(getAddiOAuthTokenDto: GetAddiOAuthTokenDto, env: string) {
+	async getAddiOAuthToken(getAddiOAuthTokenDto: GetAddiOAuthTokenDto, isProd: boolean) {
 		try {
 			const response = await axios.post<{ access_token: string }>(
-				env === "STAGING" ? this.ADDI_V1_STAGING_OAUTH_URL : this.ADDI_V1_PRODUCTION_OAUTH_URL,
+				isProd ? this.ADDI_V1_PRODUCTION_OAUTH_URL : this.ADDI_V1_STAGING_OAUTH_URL,
 				{
 					grant_type: "client_credentials",
 					...getAddiOAuthTokenDto
@@ -294,6 +292,10 @@ export class AddiService {
 
 	async getApiConnection(storeId: number) {
 		return await this.apisConexionesRepository.findOne({ where: { tiendaId: storeId } })
+	}
+
+	async getAddiProductionMode(credentials: StoreAddiCredentials) {
+		return credentials.productionMode
 	}
 
 	async isAddiOnProductionMode(credentials: StoreAddiCredentials) {
