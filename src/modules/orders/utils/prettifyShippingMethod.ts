@@ -77,6 +77,9 @@ export const prettifyShippingMethod = (method: string | null): string => {
 		case "25":
 			paymentMethodName = "ePayco"
 			break
+		case "26":
+			paymentMethodName = "Addi"
+			break
 	}
 
 	return paymentMethodName
