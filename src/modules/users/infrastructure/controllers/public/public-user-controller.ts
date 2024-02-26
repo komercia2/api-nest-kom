@@ -51,24 +51,15 @@ export class PublicUserController {
 		@Body() body: { document: string }
 	) {
 		const { document } = body
-		try {
-			const token = await this.authenticateCheckoutUserQuery.execute(document)
 
-			return handlerHttpResponse(res, {
-				data: token,
-				message: "User authenticated successfully",
-				statusCode: HttpStatus.OK,
-				success: true
-			})
-		} catch (error) {
-			console.log(error)
-			return handlerHttpResponse(res, {
-				data: null,
-				message: "Error authenticating user",
-				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
-				success: false
-			})
-		}
+		const token = await this.authenticateCheckoutUserQuery.execute(document)
+
+		return handlerHttpResponse(res, {
+			data: token,
+			message: "User authenticated successfully",
+			statusCode: HttpStatus.OK,
+			success: true
+		})
 	}
 
 	@UseGuards(CheckoutJwtGuard)
