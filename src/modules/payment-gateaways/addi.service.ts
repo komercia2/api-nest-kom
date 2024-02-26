@@ -24,6 +24,7 @@ import { AddiUtils } from "./utils/addi-utils"
 @Injectable()
 export class AddiService {
 	private readonly ADDI_V1_STAGING_APP_URL = "https://api.addi-staging.com/v1/online-applications"
+	private readonly ADDI_V1_PRODUCTION_APP_URL = "https://api.addi.com/v1/online-applications"
 	private readonly ADDI_V1_STAGING_OAUTH_URL = "https://auth.addi-staging.com/oauth/token"
 	private readonly ADDI_V1_PRODUCTION_OAUTH_URL = "https://auth.addi.com/oauth/token"
 	private readonly ADDI_V1_STAGING_CANCEL_URL =
@@ -170,14 +171,18 @@ export class AddiService {
 		)
 
 		try {
-			const response = await axios.post(this.ADDI_V1_STAGING_APP_URL, createAddiApplicationDto, {
-				maxRedirects: this.addiUtils.maxRedirects,
-				validateStatus: this.addiUtils.validateStatus,
-				headers: {
-					Authorization: `Bearer ${credentials.access_token}`,
-					"Content-Type": "application/json"
+			const response = await axios.post(
+				env === "STAGING" ? this.ADDI_V1_STAGING_APP_URL : this.ADDI_V1_PRODUCTION_APP_URL,
+				createAddiApplicationDto,
+				{
+					maxRedirects: this.addiUtils.maxRedirects,
+					validateStatus: this.addiUtils.validateStatus,
+					headers: {
+						Authorization: `Bearer ${credentials.access_token}`,
+						"Content-Type": "application/json"
+					}
 				}
-			})
+			)
 
 			if (this.addiUtils.isRedirect(response.status)) {
 				const location = response.headers.location
