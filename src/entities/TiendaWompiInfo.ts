@@ -20,6 +20,9 @@ export class TiendaWompiInfo {
 	@Column("timestamp", { name: "updated_at", nullable: true })
 	updatedAt: Date | null
 
+	@Column("varchar", { name: "integrity", length: 255, nullable: true })
+	integrity: string | null
+
 	@ManyToOne(() => Tiendas, (tiendas) => tiendas.tiendaWompiInfos, {
 		onDelete: "CASCADE",
 		onUpdate: "NO ACTION"
