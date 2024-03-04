@@ -1,4 +1,4 @@
-import { StorePaymentMethodsWithoutAuthDto } from "../dtos"
+import { EncryptWompiIntegrityDto, StorePaymentMethodsWithoutAuthDto } from "../dtos"
 import { ChangePaymentGatewayStatus } from "../dtos/change-payment-gateway-status.dto"
 import { FindPaymentMethodWithCredentialsDto } from "../dtos/find-payment-method-with-credentials-dto"
 import { StorePaymentGateWay } from "../types/store-payment-gateways-type"
@@ -18,4 +18,11 @@ export interface IStorePaymentMethodsRepository {
 		method: FindPaymentMethodWithCredentialsDto,
 		data: StorePaymentGateWay
 	): Promise<void>
+	createPaymentGateway(
+		storeId: number,
+		method: FindPaymentMethodWithCredentialsDto,
+		data: StorePaymentGateWay
+	): Promise<void>
+
+	encryptWompiIntegrity(data: EncryptWompiIntegrityDto): Promise<string>
 }
