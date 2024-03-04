@@ -1,10 +1,14 @@
-import { Controller, Get, Inject, Param, Req, Res, UseGuards } from "@nestjs/common"
+import { Body, Controller, Get, Inject, Param, Post, Req, Res, UseGuards } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { CheckoutJwtGuard } from "@shared/infrastructure/guards"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { HttpStatusCode } from "axios"
 import { Request, Response } from "express"
-import { GetPaymentMethodsWithoutAuthQuery } from "src/modules/stores/application/query"
+import {
+	EncryptWompiIntegrityQuery,
+	GetPaymentMethodsWithoutAuthQuery
+} from "src/modules/stores/application/query"
+import { EncryptWompiIntegrityDto } from "src/modules/stores/domain/dtos"
 
 import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-injection-tokens"
 
@@ -13,8 +17,19 @@ import { StoresInfrastructureInjectionTokens } from "../../store-infrastructure-
 export class PublicStorePaymentMethodsController {
 	constructor(
 		@Inject(StoresInfrastructureInjectionTokens.GetPaymentMethodsQueryWithoutAuth)
-		private readonly getStorePaymentsMethodsWithoutAuthQuery: GetPaymentMethodsWithoutAuthQuery
+		private readonly getStorePaymentsMethodsWithoutAuthQuery: GetPaymentMethodsWithoutAuthQuery,
+
+		@Inject(StoresInfrastructureInjectionTokens.EncryptWompiIntegrityQuery)
+		private readonly encryptWompiIntegrityQuery: EncryptWompiIntegrityQuery
 	) {}
+
+	@Post("public/:storeId/encrypt-wompi-integrity")
+	async encryptWompiIntegrity(@Body() encryptWompiIntegrityDto: EncryptWompiIntegrityDto) {
+		const integritySignature = await this.encryptWompiIntegrityQuery.execute(
+			encryptWompiIntegrityDto
+		)
+		return { integritySignature }
+	}
 
 	@Get("public/:storeId")
 	async getStorePaymentsMethods(

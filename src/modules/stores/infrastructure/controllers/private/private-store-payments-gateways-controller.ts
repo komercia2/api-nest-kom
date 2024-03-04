@@ -1,8 +1,11 @@
-import { Body, Controller, Get, Inject, Put, Query, Req, Res } from "@nestjs/common"
+import { Body, Controller, Get, Inject, Post, Put, Query, Req, Res } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
-import { ChangePaymentGatewayStatusCommand } from "src/modules/stores/application/command"
+import {
+	ChangePaymentGatewayStatusCommand,
+	CreatePaymentGatewayCommand
+} from "src/modules/stores/application/command"
 import { UpdatePaymentGatewayCommand } from "src/modules/stores/application/command/update-payment-gateway-command"
 import { FindPaymentMethodWithCredentialsQuery } from "src/modules/stores/application/query"
 import { ChangePaymentGatewayStatus } from "src/modules/stores/domain/dtos/change-payment-gateway-status.dto"
@@ -22,8 +25,41 @@ export class PrivateStorePaymentGatewaysController {
 		private readonly deactivatePaymentGatewayCommand: ChangePaymentGatewayStatusCommand,
 
 		@Inject(StoresInfrastructureInjectionTokens.UpdatePaymentGatewayCommand)
-		private readonly updatePaymentGatewayCommand: UpdatePaymentGatewayCommand
+		private readonly updatePaymentGatewayCommand: UpdatePaymentGatewayCommand,
+
+		@Inject(StoresInfrastructureInjectionTokens.CreatePaymentGatewayCommand)
+		private readonly createPaymentGatewayCommand: CreatePaymentGatewayCommand
 	) {}
+
+	@Post("dynamic-create/:storeId")
+	create(
+		@Req() req: Request,
+		@Res() res: Response,
+		@Query() query: FindPaymentMethodWithCredentialsDto,
+		@Body() body: StorePaymentGateWay
+	) {
+		const { storeId } = req.params
+
+		this.createPaymentGatewayCommand
+			.execute(+storeId, query, body)
+			.then((resp) => {
+				return handlerHttpResponse(res, {
+					message: "Payment method created",
+					statusCode: 201,
+					data: null,
+					success: true
+				})
+			})
+			.catch((err) => {
+				console.log(err)
+				return handlerHttpResponse(res, {
+					message: "Error while creating payment method",
+					statusCode: 500,
+					data: null,
+					success: false
+				})
+			})
+	}
 
 	@Put("dynamic-update/:storeId")
 	update(

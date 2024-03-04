@@ -37,11 +37,16 @@ import {
 	WhatsappCheckout
 } from "src/entities"
 
-import { ChangePaymentGatewayStatusCommand, SaveStoreAnalyticCommand } from "./application/command"
+import {
+	ChangePaymentGatewayStatusCommand,
+	CreatePaymentGatewayCommand,
+	SaveStoreAnalyticCommand
+} from "./application/command"
 import { UpdatePaymentGatewayCommand } from "./application/command/update-payment-gateway-command"
 import {
 	CheckWithoutAuthQuery,
 	CountDevicesQuery,
+	EncryptWompiIntegrityQuery,
 	FindPaymentMethodWithCredentialsQuery,
 	FindStoreHeadquartersQuery,
 	GetAllEventsCountQuery,
@@ -192,6 +197,14 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.EncryptWompiIntegrityQuery,
+		useClass: EncryptWompiIntegrityQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.CreatePaymentGatewayCommand,
+		useClass: CreatePaymentGatewayCommand
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.UpdatePaymentGatewayCommand,
 		useClass: UpdatePaymentGatewayCommand

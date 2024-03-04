@@ -50,5 +50,7 @@ export enum StoresInfrastructureInjectionTokens {
 	 * Use cases (commands)
 	 */
 	DeactivatePaymentGatewayCommand = "DeactivatePaymentGatewayCommand",
-	UpdatePaymentGatewayCommand = "UpdatePaymentGatewayCommand"
+	UpdatePaymentGatewayCommand = "UpdatePaymentGatewayCommand",
+	CreatePaymentGatewayCommand = "CreatePaymentGatewayCommand",
+	EncryptWompiIntegrityQuery = "EncryptWompiIntegrityQuery"
 }

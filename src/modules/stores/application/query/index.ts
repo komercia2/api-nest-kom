@@ -1,5 +1,6 @@
 export * from "./check-without-auth-query"
 export * from "./count-devices-query"
+export * from "./encrypt-wompi-integrity-query"
 export * from "./find-store-headquarters-query"
 export * from "./get-all-events-count-query"
 export * from "./get-filtered-store-analytics-query"
