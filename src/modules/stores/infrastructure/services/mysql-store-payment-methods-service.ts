@@ -1,5 +1,6 @@
 import { Injectable, InternalServerErrorException, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
+import { SHA256 } from "crypto-js"
 import {
 	MedioPagos,
 	StoreAddiCredentials,
@@ -110,12 +111,9 @@ export class MySQLStorePaymentMethodsService {
 
 		const integrityString = `${reference}${transactionAmount}${currency}${integrity}`
 
-		const encondedText = new TextEncoder().encode(integrityString)
-		const hashBuffer = await crypto.subtle.digest("SHA-256", encondedText)
-		const hashArray = Array.from(new Uint8Array(hashBuffer))
-		const hashHex = hashArray.map((b) => b.toString(16).padStart(2, "0")).join("")
+		const integrityHash = SHA256(integrityString).toString()
 
-		return hashHex
+		return integrityHash
 	}
 
 	async createPaymentGateway(
