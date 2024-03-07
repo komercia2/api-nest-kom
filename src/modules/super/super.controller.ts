@@ -19,7 +19,7 @@ import { CouponsService } from "../coupons/coupons.service"
 import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "../coupons/dtos/filter-subscription-cuopons"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
-import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { FilterSuscriptionDto, GetFilteredStoresDto, UpdateStoreDto } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -33,6 +33,24 @@ export class SuperController {
 		private readonly superService: SuperService,
 		private readonly couponsService: CouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("stores")
+	updateStore(@Body() updateStoreDto: UpdateStoreDto) {
+		return this.superService.updateStore(updateStoreDto)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/templates")
+	getStoresTemplates() {
+		return this.superService.getStoresTemplates()
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("stores/categories")
+	getStoresCategories() {
+		return this.superService.getAllStoresCategories()
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("stores/plan/:storeId")

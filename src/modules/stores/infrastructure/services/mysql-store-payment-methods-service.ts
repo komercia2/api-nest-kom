@@ -256,7 +256,7 @@ export class MySQLStorePaymentMethodsService {
 				await this.tiendaWompiInfoRepository.update({ idTienda: storeId }, wompi)
 			}
 
-			if (pMethod === StorePaymentGateawayMethods.ADDI && data instanceof StoreAddiEntity) {
+			if (pMethod === StorePaymentGateawayMethods.ADDI) {
 				const addi = data as StoreAddiEntity
 				await this.storeAddiCredentialsRepository.update({ storeId }, addi)
 			}
