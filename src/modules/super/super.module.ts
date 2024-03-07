@@ -2,11 +2,13 @@ import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import {
 	Carritos,
+	CategoriaTiendas,
 	Entidades,
 	Paises,
 	Productos,
 	StoreAnalytics,
 	Tiendas,
+	TiendasInfo,
 	TiendaSuscripcionStripe,
 	Users,
 	Ventas
@@ -27,7 +29,9 @@ import { SuperService } from "./super.service"
 			Paises,
 			Entidades,
 			Users,
+			TiendasInfo,
 			Productos,
+			CategoriaTiendas,
 			StoreAnalytics
 		])
 	],

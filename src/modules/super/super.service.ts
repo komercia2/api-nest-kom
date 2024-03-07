@@ -3,18 +3,21 @@ import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
 import {
 	Carritos,
+	CategoriaTiendas,
 	Entidades,
 	Paises,
 	Productos,
 	StoreAnalytics,
 	Tiendas as Store,
+	Tiendas,
+	TiendasInfo,
 	TiendaSuscripcionStripe,
 	Users
 } from "src/entities"
 import { In, Repository } from "typeorm"
 
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
-import { FilterSuscriptionDto, GetFilteredStoresDto } from "./dtos"
+import { FilterSuscriptionDto, GetFilteredStoresDto, UpdateStoreDto } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -47,8 +50,62 @@ export class SuperService {
 		@InjectRepository(StoreAnalytics)
 		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>,
 
-		private readonly configService: ConfigService
+		private readonly configService: ConfigService,
+
+		@InjectRepository(CategoriaTiendas)
+		private readonly categoriaTiendasRepository: Repository<CategoriaTiendas>,
+
+		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
+
+		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>
 	) {}
+
+	async updateStore(updateStoreDto: UpdateStoreDto) {
+		const { storeId } = updateStoreDto
+
+		const store = await this.findStoreById(storeId)
+
+		if (!store) throw new BadRequestException("Store not found")
+		try {
+			store.nombre = updateStoreDto.storeName
+			store.subdominio = updateStoreDto.subdomain
+			store.tiendasInfo.emailTienda = updateStoreDto.email
+			store.tiendasInfo.telefono = updateStoreDto.phone
+			store.tiendasInfo.dominio = updateStoreDto.domain
+			store.tiendasInfo.descripcion = updateStoreDto.description
+			store.tiendasInfo.paisesId = updateStoreDto.countryId
+			store.template = updateStoreDto.template
+			store.categoria = updateStoreDto.categoryId
+
+			await Promise.all([
+				await this.storeRepository.save(store),
+				await this.tiendasInfoRepository.save(store.tiendasInfo)
+			])
+
+			return { success: true, message: "Store updated" }
+		} catch (error) {
+			return { success: false, message: "Error updating store" }
+		}
+	}
+
+	async findStoreById(storeId: number) {
+		return await this.storeRepository.findOne({
+			where: { id: storeId },
+			relations: { tiendasInfo: true }
+		})
+	}
+
+	async getStoresTemplates() {
+		return await this.tiendasRepository
+			.createQueryBuilder("tiendas")
+			.select(["tiendas.template"])
+			.distinct(true)
+			.getRawMany()
+	}
+
+	async getAllStoresCategories() {
+		return await this.categoriaTiendasRepository.find()
+	}
 
 	async getStoreCurrentPlan(storeId: number) {
 		const store = await this.storeRepository.findOne({ where: { id: storeId } })
