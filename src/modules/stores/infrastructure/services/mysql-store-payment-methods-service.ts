@@ -123,95 +123,107 @@ export class MySQLStorePaymentMethodsService {
 	) {
 		const { paymentGateawayMethod: pMethod } = method
 
-		if (pMethod === StorePaymentGateawayMethods.PAYU) {
-			const payu = data as unknown as PayUEntity
-			await this.tiendaPayuInfoRepository.insert(payu)
-		}
+		try {
+			if (pMethod === StorePaymentGateawayMethods.PAYU) {
+				const payu = data as unknown as PayUEntity
+				await this.tiendaPayuInfoRepository.insert(payu)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.CREDIBANCO) {
-			const credibanco = data as StoreCredibancoEntity
-			await this.tiendaCredibancoInfoRepository.insert(credibanco)
-		}
+			if (pMethod === StorePaymentGateawayMethods.CREDIBANCO) {
+				const credibanco = data as StoreCredibancoEntity
+				await this.tiendaCredibancoInfoRepository.insert(credibanco)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.EPAYCO) {
-			const epayco = data as StoreEpaycoEntity
-			await this.tiendaEpaycoInfoRepository.insert(epayco)
-		}
+			if (pMethod === StorePaymentGateawayMethods.EPAYCO) {
+				const epayco = data as StoreEpaycoEntity
+				await this.tiendaEpaycoInfoRepository.insert(epayco)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.PAYMENTS_WAY) {
-			const paymentsWay = data as StorePaymentsWayEntity
-			await this.tiendaPaymentswayRepository.insert(paymentsWay)
-		}
+			if (pMethod === StorePaymentGateawayMethods.PAYMENTS_WAY) {
+				const paymentsWay = data as StorePaymentsWayEntity
+				await this.tiendaPaymentswayRepository.insert(paymentsWay)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.TU_COMPRA) {
-			const tuCompra = data as StoreTuCompraEntity
-			await this.tiendaTucompraInfoRepository.insert(tuCompra)
-		}
+			if (pMethod === StorePaymentGateawayMethods.TU_COMPRA) {
+				const tuCompra = data as StoreTuCompraEntity
+				await this.tiendaTucompraInfoRepository.insert(tuCompra)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.WEPAY4U) {
-			const wepay4u = data as StoreWePay4uEntity
-			await this.tiendaWepay4uInfoRepository.insert(wepay4u)
-		}
+			if (pMethod === StorePaymentGateawayMethods.WEPAY4U) {
+				const wepay4u = data as StoreWePay4uEntity
+				await this.tiendaWepay4uInfoRepository.insert(wepay4u)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.WOMPI) {
-			const wompi = data as StoreWompiEntity
-			await this.tiendaWompiInfoRepository.insert(wompi)
-		}
+			if (pMethod === StorePaymentGateawayMethods.WOMPI) {
+				const wompi = data as StoreWompiEntity
+				await this.tiendaWompiInfoRepository.insert(wompi)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.ADDI) {
-			const addi = data as StoreAddiEntity
-			await this.storeAddiCredentialsRepository.insert(addi)
-		}
+			if (pMethod === StorePaymentGateawayMethods.ADDI) {
+				const addi = data as StoreAddiEntity
+				await this.storeAddiCredentialsRepository.insert({
+					...addi,
+					createdAt: new Date()
+				})
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.FLOW) {
-			const flow = data as StoreFlowEntity
-			await this.tiendaFlowInfoRepository.insert({
-				...flow,
-				secretKey: flow.secret_key
-			})
-		}
+			if (pMethod === StorePaymentGateawayMethods.FLOW) {
+				const flow = data as StoreFlowEntity
+				await this.tiendaFlowInfoRepository.insert({
+					...flow,
+					secretKey: flow.secret_key
+				})
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.MERCADOPAGO) {
-			const mercadopago = data as MercadopagoStoreInfoEntity
-			await this.tiendaMercadoPagoInfoRepository.insert(mercadopago)
-		}
+			if (pMethod === StorePaymentGateawayMethods.MERCADOPAGO) {
+				const mercadopago = data as MercadopagoStoreInfoEntity
+				await this.tiendaMercadoPagoInfoRepository.insert(mercadopago)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.CASH_ON_DELIVERY) {
-			const cashOnDelivery = data as CashOnDelivery
-			await this.tiendaContraentregaInfoRepository.insert(cashOnDelivery)
-		}
+			if (pMethod === StorePaymentGateawayMethods.CASH_ON_DELIVERY) {
+				const cashOnDelivery = data as CashOnDelivery
+				await this.tiendaContraentregaInfoRepository.insert(cashOnDelivery)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
-			const pickupAndPayInStore = data as { connected: boolean }
-			await this.medioPagosRepository.update(storeId, { tienda: pickupAndPayInStore.connected })
-		}
+			if (pMethod === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
+				const pickupAndPayInStore = data as { connected: boolean }
+				await this.medioPagosRepository.update(storeId, { tienda: pickupAndPayInStore.connected })
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
-			const paymentToBeAgreed = data as { connected: boolean }
-			await this.medioPagosRepository.update(storeId, { convenir: paymentToBeAgreed.connected })
-		}
+			if (pMethod === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
+				const paymentToBeAgreed = data as { connected: boolean }
+				await this.medioPagosRepository.update(storeId, { convenir: paymentToBeAgreed.connected })
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
-			const bankConsignment = data as BankConsignmmentEntity
-			await this.tiendaConsignacionInfoRepository.insert(bankConsignment)
-		}
+			if (pMethod === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
+				const bankConsignment = data as BankConsignmmentEntity
+				await this.tiendaConsignacionInfoRepository.insert(bankConsignment)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.EFECTY) {
-			const efecty = data as EfectyStoreEntity
-			await this.tiendaEfectyInfoRepository.insert(efecty)
-		}
+			if (pMethod === StorePaymentGateawayMethods.EFECTY) {
+				const efecty = data as EfectyStoreEntity
+				await this.tiendaEfectyInfoRepository.insert(efecty)
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.NEQUI) {
-			const nequi = data as StoreNequiEntity
-			await this.tiendaNequiInfoRepository.insert(nequi)
-		}
+			if (pMethod === StorePaymentGateawayMethods.NEQUI) {
+				const nequi = data as StoreNequiEntity
+				await this.tiendaNequiInfoRepository.insert({
+					referencia: nequi.referencia,
+					idTienda: storeId,
+					comentario: nequi.comentario,
+					createdAt: new Date()
+				})
+			}
 
-		if (pMethod === StorePaymentGateawayMethods.DAVIPLATA) {
-			const daviplata = data as StoreDaviplataEntity
-			await this.tiendaDaviplataInfoRepository.insert(daviplata)
-		}
+			if (pMethod === StorePaymentGateawayMethods.DAVIPLATA) {
+				const daviplata = data as StoreDaviplataEntity
+				await this.tiendaDaviplataInfoRepository.insert(daviplata)
+			}
 
-		return data
+			return data
+		} catch (error) {
+			console.log(error)
+		}
 	}
 
 	async updatePaymentGateway(
