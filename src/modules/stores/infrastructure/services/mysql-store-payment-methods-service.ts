@@ -136,6 +136,7 @@ export class MySQLStorePaymentMethodsService {
 				const credibanco = data as StoreCredibancoEntity
 				await this.tiendaCredibancoInfoRepository.insert({
 					...credibanco,
+					idTienda: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -144,6 +145,7 @@ export class MySQLStorePaymentMethodsService {
 				const epayco = data as StoreEpaycoEntity
 				await this.tiendaEpaycoInfoRepository.insert({
 					...epayco,
+					idTienda: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -160,6 +162,7 @@ export class MySQLStorePaymentMethodsService {
 				const tuCompra = data as StoreTuCompraEntity
 				await this.tiendaTucompraInfoRepository.insert({
 					...tuCompra,
+					tiendasId: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -168,6 +171,7 @@ export class MySQLStorePaymentMethodsService {
 				const wepay4u = data as StoreWePay4uEntity
 				await this.tiendaWepay4uInfoRepository.insert({
 					...wepay4u,
+					tiendasId: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -176,6 +180,8 @@ export class MySQLStorePaymentMethodsService {
 				const wompi = data as StoreWompiEntity
 				await this.tiendaWompiInfoRepository.insert({
 					...wompi,
+					integrity: wompi.integrity,
+					idTienda: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -184,6 +190,7 @@ export class MySQLStorePaymentMethodsService {
 				const addi = data as StoreAddiEntity
 				await this.storeAddiCredentialsRepository.insert({
 					...addi,
+					storeId,
 					createdAt: new Date()
 				})
 			}
@@ -192,6 +199,7 @@ export class MySQLStorePaymentMethodsService {
 				const flow = data as StoreFlowEntity
 				await this.tiendaFlowInfoRepository.insert({
 					...flow,
+					tiendasId: storeId,
 					secretKey: flow.secret_key
 				})
 			}
@@ -200,6 +208,7 @@ export class MySQLStorePaymentMethodsService {
 				const mercadopago = data as MercadopagoStoreInfoEntity
 				await this.tiendaMercadoPagoInfoRepository.insert({
 					...mercadopago,
+					idTienda: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -208,6 +217,7 @@ export class MySQLStorePaymentMethodsService {
 				const cashOnDelivery = data as CashOnDelivery
 				await this.tiendaContraentregaInfoRepository.insert({
 					...cashOnDelivery,
+					idTienda: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -226,6 +236,7 @@ export class MySQLStorePaymentMethodsService {
 				const bankConsignment = data as BankConsignmmentEntity
 				await this.tiendaConsignacionInfoRepository.insert({
 					...bankConsignment,
+					tiendaId: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -234,6 +245,7 @@ export class MySQLStorePaymentMethodsService {
 				const efecty = data as EfectyStoreEntity
 				await this.tiendaEfectyInfoRepository.insert({
 					...efecty,
+					tiendaId: storeId,
 					createdAt: new Date()
 				})
 			}
@@ -273,42 +285,90 @@ export class MySQLStorePaymentMethodsService {
 		try {
 			if (pMethod === StorePaymentGateawayMethods.PAYU) {
 				const payu = data as unknown as PayUEntity
-				await this.tiendaPayuInfoRepository.update({ tiendaId: storeId }, payu)
+				await this.tiendaPayuInfoRepository.update(
+					{ tiendaId: storeId },
+					{
+						...payu,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.CREDIBANCO) {
 				const credibanco = data as StoreCredibancoEntity
-				await this.tiendaCredibancoInfoRepository.update({ idTienda: storeId }, credibanco)
+				await this.tiendaCredibancoInfoRepository.update(
+					{ idTienda: storeId },
+					{
+						...credibanco,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.EPAYCO) {
 				const epayco = data as StoreEpaycoEntity
-				await this.tiendaEpaycoInfoRepository.update({ idTienda: storeId }, epayco)
+				await this.tiendaEpaycoInfoRepository.update(
+					{ idTienda: storeId },
+					{
+						...epayco,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.PAYMENTS_WAY) {
 				const paymentsWay = data as StorePaymentsWayEntity
-				await this.tiendaPaymentswayRepository.update({ tiendasId: storeId }, paymentsWay)
+				await this.tiendaPaymentswayRepository.update(
+					{ tiendasId: storeId },
+					{
+						...paymentsWay,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.TU_COMPRA) {
 				const tuCompra = data as StoreTuCompraEntity
-				await this.tiendaTucompraInfoRepository.update({ tiendasId: storeId }, tuCompra)
+				await this.tiendaTucompraInfoRepository.update(
+					{ tiendasId: storeId },
+					{
+						...tuCompra,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.WEPAY4U) {
 				const wepay4u = data as StoreWePay4uEntity
-				await this.tiendaWepay4uInfoRepository.update({ tiendasId: storeId }, wepay4u)
+				await this.tiendaWepay4uInfoRepository.update(
+					{ tiendasId: storeId },
+					{
+						...wepay4u,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.WOMPI) {
 				const wompi = data as StoreWompiEntity
-				await this.tiendaWompiInfoRepository.update({ idTienda: storeId }, wompi)
+				await this.tiendaWompiInfoRepository.update(
+					{ idTienda: storeId },
+					{
+						...wompi,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.ADDI) {
 				const addi = data as StoreAddiEntity
-				await this.storeAddiCredentialsRepository.update({ storeId }, addi)
+				await this.storeAddiCredentialsRepository.update(
+					{ storeId },
+					{
+						...addi,
+						createdAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.FLOW) {
