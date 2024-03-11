@@ -155,7 +155,8 @@ export class MySQLStorePaymentMethodsService {
 				const paymentsWay = data as StorePaymentsWayEntity
 				await this.tiendaPaymentswayRepository.insert({
 					...paymentsWay,
-					tiendasId: storeId
+					tiendasId: storeId,
+					createdAt: new Date()
 				})
 			}
 
@@ -201,7 +202,8 @@ export class MySQLStorePaymentMethodsService {
 				await this.tiendaFlowInfoRepository.insert({
 					...flow,
 					tiendasId: storeId,
-					secretKey: flow.secret_key
+					secretKey: flow.secret_key,
+					createdAt: new Date()
 				})
 			}
 
@@ -225,12 +227,18 @@ export class MySQLStorePaymentMethodsService {
 
 			if (pMethod === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
 				const pickupAndPayInStore = data as { connected: boolean }
-				await this.medioPagosRepository.update(storeId, { tienda: pickupAndPayInStore.connected })
+				await this.medioPagosRepository.update(storeId, {
+					tienda: pickupAndPayInStore.connected,
+					createdAt: new Date()
+				})
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
 				const paymentToBeAgreed = data as { connected: boolean }
-				await this.medioPagosRepository.update(storeId, { convenir: paymentToBeAgreed.connected })
+				await this.medioPagosRepository.update(storeId, {
+					convenir: paymentToBeAgreed.connected,
+					createdAt: new Date()
+				})
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
