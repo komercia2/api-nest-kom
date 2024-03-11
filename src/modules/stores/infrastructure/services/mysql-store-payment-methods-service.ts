@@ -202,7 +202,7 @@ export class MySQLStorePaymentMethodsService {
 				await this.tiendaFlowInfoRepository.insert({
 					...flow,
 					tiendasId: storeId,
-					secretKey: flow.secret_key,
+					secretKey: flow.secretKey,
 					createdAt: new Date()
 				})
 			}
