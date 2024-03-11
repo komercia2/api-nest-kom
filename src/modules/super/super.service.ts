@@ -123,7 +123,7 @@ export class SuperService {
 		if (!store) throw new BadRequestException("Store not found")
 
 		await this.storeRepository.update(storeId, {
-			fechaExpiracion: expirationDate.toISOString(),
+			fechaExpiracion: new Date(expirationDate).toISOString(),
 			tipo: plan
 		})
 
