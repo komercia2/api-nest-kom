@@ -128,7 +128,8 @@ export class MySQLStorePaymentMethodsService {
 				const payu = data as unknown as PayUEntity
 				await this.tiendaPayuInfoRepository.insert({
 					...payu,
-					tiendaId: storeId
+					tiendaId: storeId,
+					createdAt: new Date()
 				})
 			}
 
@@ -289,7 +290,7 @@ export class MySQLStorePaymentMethodsService {
 					{ tiendaId: storeId },
 					{
 						...payu,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -300,7 +301,7 @@ export class MySQLStorePaymentMethodsService {
 					{ idTienda: storeId },
 					{
 						...credibanco,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -311,7 +312,7 @@ export class MySQLStorePaymentMethodsService {
 					{ idTienda: storeId },
 					{
 						...epayco,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -322,7 +323,7 @@ export class MySQLStorePaymentMethodsService {
 					{ tiendasId: storeId },
 					{
 						...paymentsWay,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -333,7 +334,7 @@ export class MySQLStorePaymentMethodsService {
 					{ tiendasId: storeId },
 					{
 						...tuCompra,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -344,7 +345,7 @@ export class MySQLStorePaymentMethodsService {
 					{ tiendasId: storeId },
 					{
 						...wepay4u,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -355,7 +356,7 @@ export class MySQLStorePaymentMethodsService {
 					{ idTienda: storeId },
 					{
 						...wompi,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -366,7 +367,7 @@ export class MySQLStorePaymentMethodsService {
 					{ storeId },
 					{
 						...addi,
-						createdAt: new Date()
+						updatedAt: new Date()
 					}
 				)
 			}
@@ -377,7 +378,7 @@ export class MySQLStorePaymentMethodsService {
 					{ tiendasId: storeId },
 					{
 						...flow,
-						tiendasId: storeId
+						updatedAt: storeId
 					}
 				)
 			}
@@ -394,32 +395,62 @@ export class MySQLStorePaymentMethodsService {
 
 			if (pMethod === StorePaymentGateawayMethods.PICKUP_AND_PAY_IN_STORE) {
 				const pickupAndPayInStore = data as { connected: boolean }
-				await this.medioPagosRepository.update(storeId, { tienda: pickupAndPayInStore.connected })
+				await this.medioPagosRepository.update(storeId, {
+					tienda: pickupAndPayInStore.connected,
+					updatedAt: new Date()
+				})
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.PAYMENT_TO_BE_AGREED) {
 				const paymentToBeAgreed = data as { connected: boolean }
-				await this.medioPagosRepository.update(storeId, { convenir: paymentToBeAgreed.connected })
+				await this.medioPagosRepository.update(storeId, {
+					convenir: paymentToBeAgreed.connected,
+					updatedAt: new Date()
+				})
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.BANK_CONSIGNMENT) {
 				const bankConsignment = data as BankConsignmmentEntity
-				await this.tiendaConsignacionInfoRepository.update({ tiendaId: storeId }, bankConsignment)
+				await this.tiendaConsignacionInfoRepository.update(
+					{ tiendaId: storeId },
+					{
+						...bankConsignment,
+						updatedAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.EFECTY) {
 				const efecty = data as EfectyStoreEntity
-				await this.tiendaEfectyInfoRepository.update({ tiendaId: storeId }, efecty)
+				await this.tiendaEfectyInfoRepository.update(
+					{ tiendaId: storeId },
+					{
+						...efecty,
+						updatedAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.NEQUI) {
 				const nequi = data as StoreNequiEntity
-				await this.tiendaNequiInfoRepository.update({ idTienda: storeId }, { ...nequi })
+				await this.tiendaNequiInfoRepository.update(
+					{ idTienda: storeId },
+					{
+						...nequi,
+						updatedAt: new Date()
+					}
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.DAVIPLATA) {
 				const daviplata = data as StoreDaviplataEntity
-				await this.tiendaDaviplataInfoRepository.update({ idTienda: storeId }, { ...daviplata })
+				await this.tiendaDaviplataInfoRepository.update(
+					{ idTienda: storeId },
+					{
+						...daviplata,
+						updatedAt: new Date()
+					}
+				)
 			}
 		} catch (error) {
 			throw new InternalServerErrorException("Error updating payment gateway")
