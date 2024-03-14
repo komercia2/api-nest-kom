@@ -68,9 +68,11 @@ import {
 	GetStoresInfoByEntityQuery,
 	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
+import { GetStoreIntegrationsQuery } from "./application/query/get-store-integrations-query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
 	PrivateStoreAnalyticsController,
+	PrivateStoreIntegrationsController,
 	PrivateStorePaymentGatewaysController
 } from "./infrastructure/controllers/private"
 import {
@@ -101,6 +103,7 @@ import {
 	MySQLStoreGeolocationRepository,
 	MySQLStoreHeadquartersRepository,
 	MySQLStoreInfoRepository,
+	MySqlStoreIntegrationsRepository,
 	MySQLStorePaymentMethodsRepository,
 	MySQLStorePoliciesRepository,
 	MySQLStoreWhatsappCheckoutRepository
@@ -120,6 +123,7 @@ import {
 	MySQLStoreGeolocationService,
 	MySQLStoreHeadquartersService,
 	MySQLStoreInfoService,
+	MySqlStoreIntegrationsService,
 	MySQLStorePaymentMethodsService,
 	MySQLStorePoliciesService,
 	MySQLStoreProductCategoryService,
@@ -130,6 +134,10 @@ import { MysqlStoreShippingMeansService } from "./infrastructure/services/mysql-
 import { StoresInfrastructureInjectionTokens } from "./infrastructure/store-infrastructure-injection-tokens"
 
 const application = [
+	{
+		provide: StoresApplicationInjectionTokens.IStoreIntegrationsRepository,
+		useClass: MySqlStoreIntegrationsRepository
+	},
 	{
 		provide: StoresApplicationInjectionTokens.IStoreExternalApiRepository,
 		useClass: MySQLStoreExternalApiRepository
@@ -197,6 +205,10 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreIntegrationsQuery,
+		useClass: GetStoreIntegrationsQuery
+	},
 	{
 		provide: StoresInfrastructureInjectionTokens.EncryptWompiIntegrityQuery,
 		useClass: EncryptWompiIntegrityQuery
@@ -368,6 +380,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStorePaymentMethodsService,
 		useClass: MySQLStorePaymentMethodsService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MysqlStoreIntegrationsService,
+		useClass: MySqlStoreIntegrationsService
 	}
 ]
 
@@ -427,7 +443,8 @@ const infrastructure = [
 		PublicStoreAnalyticsController,
 		PrivateStoreAnalyticsController,
 		PublicStorePaymentMethodsController,
-		PrivateStorePaymentGatewaysController
+		PrivateStorePaymentGatewaysController,
+		PrivateStoreIntegrationsController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -451,7 +468,8 @@ export class StoresModule implements NestModule {
 				PublicStoreEntitiesController,
 				PublicStoreHeadquartersController,
 				PublicShippingMeansController,
-				PublicStorePaymentMethodsController
+				PublicStorePaymentMethodsController,
+				PrivateStoreIntegrationsController
 			)
 			.apply(LaravelAuthMiddleware)
 			.exclude({

@@ -18,6 +18,7 @@ export enum StoresInfrastructureInjectionTokens {
 	MySQLStoreShippingMeansService = "MysqlStoreShippingMeansService",
 	MySQLStoreAnalyticsService = "MySQLStoreAnalyticsService",
 	MySQLStorePaymentMethodsService = "MySQLStorePaymentMethodsService",
+	MysqlStoreIntegrationsService = "MysqlStoreIntegrationsService",
 
 	/**
 	 * Use cases (queries)
@@ -52,5 +53,6 @@ export enum StoresInfrastructureInjectionTokens {
 	DeactivatePaymentGatewayCommand = "DeactivatePaymentGatewayCommand",
 	UpdatePaymentGatewayCommand = "UpdatePaymentGatewayCommand",
 	CreatePaymentGatewayCommand = "CreatePaymentGatewayCommand",
-	EncryptWompiIntegrityQuery = "EncryptWompiIntegrityQuery"
+	EncryptWompiIntegrityQuery = "EncryptWompiIntegrityQuery",
+	GetStoreIntegrationsQuery = "GetStoreIntegrationsQuery"
 }
