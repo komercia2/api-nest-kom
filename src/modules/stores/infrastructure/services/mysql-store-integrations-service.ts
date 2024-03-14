@@ -92,6 +92,14 @@ export class MySqlStoreIntegrationsService {
 			{
 				integrationName: "GOOGLE_MERCHANT",
 				connected: otherIntegrations?.apisConexiones[0]?.googleMerchant ? true : false
+			},
+			{
+				integrationName: "FACEBOOK_CHAT",
+				connected: otherIntegrations?.apisConexiones[0]?.facebookChat ? true : false
+			},
+			{
+				integrationName: "PAYMENTS_WAY",
+				connected: otherIntegrations?.tiendaPaymentsways ? true : false
 			}
 		]
 	}
