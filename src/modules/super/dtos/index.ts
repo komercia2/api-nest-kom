@@ -1,3 +1,5 @@
+export * from "./change-password.dto"
 export * from "./filter-suscription.dto"
 export * from "./get-filtered-stores.dto"
+export * from "./get-store-admins.dto"
 export * from "./update-store.dto"

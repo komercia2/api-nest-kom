@@ -16,8 +16,15 @@ import {
 } from "src/entities"
 import { In, Repository } from "typeorm"
 
+import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
-import { FilterSuscriptionDto, GetFilteredStoresDto, UpdateStoreDto } from "./dtos"
+import {
+	ChangePasswordDto,
+	FilterSuscriptionDto,
+	GetFilteredStoresDto,
+	GetStoreAdminsDto,
+	UpdateStoreDto
+} from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -59,6 +66,20 @@ export class SuperService {
 
 		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>
 	) {}
+
+	async changePassword(changePasswordDto: ChangePasswordDto) {
+		const { userId, newPassword } = changePasswordDto
+
+		const bcryptHash = PasswordUtil.hash(newPassword)
+		const laravelHash = PasswordUtil.toLaravelHash(bcryptHash)
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		await this.usersRepository.update({ id: userId }, { password: laravelHash })
+		return { message: "Password updated" }
+	}
 
 	async updateStore(updateStoreDto: UpdateStoreDto) {
 		const { storeId } = updateStoreDto
@@ -170,13 +191,37 @@ export class SuperService {
 		return { message: "Admin unlinked from store" }
 	}
 
-	async getStoreAdmins(storeId: number) {
-		const admins = await this.usersRepository.find({
-			where: { tienda: storeId },
-			select: ["id", "nombre", "email", "activo", "rol"]
-		})
+	async getStoreAdmins(getStoreAdminsDto: GetStoreAdminsDto) {
+		const { page, limit, storeId } = getStoreAdminsDto
 
-		return admins
+		const [admins, total] = await this.usersRepository
+			.createQueryBuilder("users")
+			.select([
+				"users.id",
+				"users.nombre",
+				"users.email",
+				"users.activo",
+				"users.rol",
+				"users.createdAt",
+				"users.updatedAt",
+				"usersInfo.telefono"
+			])
+			.where("users.tienda = :storeId", { storeId })
+			.innerJoin("users.usersInfo", "usersInfo")
+			.skip((page - 1) * limit)
+			.take(limit)
+			.getManyAndCount()
+
+		return {
+			data: admins,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
 	}
 
 	async getStoreInfo(storeId: number) {

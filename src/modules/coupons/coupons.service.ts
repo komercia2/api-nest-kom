@@ -132,7 +132,7 @@ export class CouponsService {
 			await queryRunner.commitTransaction()
 			this.logger.log("Coupons created successfully")
 
-			return { message: "Coupons created successfully" }
+			return couponEntities.map(({ coupon }) => coupon)
 		} catch (error) {
 			await queryRunner.rollbackTransaction()
 			this.logger.error("Error creating coupon")
