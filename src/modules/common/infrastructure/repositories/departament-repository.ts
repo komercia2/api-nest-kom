@@ -15,6 +15,18 @@ export class DepartamentRepository implements IDepartamentRepository {
 		@Inject(CACHE_MANAGER) private readonly cacheManager: Cache
 	) {}
 
+	async getByCountry(countryId: number): Promise<DepartamentEntity[]> {
+		const departaments = await this.cacheManager.get<DepartamentEntity[]>(
+			`departaments_${countryId}`
+		)
+		if (departaments) return departaments
+
+		const departamentsFromDatabase = await this.mysqlDepartamentService.getByCountry(countryId)
+		await this.cacheManager.set(`departaments_${countryId}`, departamentsFromDatabase, 60 * 60)
+
+		return departamentsFromDatabase
+	}
+
 	async getAll(): Promise<DepartamentEntity[]> {
 		const departaments = await this.cacheManager.get<DepartamentEntity[]>("departaments")
 		if (departaments) return departaments

@@ -9,6 +9,7 @@ import {
 	GetAllCitiesQuery,
 	GetAllDepartamentsQuery
 } from "./application/query"
+import { GetDepartamentsByCountryQuery } from "./application/query/get-departaments-by-country-query"
 import { CommonInfrastructureInjectionTokens } from "./infrastructure/common-infrastructure-injection-tokens"
 import { CityController, DepartamentController } from "./infrastructure/controllers"
 import { PublicBanksController } from "./infrastructure/controllers/bank-controller"
@@ -62,6 +63,14 @@ const infrastructure = [
 	{
 		provide: CommonInfrastructureInjectionTokens.MySQLBankService,
 		useClass: MySQLBankService
+	},
+	{
+		provide: CommonInfrastructureInjectionTokens.GetDepartamentsByCountryQuery,
+		useClass: GetDepartamentsByCountryQuery
+	},
+	{
+		provide: CommonInfrastructureInjectionTokens.GetDepartamentsByCountryQuery,
+		useClass: GetDepartamentsByCountryQuery
 	}
 ]
 

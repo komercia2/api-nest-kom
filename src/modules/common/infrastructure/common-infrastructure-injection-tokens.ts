@@ -4,5 +4,6 @@ export enum CommonInfrastructureInjectionTokens {
 	MySQLDepartamentService = "MySQLDepartamentService",
 	GetAllDepartamentsQuery = "GetAllDepartamentsQuery",
 	MySQLBankService = "MySQLBankService",
-	GetAllBanksByCountryQuery = "GetAllBanksByCountryQuery"
+	GetAllBanksByCountryQuery = "GetAllBanksByCountryQuery",
+	GetDepartamentsByCountryQuery = "GetDepartamentsByCountryQuery"
 }
