@@ -16,8 +16,14 @@ import {
 } from "src/entities"
 import { In, Repository } from "typeorm"
 
+import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
-import { FilterSuscriptionDto, GetFilteredStoresDto, UpdateStoreDto } from "./dtos"
+import {
+	ChangePasswordDto,
+	FilterSuscriptionDto,
+	GetFilteredStoresDto,
+	UpdateStoreDto
+} from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -59,6 +65,20 @@ export class SuperService {
 
 		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>
 	) {}
+
+	async changePassword(changePasswordDto: ChangePasswordDto) {
+		const { userId, newPassword } = changePasswordDto
+
+		const bcryptHash = PasswordUtil.hash(newPassword)
+		const laravelHash = PasswordUtil.toLaravelHash(bcryptHash)
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		await this.usersRepository.update({ id: userId }, { password: laravelHash })
+		return { message: "Password updated" }
+	}
 
 	async updateStore(updateStoreDto: UpdateStoreDto) {
 		const { storeId } = updateStoreDto

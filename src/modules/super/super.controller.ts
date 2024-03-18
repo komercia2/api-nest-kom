@@ -19,7 +19,12 @@ import { CouponsService } from "../coupons/coupons.service"
 import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "../coupons/dtos/filter-subscription-cuopons"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
-import { FilterSuscriptionDto, GetFilteredStoresDto, UpdateStoreDto } from "./dtos"
+import {
+	ChangePasswordDto,
+	FilterSuscriptionDto,
+	GetFilteredStoresDto,
+	UpdateStoreDto
+} from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -33,6 +38,12 @@ export class SuperController {
 		private readonly superService: SuperService,
 		private readonly couponsService: CouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("change-password")
+	chagePassword(@Body() changePasswordDto: ChangePasswordDto) {
+		return this.superService.changePassword(changePasswordDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Put("stores")

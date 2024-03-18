@@ -1,4 +1,4 @@
-import { compare } from "bcrypt"
+import { compare, hashSync } from "bcrypt"
 
 export class PasswordUtil {
 	static compare(password: string, hash: string) {
@@ -6,6 +6,10 @@ export class PasswordUtil {
 			return compare(password, this.laravelHashToBcrypt(hash))
 		}
 		return compare(password, hash)
+	}
+
+	static hash(password: string) {
+		return hashSync(password, 10)
 	}
 
 	static toLaravelHash(bcryptHash: string) {
