@@ -12,6 +12,11 @@ export class MySQLDepartamentService {
 		private readonly departamentRepository: Repository<Departamentos>
 	) {}
 
+	async getByCountry(countryId: number) {
+		const departaments = await this.departamentRepository.find({ where: { paisesId: countryId } })
+		return departaments.map((departament) => this.toDepartamentEntity(departament))
+	}
+
 	async getAll() {
 		const departaments = await this.departamentRepository.find()
 		return departaments.map((departament) => this.toDepartamentEntity(departament))
