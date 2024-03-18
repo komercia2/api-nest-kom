@@ -26,6 +26,8 @@ export class MySqlStoreIntegrationsService {
 			}
 		})
 
+		console.log({ paymentMethods, otherIntegrations })
+
 		if (!paymentMethods) return []
 
 		return [
@@ -63,11 +65,16 @@ export class MySqlStoreIntegrationsService {
 			},
 			{
 				integrationName: "MI_PAQUETE",
-				connected: otherIntegrations?.miPaqueteCredenciales ? true : false
+				connected:
+					otherIntegrations?.miPaqueteCredenciales &&
+					otherIntegrations?.miPaqueteCredenciales.length > 0
+						? true
+						: false
 			},
 			{
 				integrationName: "HOKO",
-				connected: otherIntegrations?.tiendaHokos ? true : false
+				connected:
+					otherIntegrations?.tiendaHokos && otherIntegrations?.tiendaHokos.length > 0 ? true : false
 			},
 			{
 				integrationName: "GOOGLE_ANALYTICS",
@@ -87,7 +94,10 @@ export class MySqlStoreIntegrationsService {
 			},
 			{
 				integrationName: "CUBIKO",
-				connected: otherIntegrations?.tiendaCubikos ? true : false
+				connected:
+					otherIntegrations?.tiendaCubikos && otherIntegrations?.tiendaCubikos.length > 0
+						? true
+						: false
 			},
 			{
 				integrationName: "GOOGLE_MERCHANT",
