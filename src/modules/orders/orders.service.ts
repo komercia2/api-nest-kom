@@ -27,6 +27,7 @@ import { MailsService } from "../mails/mails.service"
 import { WhatsappService } from "../whatsapp/whatsapp.service"
 import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
+import { GetOrderDto } from "./dtos/get-order-dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
 import { prettifyShippingMethod } from "./utils/prettifyShippingMethod"
 
@@ -78,6 +79,37 @@ export class OrdersService {
 
 		private readonly whatsappService: WhatsappService
 	) {}
+
+	async getOrder(getOrderDto: GetOrderDto) {
+		const { orderId, storeId, userId } = getOrderDto
+
+		const order = await this.carritosRepository
+			.createQueryBuilder("carritos")
+			.leftJoinAndSelect("carritos.productosCarritos", "productosCarritos")
+			.leftJoinAndSelect("productosCarritos.producto2", "producto2")
+			.leftJoinAndSelect("carritos.mensajeOrdens", "mensajeOrdens")
+			.leftJoin("mensajeOrdens.user", "user")
+			.leftJoin("producto2.productosInfo", "productosInfo")
+			.addSelect([
+				"productosInfo.id",
+				"productosInfo.sku",
+				"user.id",
+				"user.nombre",
+				"user.email",
+				"user.identificacion",
+				"user.ciudad"
+			])
+			.where("carritos.id = :orderId", { orderId })
+			.andWhere("carritos.tienda = :storeId", { storeId })
+			.andWhere("carritos.usuario = :userId", { userId })
+			.getOne()
+
+		if (!order) {
+			throw new BadRequestException("Order not found")
+		}
+
+		return order
+	}
 
 	async createOrder(createOrderDto: CreateOrderDto) {
 		const queryRunner = this.datasource.createQueryRunner()
