@@ -23,6 +23,7 @@ import {
 	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
+	GetStoreAdminsDto,
 	UpdateStoreDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
@@ -101,9 +102,9 @@ export class SuperController {
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Get("stores/:storeId/admins")
-	getStoreAdmins(@Param("storeId") storeId: number) {
-		return this.superService.getStoreAdmins(storeId)
+	@Get("stores/admins")
+	getStoreAdmins(@Query() getStoreAdminsDto: GetStoreAdminsDto) {
+		return this.superService.getStoreAdmins(getStoreAdminsDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)

@@ -22,6 +22,7 @@ import {
 	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
+	GetStoreAdminsDto,
 	UpdateStoreDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
@@ -190,13 +191,37 @@ export class SuperService {
 		return { message: "Admin unlinked from store" }
 	}
 
-	async getStoreAdmins(storeId: number) {
-		const admins = await this.usersRepository.find({
-			where: { tienda: storeId },
-			select: ["id", "nombre", "email", "activo", "rol"]
-		})
+	async getStoreAdmins(getStoreAdminsDto: GetStoreAdminsDto) {
+		const { page, limit, storeId } = getStoreAdminsDto
 
-		return admins
+		const [admins, total] = await this.usersRepository
+			.createQueryBuilder("users")
+			.select([
+				"users.id",
+				"users.nombre",
+				"users.email",
+				"users.activo",
+				"users.rol",
+				"users.createdAt",
+				"users.updatedAt",
+				"usersInfo.telefono"
+			])
+			.where("users.tienda = :storeId", { storeId })
+			.innerJoin("users.usersInfo", "usersInfo")
+			.skip((page - 1) * limit)
+			.take(limit)
+			.getManyAndCount()
+
+		return {
+			data: admins,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
 	}
 
 	async getStoreInfo(storeId: number) {
