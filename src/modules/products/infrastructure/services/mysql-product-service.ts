@@ -223,6 +223,7 @@ export class MySQLProductService {
 			.leftJoinAndSelect("variantes.productosVariantesCombinaciones", "combinaciones")
 			.leftJoinAndSelect("product.subcategoria2", "subcategoria_producto")
 			.addSelect([
+				"info.id",
 				"info.marca",
 				"info.sku",
 				"info.peso",
