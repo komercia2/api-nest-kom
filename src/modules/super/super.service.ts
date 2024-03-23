@@ -5,6 +5,7 @@ import {
 	Carritos,
 	CategoriaTiendas,
 	Entidades,
+	EntidadesTiendas,
 	Paises,
 	Productos,
 	StoreAnalytics,
@@ -14,7 +15,7 @@ import {
 	TiendaSuscripcionStripe,
 	Users
 } from "src/entities"
-import { In, Repository } from "typeorm"
+import { DataSource, In, Repository } from "typeorm"
 
 import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
@@ -23,7 +24,8 @@ import {
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
 	GetStoreAdminsDto,
-	UpdateStoreDto
+	UpdateStoreDto,
+	UpdateStoreEntitiesDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
@@ -64,8 +66,110 @@ export class SuperService {
 
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
 
-		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>
+		@InjectRepository(TiendasInfo) private readonly tiendasInfoRepository: Repository<TiendasInfo>,
+
+		@InjectRepository(EntidadesTiendas)
+		private readonly entidadesTiendasRepository: Repository<EntidadesTiendas>,
+
+		private readonly datasource: DataSource
 	) {}
+
+	async updateStoreEntities(storeId: number, updateStoreEntitiesDto: UpdateStoreEntitiesDto) {
+		const { entities: incomingEntities } = updateStoreEntitiesDto
+		const queryRunner = this.datasource.createQueryRunner()
+
+		try {
+			await queryRunner.connect()
+			await queryRunner.startTransaction()
+
+			const currentEntities = await this.entidadesTiendasRepository.find({
+				where: { tiendaId: storeId }
+			})
+
+			if (!currentEntities) {
+				// If store has no entities, insert all incoming entities
+				await this.entidadesTiendasRepository.insert(
+					incomingEntities.map((entityId) => ({ tiendaId: storeId, entidadId: entityId }))
+				)
+
+				return { message: "Store entities updated" }
+			}
+
+			// If store has entities, compare incoming entities with current entities
+			const currentEntitiesIds = currentEntities.map((entity) => entity.entidadId).sort()
+			const incomingEntitiesIds = new Set(incomingEntities.sort())
+
+			if (currentEntitiesIds.toString() === incomingEntitiesIds.toString()) {
+				return { message: "Store entities are the same" }
+			}
+
+			// If incoming entities are different from current entities, delete current entities and insert incoming entities
+			await this.entidadesTiendasRepository.delete({ tiendaId: storeId })
+
+			const mappedEntities: EntidadesTiendas[] = incomingEntities.map((entityId) => {
+				const entity = new EntidadesTiendas()
+				entity.tiendaId = storeId
+				entity.entidadId = entityId
+				return entity
+			})
+
+			await this.entidadesTiendasRepository.save(mappedEntities)
+			await queryRunner.commitTransaction()
+
+			return { message: "Store entities updated" }
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			throw error
+		} finally {
+			await queryRunner.release()
+		}
+	}
+
+	async deleteUser(userId: number) {
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const queryRunner = this.datasource.createQueryRunner()
+		await queryRunner.connect()
+		await queryRunner.startTransaction()
+
+		try {
+			await this.usersRepository.delete(userId)
+
+			await queryRunner.commitTransaction()
+
+			return { message: "User deleted" }
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			throw error
+		} finally {
+			await queryRunner.release()
+		}
+	}
+
+	async deleteStore(storeId: number) {
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		const queryRunner = this.datasource.createQueryRunner()
+		await queryRunner.connect()
+		await queryRunner.startTransaction()
+		try {
+			await this.usersRepository.delete({ tienda: storeId })
+			await this.storeRepository.delete(storeId)
+
+			await queryRunner.commitTransaction()
+
+			return { message: "Store deleted" }
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			throw error
+		} finally {
+			await queryRunner.release()
+		}
+	}
 
 	async changePassword(changePasswordDto: ChangePasswordDto) {
 		const { userId, newPassword } = changePasswordDto

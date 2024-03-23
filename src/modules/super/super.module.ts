@@ -4,6 +4,7 @@ import {
 	Carritos,
 	CategoriaTiendas,
 	Entidades,
+	EntidadesTiendas,
 	Paises,
 	Productos,
 	StoreAnalytics,
@@ -32,7 +33,8 @@ import { SuperService } from "./super.service"
 			TiendasInfo,
 			Productos,
 			CategoriaTiendas,
-			StoreAnalytics
+			StoreAnalytics,
+			EntidadesTiendas
 		])
 	],
 	controllers: [SuperController],
