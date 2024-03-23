@@ -216,12 +216,48 @@ export class MySQLProductService {
 		const product = await this.productRepository
 			.createQueryBuilder("product")
 			.where("product.id = :productId", { productId })
-			.leftJoinAndSelect("product.productosInfo", "info")
+			.leftJoin("product.productosInfo", "info")
 			.leftJoinAndSelect("product.categoriaProducto2", "categoria")
 			.leftJoinAndSelect("product.productosFotos", "fotos")
 			.leftJoinAndSelect("product.productosVariantes", "variantes")
 			.leftJoinAndSelect("variantes.productosVariantesCombinaciones", "combinaciones")
 			.leftJoinAndSelect("product.subcategoria2", "subcategoria_producto")
+			.addSelect([
+				"info.id",
+				"info.marca",
+				"info.sku",
+				"info.peso",
+				"info.inventario",
+				"info.garantia",
+				"info.video",
+				"info.visitas",
+				"info.positiva",
+				"info.negativa",
+				"info.proveedoresId",
+				"info.codigoBarras",
+				"info.codigoQr",
+				"info.tipoServicio",
+				"info.botonCompra",
+				"info.botonWhatsapp",
+				"info.botonPersonalizado",
+				"info.textoBotonPersonalizado",
+				"info.urlBotonPersonalizado",
+				"info.activarMensajes",
+				"info.labelMensaje",
+				"info.mensajeObligatorio",
+				"info.mensaje",
+				"info.iframe",
+				"info.descripcionCorta",
+				"info.promocionValor",
+				"info.tagPromocion",
+				"info.etiquetas",
+				"info.bodega",
+				"info.alto",
+				"info.ancho",
+				"info.largo",
+				"info.dealerWhatsapp",
+				"info.condicion"
+			])
 			.getOne()
 
 		await this.increaseProductVisits(productId)
