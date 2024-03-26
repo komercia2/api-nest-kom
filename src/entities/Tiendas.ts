@@ -45,6 +45,7 @@ import { ReputacionTiendaMarketplace } from "./ReputacionTiendaMarketplace"
 import { StoreAddiCredentials } from "./StoreAddiCredentials"
 import { StoreAnalytics } from "./StoreAnalytics"
 import { StoreNotification } from "./StoreNotifications"
+import { StoresCouponsPlus } from "./StoresCouponsPlus"
 import { Subcategorias } from "./Subcategorias"
 import { Subscriptions } from "./Subscriptions"
 import { SubscriptionCoupon } from "./SubscriptionsCoupon"
@@ -416,4 +417,7 @@ export class Tiendas {
 
 	@OneToOne(() => StoreAddiCredentials, (addiCredentials) => addiCredentials.store)
 	addiCredentials: StoreAddiCredentials
+
+	@OneToMany(() => StoresCouponsPlus, (storesCouponsPlus) => storesCouponsPlus.store)
+	storesCouponsPlus: StoresCouponsPlus[]
 }
