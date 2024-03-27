@@ -16,8 +16,8 @@ export class StoresCouponsPlus {
 	@Column({ type: "tinyint", nullable: false, default: 1 })
 	status: number
 
-	@Column({ type: "binary", nullable: false })
-	type: Buffer
+	@Column({ type: "tinyint", nullable: false })
+	type: number
 
 	@Column({ type: "float", unsigned: true, nullable: true })
 	percentage_value: number
@@ -35,7 +35,7 @@ export class StoresCouponsPlus {
 	claim_limit_per_client: number
 
 	@Column({ type: "timestamp", nullable: true })
-	expiration_date: Date
+	expiration_date: Date | null
 
 	@Column({ type: "int", unsigned: true })
 	store_id: number
