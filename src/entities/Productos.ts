@@ -17,6 +17,7 @@ import { ProductosFotos } from "./ProductosFotos"
 import { ProductosInfo } from "./ProductosInfo"
 import { ProductosVariantes } from "./ProductosVariantes"
 import { StoreAnalytics } from "./StoreAnalytics"
+import { StoresCouponsPlus } from "./StoresCouponsPlus"
 import { Subcategorias } from "./Subcategorias"
 import { TagProduct } from "./TagProduct"
 import { TiendaPromociones } from "./TiendaPromociones"
@@ -150,4 +151,7 @@ export class Productos {
 
 	@OneToMany(() => StoreAnalytics, (storeAnalytics) => storeAnalytics.Productos)
 	analytics: StoreAnalytics[]
+
+	@OneToMany(() => StoresCouponsPlus, (storesCouponsPlus) => storesCouponsPlus.product)
+	storesCouponsPlus: StoresCouponsPlus[]
 }

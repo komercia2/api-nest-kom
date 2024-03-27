@@ -17,6 +17,7 @@ import { DireccionesUsuario } from "./DireccionesUsuario"
 import { LogTiendas } from "./LogTiendas"
 import { MensajeOrden } from "./MensajeOrden"
 import { Mensajes } from "./Mensajes"
+import { StoresCouponsPlus } from "./StoresCouponsPlus"
 import { SubscriptionPayments } from "./SubscriptionPayments"
 import { Subscriptions } from "./Subscriptions"
 import { TiendaPromociones } from "./TiendaPromociones"
@@ -208,4 +209,7 @@ export class Users {
 
 	@OneToMany(() => Vacantes, (vacantes) => vacantes.users)
 	vacantes: Vacantes[]
+
+	@OneToMany(() => StoresCouponsPlus, (storesCouponsPlus) => storesCouponsPlus.user)
+	storesCouponsPlus: StoresCouponsPlus[]
 }

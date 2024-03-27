@@ -1,9 +1,7 @@
-import { Body, Controller, Get, HttpCode, HttpStatus, Post, Put, Query } from "@nestjs/common"
+import { Body, Controller, Get, HttpCode, HttpStatus, Put, Query } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 
 import { CouponsService } from "./coupons.service"
-import { CreateSubscriptionCouponDto } from "./dtos/create-coupon.dto"
-import { FilterSubscriptionCouponsDto } from "./dtos/filter-subscription-cuopons"
 import { RedeemCouponDto } from "./dtos/redeem-coupon.dto"
 
 @ApiTags("Coupons")

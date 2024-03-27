@@ -80,6 +80,7 @@ import {
 	StoreAddiCredentials,
 	StoreAnalytics,
 	StoreNotification,
+	StoresCouponsPlus,
 	Subcategorias,
 	SubscriptionCoupon,
 	SubscriptionGateways,
@@ -300,7 +301,8 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
 			VisitasTienda,
 			WhatsappCheckout,
 			Zonas,
-			ZonasPaths
+			ZonasPaths,
+			StoresCouponsPlus
 		]
 	})
 }
