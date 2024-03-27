@@ -88,8 +88,9 @@ export class OrdersService {
 			.leftJoinAndSelect("carritos.productosCarritos", "productosCarritos")
 			.leftJoinAndSelect("productosCarritos.producto2", "producto2")
 			.leftJoinAndSelect("carritos.mensajeOrdens", "mensajeOrdens")
-			.leftJoin("mensajeOrdens.user", "user")
+			.leftJoin("mensajeOrdens.user", "user_message")
 			.leftJoin("producto2.productosInfo", "productosInfo")
+			.leftJoin("mensajeOrdens.user", "user")
 			.leftJoinAndSelect("user.usersInfo", "usersInfo")
 			.leftJoinAndSelect("carritos.tienda2", "tienda2")
 			.leftJoinAndSelect("tienda2.tiendasInfo", "tiendasInfo")
@@ -103,7 +104,16 @@ export class OrdersService {
 				"user.email",
 				"user.identificacion",
 				"user.ciudad",
-				"user.tipoIdentificacion"
+				"user.tipoIdentificacion",
+				"paises.id",
+				"paises.pais",
+				"paises.codigo",
+				"paises.indicativo",
+				"user_message.id",
+				"user_message.nombre",
+				"user_message.email",
+				"user_message.tipoIdentificacion",
+				"user_message.identificacion"
 			])
 			.where("carritos.id = :orderId", { orderId })
 			.andWhere("carritos.tienda = :storeId", { storeId })
