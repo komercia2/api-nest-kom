@@ -31,9 +31,6 @@ export class StoresCouponsPlus {
 	@Column({ type: "int", unsigned: true, nullable: true })
 	claim_limit: number
 
-	@Column({ type: "int", unsigned: true, nullable: true, default: 1 })
-	claim_limit_per_client: number
-
 	@Column({ type: "timestamp", nullable: true })
 	expiration_date: Date | null
 
