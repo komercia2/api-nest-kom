@@ -61,7 +61,11 @@ export class CouponsPlusService {
 
 		const couponExists = await this.findValidCoupon(coupon, storeId)
 
-		const { id: couponID } = couponExists
+		const { id: couponID, claim_limit } = couponExists
+
+		const newClaimLimit = claim_limit - 1
+
+		if (newClaimLimit < 0) throw new BadRequestException("Coupon has reached its claim limit")
 
 		const currentDate = new Date()
 
@@ -70,7 +74,8 @@ export class CouponsPlusService {
 				{ id: couponID, store_id: storeId },
 				{
 					claimed_at: currentDate,
-					status: 0
+					status: 0,
+					claim_limit: newClaimLimit
 				}
 			)
 			return { message: "Coupon redeemed successfully", success: true }
