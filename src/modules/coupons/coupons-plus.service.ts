@@ -6,6 +6,7 @@ import { Repository } from "typeorm"
 import { CreateDiscountCouponDto } from "./dtos/crete-discount-coupon.dto"
 import { FindAllDiscountCouponsDto } from "./dtos/find-all-discount-coupons.dto"
 import { RedeemDiscountCouponDto } from "./dtos/redeem-discount-coupon.dto"
+import { UpdateDiscountCouponDto } from "./dtos/update-coupons.dto"
 
 @Injectable()
 export class CouponsPlusService {
@@ -13,6 +14,49 @@ export class CouponsPlusService {
 		@InjectRepository(StoresCouponsPlus)
 		private readonly couponsPlusRepository: Repository<StoresCouponsPlus>
 	) {}
+
+	async updateCoupon(updateCouponDto: UpdateDiscountCouponDto) {
+		const { coupon, store_id } = updateCouponDto
+
+		const couponExists = await this.findCoupon(coupon, store_id)
+
+		if (!couponExists) throw new BadRequestException("Coupon not found")
+
+		const currentDate = new Date()
+
+		try {
+			await this.couponsPlusRepository.update(
+				{ id: couponExists.id, store_id },
+				{
+					...updateCouponDto,
+					updated_at: currentDate
+				}
+			)
+			return { message: "Coupon updated successfully", success: true }
+		} catch (error) {
+			throw new InternalServerErrorException("Error updating coupon")
+		}
+	}
+
+	async deactivateCoupon(coupon: string, storeId: number) {
+		const couponExists = await this.findValidCoupon(coupon, storeId)
+
+		const currentDate = new Date()
+
+		try {
+			await this.couponsPlusRepository.update(
+				{ id: couponExists.id, store_id: storeId },
+				{
+					status: 0,
+					deleted_at: currentDate,
+					updated_at: currentDate
+				}
+			)
+			return { message: "Coupon deactivated successfully", success: true }
+		} catch (error) {
+			throw new InternalServerErrorException("Error deactivating coupon")
+		}
+	}
 
 	async redeemCoupon(redeemDiscountCouponDto: RedeemDiscountCouponDto) {
 		const { coupon, storeId } = redeemDiscountCouponDto
@@ -28,8 +72,7 @@ export class CouponsPlusService {
 				{ id: couponID, store_id: storeId },
 				{
 					claimed_at: currentDate,
-					status: 0,
-					updated_at: currentDate
+					status: 0
 				}
 			)
 			return { message: "Coupon redeemed successfully", success: true }
@@ -56,7 +99,6 @@ export class CouponsPlusService {
 				"coupons.fixed_price_value",
 				"coupons.public",
 				"coupons.claim_limit",
-				"coupons.claim_limit_per_client",
 				"coupons.expiration_date",
 				"coupons.created_at",
 				"coupons.updated_at",
@@ -74,6 +116,8 @@ export class CouponsPlusService {
 				"user.email",
 				"ciudad.nombreCiu"
 			])
+			.orderBy("coupons.created_at", "DESC")
+			.andWhere("coupons.deleted_at IS NULL")
 			.skip((page - 1) * limit)
 			.take(limit)
 
