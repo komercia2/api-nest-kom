@@ -15,10 +15,8 @@ export class CouponsPlusService {
 		private readonly couponsPlusRepository: Repository<StoresCouponsPlus>
 	) {}
 
-	async updateCoupon(updateCouponDto: UpdateDiscountCouponDto) {
-		const { coupon, store_id } = updateCouponDto
-
-		const couponExists = await this.findCoupon(coupon, store_id)
+	async updateCoupon(updateCouponDto: UpdateDiscountCouponDto, storeId: number, coupon: string) {
+		const couponExists = await this.findCoupon(coupon, storeId)
 
 		if (!couponExists) throw new BadRequestException("Coupon not found")
 
@@ -26,7 +24,7 @@ export class CouponsPlusService {
 
 		try {
 			await this.couponsPlusRepository.update(
-				{ id: couponExists.id, store_id },
+				{ id: couponExists.id, store_id: storeId },
 				{
 					...updateCouponDto,
 					updated_at: currentDate
