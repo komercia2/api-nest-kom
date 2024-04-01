@@ -46,8 +46,10 @@ export class CreateDiscountCouponDto {
 	@IsIn([0, 1])
 	readonly public: number
 
+	@ValidateIf((params) => params?.client_id, {
+		message: "Claim limit per client is required when client id is provided"
+	})
 	@IsNumber()
-	@IsOptional()
 	@Type(() => Number)
 	readonly claim_limit: number
 
@@ -60,19 +62,10 @@ export class CreateDiscountCouponDto {
 	@Type(() => Number)
 	readonly store_id: number
 
-	@ValidateIf((params) => params?.claim_limit_per_client, {
-		message: "Client id is required when claim limit per client is provided"
-	})
+	@IsOptional()
 	@IsNumber()
 	@Type(() => Number)
 	readonly client_id: number
-
-	@ValidateIf((params) => params?.client_id, {
-		message: "Claim limit per client is required when client_id is provided"
-	})
-	@IsNumber()
-	@Type(() => Number)
-	readonly claim_limit_per_client: number
 
 	@IsDate()
 	@IsOptional()
