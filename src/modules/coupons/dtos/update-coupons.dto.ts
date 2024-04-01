@@ -65,10 +65,6 @@ export class UpdateDiscountCouponDto {
 	@Type(() => Number)
 	readonly product_id: number
 
-	@IsNumber()
-	@Type(() => Number)
-	readonly store_id: number
-
 	@IsOptional()
 	@IsNumber()
 	@Type(() => Number)
@@ -79,4 +75,10 @@ export class UpdateDiscountCouponDto {
 	@IsOptional()
 	@Type(() => Date)
 	readonly expiration_date: Date
+
+	@IsOptional()
+	@IsDate()
+	@IsOptional()
+	@Type(() => Date)
+	readonly deleted_at: Date
 }
