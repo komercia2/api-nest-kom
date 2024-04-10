@@ -37,6 +37,7 @@ import { MensajerosUrbanosTiendas } from "./MensajerosUrbanosTiendas"
 import { Mensajes } from "./Mensajes"
 import { MiPaqueteCredenciales } from "./MiPaqueteCredenciales"
 import { MiPaqueteEnvioBase } from "./MiPaqueteEnvioBase"
+import { MultipleSubscriptionCouponToStore } from "./MultipleSubscriptionCouponToStore"
 import { Politicas } from "./Politicas"
 import { Productos } from "./Productos"
 import { Proveedores } from "./Proveedores"
@@ -420,4 +421,10 @@ export class Tiendas {
 
 	@OneToMany(() => StoresCouponsPlus, (storesCouponsPlus) => storesCouponsPlus.store)
 	storesCouponsPlus: StoresCouponsPlus[]
+
+	@OneToMany(
+		() => MultipleSubscriptionCouponToStore,
+		(multipleSubscriptionCouponToStore) => multipleSubscriptionCouponToStore.store
+	)
+	multipleSubscriptionCouponsToStore: MultipleSubscriptionCouponToStore[]
 }
