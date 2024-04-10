@@ -9,12 +9,14 @@ import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity
 import { CreateSubscriptionCouponDto } from "./dtos/create-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "./dtos/filter-subscription-cuopons"
 import { RedeemCouponDto } from "./dtos/redeem-coupon.dto"
+import { MultipleSubscriptionCouponsService } from "./multiple-subscriptions-coupons.service"
 
 @Injectable()
 export class CouponsService {
 	constructor(
 		@InjectRepository(SubscriptionCoupon)
 		private readonly subscriptionCouponRepository: Repository<SubscriptionCoupon>,
+		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService,
 
 		@InjectRepository(Tiendas)
 		private readonly tiendasRepository: Repository<Tiendas>,
@@ -32,6 +34,18 @@ export class CouponsService {
 		this.logger.log("Redeem coupon transaction started")
 
 		const { coupon, storeId } = redeemCouponDto
+
+		const isMultipleSubscriptionCoupon =
+			this.multipleSubscriptionCouponsService.isMultipleSubscriptionCoupon(coupon)
+
+		if (isMultipleSubscriptionCoupon) {
+			await this.multipleSubscriptionCouponsService.redeem({ coupon, storeId })
+			await queryRunner.commitTransaction()
+			this.logger.log(
+				`Coupon redeemed successfully for store ${storeId} (Multiple Subscription Coupon)`
+			)
+			return { message: "Coupon redeemed successfully (Multiple Subscription Coupon)" }
+		}
 
 		try {
 			const [storeExists, couponExists, storeHasCoupon] = await Promise.all([
