@@ -5,7 +5,8 @@ export class StoreWompiEntity {
 		readonly idTienda: number,
 		readonly createdAt: Date | null,
 		readonly updatedAt: Date | null,
-		readonly integrity: string | null
+		readonly integrity: string | null,
+		readonly eventSecret: string | null
 	) {
 		this.id = id
 		this.llavePublica = llavePublica
@@ -13,5 +14,6 @@ export class StoreWompiEntity {
 		this.createdAt = createdAt
 		this.updatedAt = updatedAt
 		this.integrity = integrity
+		this.eventSecret = eventSecret
 	}
 }

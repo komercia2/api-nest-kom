@@ -23,6 +23,9 @@ export class TiendaWompiInfo {
 	@Column("varchar", { name: "integrity", length: 255, nullable: true })
 	integrity: string | null
 
+	@Column("varchar", { name: "eventSecret", length: 255, nullable: true })
+	eventSecret: string | null
+
 	@ManyToOne(() => Tiendas, (tiendas) => tiendas.tiendaWompiInfos, {
 		onDelete: "CASCADE",
 		onUpdate: "NO ACTION"
