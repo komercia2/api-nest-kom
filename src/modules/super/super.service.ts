@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common"
+import { BadRequestException, Inject, Injectable, UnauthorizedException } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
 import {
@@ -6,9 +6,12 @@ import {
 	CategoriaTiendas,
 	Entidades,
 	EntidadesTiendas,
+	MultipleSubscriptionCoupon,
+	MultipleSubscriptionCouponToStore,
 	Paises,
 	Productos,
 	StoreAnalytics,
+	SubscriptionCoupon,
 	Tiendas as Store,
 	Tiendas,
 	TiendasInfo,
@@ -28,9 +31,11 @@ import {
 	UpdateStoreEntitiesDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
+import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
+import { CouponsType } from "./enums/coupons"
 
 @Injectable()
 export class SuperService {
@@ -71,8 +76,51 @@ export class SuperService {
 		@InjectRepository(EntidadesTiendas)
 		private readonly entidadesTiendasRepository: Repository<EntidadesTiendas>,
 
-		private readonly datasource: DataSource
+		private readonly datasource: DataSource,
+
+		@InjectRepository(MultipleSubscriptionCoupon)
+		private readonly multipleSubscriptionCouponRepository: Repository<MultipleSubscriptionCoupon>,
+
+		@InjectRepository(SubscriptionCoupon)
+		private readonly subscriptionCouponRepository: Repository<SubscriptionCoupon>,
+
+		@InjectRepository(MultipleSubscriptionCouponToStore)
+		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>
 	) {}
+
+	async editSuscriptionCoupon(editSuscriptionCouponDto: EditSusctiptionCouponDto) {
+		const { type, amount, plan, validMonths, available, id } = editSuscriptionCouponDto
+
+		if (type === CouponsType.MULTIPLE) {
+			const coupon = await this.multipleSubscriptionCouponRepository.findOne({ where: { id: +id } })
+
+			if (!coupon) throw new BadRequestException("Coupon not found")
+
+			await this.multipleSubscriptionCouponRepository.update(coupon.id, {
+				amount,
+				validMonths,
+				available: available ? 1 : 0,
+				plan
+			})
+
+			return { message: "Coupon updated" }
+		}
+
+		if (type === CouponsType.SINGLE) {
+			const { id } = editSuscriptionCouponDto
+			const coupon = await this.subscriptionCouponRepository.findOne({ where: { id: String(id) } })
+
+			if (!coupon) throw new BadRequestException("Coupon not found")
+
+			await this.subscriptionCouponRepository.update(coupon.id, {
+				validMonths: validMonths,
+				available: available ? 1 : 0,
+				plan
+			})
+
+			return { message: "Coupon updated" }
+		}
+	}
 
 	async updateStoreEntities(storeId: number, updateStoreEntitiesDto: UpdateStoreEntitiesDto) {
 		const { entities: incomingEntities } = updateStoreEntitiesDto

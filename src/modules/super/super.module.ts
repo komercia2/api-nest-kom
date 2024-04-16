@@ -10,6 +10,7 @@ import {
 	Paises,
 	Productos,
 	StoreAnalytics,
+	SubscriptionCoupon,
 	Tiendas,
 	TiendasInfo,
 	TiendaSuscripcionStripe,
@@ -18,7 +19,6 @@ import {
 } from "src/entities"
 
 import { CouponsModule } from "../coupons/coupons.module"
-import { MultipleSubscriptionCouponsService } from "../coupons/multiple-subscriptions-coupons.service"
 import { SuperController } from "./super.controller"
 import { SuperService } from "./super.service"
 
@@ -37,7 +37,10 @@ import { SuperService } from "./super.service"
 			Productos,
 			CategoriaTiendas,
 			StoreAnalytics,
-			EntidadesTiendas
+			EntidadesTiendas,
+			MultipleSubscriptionCoupon,
+			MultipleSubscriptionCouponToStore,
+			SubscriptionCoupon
 		])
 	],
 	controllers: [SuperController],

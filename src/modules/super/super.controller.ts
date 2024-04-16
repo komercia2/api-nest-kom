@@ -30,6 +30,7 @@ import {
 	UpdateStoreEntitiesDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
+import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
@@ -43,6 +44,12 @@ export class SuperController {
 		private readonly couponsService: CouponsService,
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("subscriptions/coupons/multiple")
+	updateDymicSubscriptionsCoupons(@Body() editSusctiptionCouponDto: EditSusctiptionCouponDto) {
+		return this.superService.editSuscriptionCoupon(editSusctiptionCouponDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("subscriptions/coupons/multiple")
