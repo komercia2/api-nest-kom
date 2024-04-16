@@ -8,6 +8,7 @@ import {
 import { Repository } from "typeorm"
 
 import { CreateMultipleSubscriptionCouponDto } from "./dtos/create-multiple-subscription-coupon.dto"
+import { FilterSubscriptionCouponsDto } from "./dtos/filter-subscription-cuopons"
 import { RedeemMultipleSubscriptionDto } from "./dtos/redeem-multiple-subscription.dto"
 
 @Injectable()
@@ -21,6 +22,35 @@ export class MultipleSubscriptionCouponsService {
 		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>,
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>
 	) {}
+
+	async findAll(filterSubscriptionCouponsDto: FilterSubscriptionCouponsDto) {
+		const { page, limit, avaible, validMonths, plan, amount, coupon } = filterSubscriptionCouponsDto
+		const skip = (page - 1) * limit
+
+		const query = this.multipleSubscriptionCouponsRepository
+			.createQueryBuilder("coupon")
+			.skip(skip)
+			.take(limit)
+
+		if (coupon) query.andWhere("coupon.coupon = :coupon", { coupon })
+		if (avaible) query.andWhere("coupon.available > 0")
+		if (validMonths) query.andWhere("coupon.validMonths = :validMonths", { validMonths })
+		if (plan) query.andWhere("coupon.plan = :plan", { plan })
+		if (amount) query.andWhere("coupon.amount = :amount", { amount })
+
+		const [coupons, total] = await query.getManyAndCount()
+
+		return {
+			data: coupons,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
 
 	async redeem(redeemMultipleSubscriptionDto: RedeemMultipleSubscriptionDto): Promise<void> {
 		const { storeId, coupon } = redeemMultipleSubscriptionDto

@@ -1,5 +1,5 @@
 import { Type } from "class-transformer"
-import { IsBase64, IsNumber, IsString } from "class-validator"
+import { IsNumber, IsString } from "class-validator"
 
 export class UnlinkStoreAdminDto {
 	@IsNumber()
@@ -11,7 +11,6 @@ export class UnlinkStoreAdminDto {
 	adminId: number
 
 	@IsString()
-	@IsBase64()
 	@Type(() => String)
 	key: string
 }

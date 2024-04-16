@@ -19,6 +19,9 @@ import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 import { CouponsService } from "../coupons/coupons.service"
 import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "../coupons/dtos/filter-subscription-cuopons"
+import { RedeemCouponDto } from "../coupons/dtos/redeem-coupon.dto"
+import { RedeemMultipleSubscriptionDto } from "../coupons/dtos/redeem-multiple-subscription.dto"
+import { MultipleSubscriptionCouponsService } from "../coupons/multiple-subscriptions-coupons.service"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
 	ChangePasswordDto,
@@ -29,6 +32,7 @@ import {
 	UpdateStoreEntitiesDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
+import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
@@ -39,8 +43,41 @@ import { SuperService } from "./super.service"
 export class SuperController {
 	constructor(
 		private readonly superService: SuperService,
-		private readonly couponsService: CouponsService
+		private readonly couponsService: CouponsService,
+		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Post("subscriptions/coupons/single")
+	redeemSingleSubscriptionCoupon(@Body() redeemCouponDto: RedeemCouponDto) {
+		return this.couponsService.redeemCoupon(redeemCouponDto)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Post("subscriptions/coupons/multiple")
+	redeemMultipleSubscriptionCoupon(
+		@Body() redeemMultipleSubscriptionDto: RedeemMultipleSubscriptionDto
+	) {
+		return this.multipleSubscriptionCouponsService.redeem(redeemMultipleSubscriptionDto)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Delete("subscriptions/coupons/:id")
+	deleteSubscriptionCoupon(@Param("id") id: number) {
+		return this.superService.deleteSuscriptionCoupon(id)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("subscriptions/coupons")
+	updateDymicSubscriptionsCoupons(@Body() editSusctiptionCouponDto: EditSusctiptionCouponDto) {
+		return this.superService.editSuscriptionCoupon(editSusctiptionCouponDto)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("subscriptions/coupons/multiple")
+	getMultipleSubscriptionsCoupons(@Query() filter: FilterSubscriptionCouponsDto) {
+		return this.multipleSubscriptionCouponsService.findAll(filter)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Put("stores/entities/:id")

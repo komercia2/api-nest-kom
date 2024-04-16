@@ -30,7 +30,7 @@ import { MultipleSubscriptionCouponsService } from "./multiple-subscriptions-cou
 	],
 	controllers: [CouponsController, DiscountCouponsController, CheckoutDiscountCouponsController],
 	providers: [CouponsService, CouponsPlusService, MultipleSubscriptionCouponsService],
-	exports: [CouponsService]
+	exports: [CouponsService, MultipleSubscriptionCouponsService]
 })
 export class CouponsModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
