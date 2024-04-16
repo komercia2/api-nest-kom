@@ -88,6 +88,30 @@ export class SuperService {
 		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>
 	) {}
 
+	async deleteSuscriptionCoupon(id: number | string) {
+		const uniqueCoupon = await this.subscriptionCouponRepository.findOne({
+			where: { id: String(id) }
+		})
+		const multipleCoupon = await this.multipleSubscriptionCouponRepository.findOne({
+			where: { id: +id }
+		})
+
+		if (!uniqueCoupon && !multipleCoupon) throw new BadRequestException("Coupon not found")
+
+		if (uniqueCoupon) {
+			await this.subscriptionCouponRepository.delete(uniqueCoupon.id)
+			return { message: "Coupon deleted" }
+		}
+
+		if (multipleCoupon) {
+			await this.multipleSubscriptionCouponRepository.delete(multipleCoupon.id)
+			await this.multipleSubscriptionCouponToStoreRepository.delete({
+				couponId: multipleCoupon.id
+			})
+			return { message: "Coupon deleted" }
+		}
+	}
+
 	async editSuscriptionCoupon(editSuscriptionCouponDto: EditSusctiptionCouponDto) {
 		const { type, amount, plan, validMonths, available, id } = editSuscriptionCouponDto
 

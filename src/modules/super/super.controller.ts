@@ -46,7 +46,13 @@ export class SuperController {
 	) {}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Put("subscriptions/coupons/multiple")
+	@Delete("subscriptions/coupons/:id")
+	deleteSubscriptionCoupon(@Param("id") id: number) {
+		return this.superService.deleteSuscriptionCoupon(id)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("subscriptions/coupons")
 	updateDymicSubscriptionsCoupons(@Body() editSusctiptionCouponDto: EditSusctiptionCouponDto) {
 		return this.superService.editSuscriptionCoupon(editSusctiptionCouponDto)
 	}
