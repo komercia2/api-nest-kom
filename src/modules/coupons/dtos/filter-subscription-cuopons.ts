@@ -16,6 +16,16 @@ export class FilterSubscriptionCouponsDto {
 	readonly storeId: number
 
 	@IsOptional()
+	@IsNumber()
+	@Type(() => Number)
+	readonly amount: number
+
+	@IsOptional()
+	@IsNumber()
+	@Type(() => Number)
+	readonly validMonths: number
+
+	@IsOptional()
 	@IsString()
 	readonly coupon: string
 

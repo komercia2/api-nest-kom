@@ -5,6 +5,8 @@ import {
 	CategoriaTiendas,
 	Entidades,
 	EntidadesTiendas,
+	MultipleSubscriptionCoupon,
+	MultipleSubscriptionCouponToStore,
 	Paises,
 	Productos,
 	StoreAnalytics,
@@ -16,6 +18,7 @@ import {
 } from "src/entities"
 
 import { CouponsModule } from "../coupons/coupons.module"
+import { MultipleSubscriptionCouponsService } from "../coupons/multiple-subscriptions-coupons.service"
 import { SuperController } from "./super.controller"
 import { SuperService } from "./super.service"
 

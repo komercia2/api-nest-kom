@@ -19,6 +19,7 @@ import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 import { CouponsService } from "../coupons/coupons.service"
 import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "../coupons/dtos/filter-subscription-cuopons"
+import { MultipleSubscriptionCouponsService } from "../coupons/multiple-subscriptions-coupons.service"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
 	ChangePasswordDto,
@@ -39,8 +40,15 @@ import { SuperService } from "./super.service"
 export class SuperController {
 	constructor(
 		private readonly superService: SuperService,
-		private readonly couponsService: CouponsService
+		private readonly couponsService: CouponsService,
+		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("subscriptions/coupons/multiple")
+	getMultipleSubscriptionsCoupons(@Query() filter: FilterSubscriptionCouponsDto) {
+		return this.multipleSubscriptionCouponsService.findAll(filter)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Put("stores/entities/:id")
