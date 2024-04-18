@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, UnauthorizedException } from "@nestjs/common"
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
 import {
@@ -6,6 +6,7 @@ import {
 	CategoriaTiendas,
 	Entidades,
 	EntidadesTiendas,
+	LogTiendas,
 	MultipleSubscriptionCoupon,
 	MultipleSubscriptionCouponToStore,
 	Paises,
@@ -19,11 +20,11 @@ import {
 	Users
 } from "src/entities"
 import { DataSource, In, Repository } from "typeorm"
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 
 import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
-	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
 	GetStoreAdminsDto,
@@ -31,7 +32,11 @@ import {
 	UpdateStoreEntitiesDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
+import { DeleteStoreDto } from "./dtos/delete-store.dto"
+import { DeleteUserDto } from "./dtos/delete-user.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
+import { EditUserDto } from "./dtos/editUserDto"
+import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
@@ -85,8 +90,72 @@ export class SuperService {
 		private readonly subscriptionCouponRepository: Repository<SubscriptionCoupon>,
 
 		@InjectRepository(MultipleSubscriptionCouponToStore)
-		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>
+		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>,
+
+		@InjectRepository(LogTiendas)
+		private readonly logTiendasRepository: Repository<LogTiendas>
 	) {}
+
+	async deleteUser(deleteUserDto: DeleteUserDto) {
+		const { userId, key } = deleteUserDto
+
+		if (!key) throw new UnauthorizedException("Key is required")
+
+		if (key !== this.configService.get("SUPER_V2_MASTER_KEY")) {
+			throw new UnauthorizedException("Invalid key")
+		}
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const queryRunner = this.datasource.createQueryRunner()
+
+		await queryRunner.connect()
+		await queryRunner.startTransaction()
+
+		try {
+			await this.usersRepository.delete(userId)
+
+			await queryRunner.commitTransaction()
+
+			return { message: "User deleted" }
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			throw error
+		} finally {
+			await queryRunner.release()
+		}
+	}
+
+	async filterLogs(paginationDto: PaginationDto, filterLogsDto: FilterLogsDto) {
+		const { storeId, name, order } = filterLogsDto
+		const { page, limit } = paginationDto
+
+		const queryBuilder = this.logTiendasRepository
+			.createQueryBuilder("logs")
+			.select(["logs.id", "logs.accion", "logs.createdAt", "logs.tiendaId", "users.email"])
+			.innerJoin("logs.usuario", "users")
+			.orderBy("logs.createdAt", order)
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (storeId) queryBuilder.andWhere("logs.tiendaId = :storeId", { storeId })
+		if (name) queryBuilder.andWhere("users.nombre LIKE :name", { name: `%${name}%` })
+
+		const [logs, total] = await queryBuilder.getManyAndCount()
+
+		return {
+			data: logs,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
 
 	async deleteSuscriptionCoupon(id: number | string) {
 		const uniqueCoupon = await this.subscriptionCouponRepository.findOne({
@@ -197,30 +266,15 @@ export class SuperService {
 		}
 	}
 
-	async deleteUser(userId: number) {
-		const user = await this.usersRepository.findOne({ where: { id: userId } })
+	async deleteStore(deleteStoreDto: DeleteStoreDto) {
+		const { storeId, key } = deleteStoreDto
 
-		if (!user) throw new BadRequestException("User not found")
+		if (!key) throw new UnauthorizedException("Key is required")
 
-		const queryRunner = this.datasource.createQueryRunner()
-		await queryRunner.connect()
-		await queryRunner.startTransaction()
-
-		try {
-			await this.usersRepository.delete(userId)
-
-			await queryRunner.commitTransaction()
-
-			return { message: "User deleted" }
-		} catch (error) {
-			await queryRunner.rollbackTransaction()
-			throw error
-		} finally {
-			await queryRunner.release()
+		if (key !== this.configService.get("SUPER_V2_MASTER_KEY")) {
+			throw new UnauthorizedException("Invalid key")
 		}
-	}
 
-	async deleteStore(storeId: number) {
 		const store = await this.storeRepository.findOne({ where: { id: storeId } })
 
 		if (!store) throw new BadRequestException("Store not found")
@@ -243,18 +297,28 @@ export class SuperService {
 		}
 	}
 
-	async changePassword(changePasswordDto: ChangePasswordDto) {
-		const { userId, newPassword } = changePasswordDto
-
-		const bcryptHash = PasswordUtil.hash(newPassword)
-		const laravelHash = PasswordUtil.toLaravelHash(bcryptHash)
+	async editUser(edituserDto: EditUserDto) {
+		const { userId, newPassword, email, name } = edituserDto
 
 		const user = await this.usersRepository.findOne({ where: { id: userId } })
 
 		if (!user) throw new BadRequestException("User not found")
 
-		await this.usersRepository.update({ id: userId }, { password: laravelHash })
-		return { message: "Password updated" }
+		let hashedPassword = undefined
+
+		if (newPassword) {
+			const bcryptHash = PasswordUtil.hash(newPassword)
+			hashedPassword = PasswordUtil.toLaravelHash(bcryptHash)
+		}
+
+		const params: QueryDeepPartialEntity<Users> = {
+			password: hashedPassword,
+			email,
+			nombre: name
+		}
+
+		await this.usersRepository.update({ id: userId }, { ...params })
+		return { message: "User updated" }
 	}
 
 	async updateStore(updateStoreDto: UpdateStoreDto) {

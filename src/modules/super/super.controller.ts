@@ -32,7 +32,11 @@ import {
 	UpdateStoreEntitiesDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
+import { DeleteStoreDto } from "./dtos/delete-store.dto"
+import { DeleteUserDto } from "./dtos/delete-user.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
+import { EditUserDto } from "./dtos/editUserDto"
+import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
@@ -46,6 +50,12 @@ export class SuperController {
 		private readonly couponsService: CouponsService,
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("logs")
+	getLogs(@Query() paginationDto: PaginationDto, @Query() filterLogsDto: FilterLogsDto) {
+		return this.superService.filterLogs(paginationDto, filterLogsDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Post("subscriptions/coupons/single")
@@ -89,21 +99,21 @@ export class SuperController {
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Delete("stores/:id")
-	deleteStore(@Param("id") id: number) {
-		return this.superService.deleteStore(+id)
+	@Delete("stores")
+	deleteStore(@Body() deleteStoreDto: DeleteStoreDto) {
+		return this.superService.deleteStore(deleteStoreDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Delete("users/:id")
-	deleteUser(@Param("id") id: number) {
-		return this.superService.deleteUser(+id)
+	deleteUser(@Body() deleteUserDto: DeleteUserDto) {
+		return this.superService.deleteUser(deleteUserDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Put("change-password")
-	chagePassword(@Body() changePasswordDto: ChangePasswordDto) {
-		return this.superService.changePassword(changePasswordDto)
+	@Put("users")
+	editPassword(@Body() editUserDto: EditUserDto) {
+		return this.superService.editUser(editUserDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)

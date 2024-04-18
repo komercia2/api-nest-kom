@@ -5,6 +5,7 @@ import {
 	CategoriaTiendas,
 	Entidades,
 	EntidadesTiendas,
+	LogTiendas,
 	MultipleSubscriptionCoupon,
 	MultipleSubscriptionCouponToStore,
 	Paises,
@@ -40,7 +41,8 @@ import { SuperService } from "./super.service"
 			EntidadesTiendas,
 			MultipleSubscriptionCoupon,
 			MultipleSubscriptionCouponToStore,
-			SubscriptionCoupon
+			SubscriptionCoupon,
+			LogTiendas
 		])
 	],
 	controllers: [SuperController],
