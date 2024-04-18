@@ -31,6 +31,7 @@ import {
 	UpdateStoreEntitiesDto
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
+import { DeleteStoreDto } from "./dtos/delete-store.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -220,7 +221,15 @@ export class SuperService {
 		}
 	}
 
-	async deleteStore(storeId: number) {
+	async deleteStore(deleteStoreDto: DeleteStoreDto) {
+		const { storeId, key } = deleteStoreDto
+
+		if (!key) throw new UnauthorizedException("Key is required")
+
+		if (key !== this.configService.get("SUPER_V2_MASTER_KEY")) {
+			throw new UnauthorizedException("Invalid key")
+		}
+
 		const store = await this.storeRepository.findOne({ where: { id: storeId } })
 
 		if (!store) throw new BadRequestException("Store not found")
