@@ -34,6 +34,7 @@ import {
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { DeleteStoreDto } from "./dtos/delete-store.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
+import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -109,9 +110,9 @@ export class SuperController {
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Put("change-password")
-	chagePassword(@Body() changePasswordDto: ChangePasswordDto) {
-		return this.superService.changePassword(changePasswordDto)
+	@Put("users")
+	editPassword(@Body() editUserDto: EditUserDto) {
+		return this.superService.editUser(editUserDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)

@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable, UnauthorizedException } from "@nestjs/common"
+import { BadRequestException, Injectable, UnauthorizedException } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
 import {
@@ -20,11 +20,11 @@ import {
 	Users
 } from "src/entities"
 import { DataSource, In, Repository } from "typeorm"
+import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
 
 import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
-	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
 	GetStoreAdminsDto,
@@ -34,6 +34,7 @@ import {
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { DeleteStoreDto } from "./dtos/delete-store.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
+import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
@@ -286,18 +287,28 @@ export class SuperService {
 		}
 	}
 
-	async changePassword(changePasswordDto: ChangePasswordDto) {
-		const { userId, newPassword } = changePasswordDto
-
-		const bcryptHash = PasswordUtil.hash(newPassword)
-		const laravelHash = PasswordUtil.toLaravelHash(bcryptHash)
+	async editUser(edituserDto: EditUserDto) {
+		const { userId, newPassword, email, name } = edituserDto
 
 		const user = await this.usersRepository.findOne({ where: { id: userId } })
 
 		if (!user) throw new BadRequestException("User not found")
 
-		await this.usersRepository.update({ id: userId }, { password: laravelHash })
-		return { message: "Password updated" }
+		let hashedPassword = undefined
+
+		if (newPassword) {
+			const bcryptHash = PasswordUtil.hash(newPassword)
+			hashedPassword = PasswordUtil.toLaravelHash(bcryptHash)
+		}
+
+		const params: QueryDeepPartialEntity<Users> = {
+			password: hashedPassword,
+			email,
+			nombre: name
+		}
+
+		await this.usersRepository.update({ id: userId }, { ...params })
+		return { message: "User updated" }
 	}
 
 	async updateStore(updateStoreDto: UpdateStoreDto) {
