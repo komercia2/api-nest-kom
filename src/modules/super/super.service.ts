@@ -6,6 +6,7 @@ import {
 	CategoriaTiendas,
 	Entidades,
 	EntidadesTiendas,
+	LogTiendas,
 	MultipleSubscriptionCoupon,
 	MultipleSubscriptionCouponToStore,
 	Paises,
@@ -33,6 +34,7 @@ import {
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { DeleteStoreDto } from "./dtos/delete-store.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
+import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
@@ -86,8 +88,40 @@ export class SuperService {
 		private readonly subscriptionCouponRepository: Repository<SubscriptionCoupon>,
 
 		@InjectRepository(MultipleSubscriptionCouponToStore)
-		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>
+		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>,
+
+		@InjectRepository(LogTiendas)
+		private readonly logTiendasRepository: Repository<LogTiendas>
 	) {}
+
+	async filterLogs(paginationDto: PaginationDto, filterLogsDto: FilterLogsDto) {
+		const { storeId, name, order } = filterLogsDto
+		const { page, limit } = paginationDto
+
+		const queryBuilder = this.logTiendasRepository
+			.createQueryBuilder("logs")
+			.select(["logs.id", "logs.accion", "logs.createdAt", "logs.tiendaId", "users.email"])
+			.innerJoin("logs.usuario", "users")
+			.orderBy("logs.createdAt", order)
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (storeId) queryBuilder.andWhere("logs.tiendaId = :storeId", { storeId })
+		if (name) queryBuilder.andWhere("users.nombre LIKE :name", { name: `%${name}%` })
+
+		const [logs, total] = await queryBuilder.getManyAndCount()
+
+		return {
+			data: logs,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
 
 	async deleteSuscriptionCoupon(id: number | string) {
 		const uniqueCoupon = await this.subscriptionCouponRepository.findOne({

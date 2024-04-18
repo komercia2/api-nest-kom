@@ -34,6 +34,7 @@ import {
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { DeleteStoreDto } from "./dtos/delete-store.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
+import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
@@ -47,6 +48,12 @@ export class SuperController {
 		private readonly couponsService: CouponsService,
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("logs")
+	getLogs(@Query() paginationDto: PaginationDto, @Query() filterLogsDto: FilterLogsDto) {
+		return this.superService.filterLogs(paginationDto, filterLogsDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Post("subscriptions/coupons/single")
