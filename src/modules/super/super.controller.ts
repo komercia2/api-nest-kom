@@ -33,6 +33,7 @@ import {
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { DeleteStoreDto } from "./dtos/delete-store.dto"
+import { DeleteUserDto } from "./dtos/delete-user.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
@@ -105,8 +106,8 @@ export class SuperController {
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Delete("users/:id")
-	deleteUser(@Param("id") id: number) {
-		return this.superService.deleteUser(+id)
+	deleteUser(@Body() deleteUserDto: DeleteUserDto) {
+		return this.superService.deleteUser(deleteUserDto)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)

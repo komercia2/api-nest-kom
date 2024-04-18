@@ -33,6 +33,7 @@ import {
 } from "./dtos"
 import { AssignStoreAdminDto } from "./dtos/assign-store-admin.dto"
 import { DeleteStoreDto } from "./dtos/delete-store.dto"
+import { DeleteUserDto } from "./dtos/delete-user.dto"
 import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
@@ -94,6 +95,38 @@ export class SuperService {
 		@InjectRepository(LogTiendas)
 		private readonly logTiendasRepository: Repository<LogTiendas>
 	) {}
+
+	async deleteUser(deleteUserDto: DeleteUserDto) {
+		const { userId, key } = deleteUserDto
+
+		if (!key) throw new UnauthorizedException("Key is required")
+
+		if (key !== this.configService.get("SUPER_V2_MASTER_KEY")) {
+			throw new UnauthorizedException("Invalid key")
+		}
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const queryRunner = this.datasource.createQueryRunner()
+
+		await queryRunner.connect()
+		await queryRunner.startTransaction()
+
+		try {
+			await this.usersRepository.delete(userId)
+
+			await queryRunner.commitTransaction()
+
+			return { message: "User deleted" }
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+			throw error
+		} finally {
+			await queryRunner.release()
+		}
+	}
 
 	async filterLogs(paginationDto: PaginationDto, filterLogsDto: FilterLogsDto) {
 		const { storeId, name, order } = filterLogsDto
@@ -225,29 +258,6 @@ export class SuperService {
 			await queryRunner.commitTransaction()
 
 			return { message: "Store entities updated" }
-		} catch (error) {
-			await queryRunner.rollbackTransaction()
-			throw error
-		} finally {
-			await queryRunner.release()
-		}
-	}
-
-	async deleteUser(userId: number) {
-		const user = await this.usersRepository.findOne({ where: { id: userId } })
-
-		if (!user) throw new BadRequestException("User not found")
-
-		const queryRunner = this.datasource.createQueryRunner()
-		await queryRunner.connect()
-		await queryRunner.startTransaction()
-
-		try {
-			await this.usersRepository.delete(userId)
-
-			await queryRunner.commitTransaction()
-
-			return { message: "User deleted" }
 		} catch (error) {
 			await queryRunner.rollbackTransaction()
 			throw error
