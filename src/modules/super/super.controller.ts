@@ -18,6 +18,7 @@ import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
 
 import { CouponsService } from "../coupons/coupons.service"
 import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
+import { CreateMultipleSubscriptionCouponDto } from "../coupons/dtos/create-multiple-subscription-coupon.dto"
 import { FilterSubscriptionCouponsDto } from "../coupons/dtos/filter-subscription-cuopons"
 import { RedeemCouponDto } from "../coupons/dtos/redeem-coupon.dto"
 import { RedeemMultipleSubscriptionDto } from "../coupons/dtos/redeem-multiple-subscription.dto"
@@ -50,6 +51,15 @@ export class SuperController {
 		private readonly couponsService: CouponsService,
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Post("multiple-subscriptions")
+	@HttpCode(HttpStatus.CREATED)
+	createMultipleSubscriptionCoupons(
+		@Body() createMultipleSubscriptionCouponDto: CreateMultipleSubscriptionCouponDto
+	) {
+		return this.multipleSubscriptionCouponsService.createCoupon(createMultipleSubscriptionCouponDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("logs")
