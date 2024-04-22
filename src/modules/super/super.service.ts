@@ -158,12 +158,20 @@ export class SuperService {
 	}
 
 	async deleteSuscriptionCoupon(id: number | string) {
-		const uniqueCoupon = await this.subscriptionCouponRepository.findOne({
-			where: { id: String(id) }
-		})
-		const multipleCoupon = await this.multipleSubscriptionCouponRepository.findOne({
-			where: { id: +id }
-		})
+		let uniqueCoupon = null
+		let multipleCoupon = null
+
+		if (typeof id === "string") {
+			uniqueCoupon = await this.subscriptionCouponRepository.findOne({
+				where: { id }
+			})
+		}
+
+		if (typeof id === "number") {
+			multipleCoupon = await this.multipleSubscriptionCouponRepository.findOne({
+				where: { id }
+			})
+		}
 
 		if (!uniqueCoupon && !multipleCoupon) throw new BadRequestException("Coupon not found")
 
