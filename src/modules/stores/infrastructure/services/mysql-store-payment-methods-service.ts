@@ -2,6 +2,7 @@ import { Injectable, InternalServerErrorException, NotFoundException } from "@ne
 import { InjectRepository } from "@nestjs/typeorm"
 import { SHA256 } from "crypto-js"
 import {
+	ApisConexiones,
 	MedioPagos,
 	StoreAddiCredentials,
 	TiendaConsignacionInfo,
@@ -97,7 +98,10 @@ export class MySQLStorePaymentMethodsService {
 		private readonly tiendaNequiInfoRepository: Repository<TiendaNequiInfo>,
 
 		@InjectRepository(TiendaDaviplataInfo)
-		private readonly tiendaDaviplataInfoRepository: Repository<TiendaDaviplataInfo>
+		private readonly tiendaDaviplataInfoRepository: Repository<TiendaDaviplataInfo>,
+
+		@InjectRepository(ApisConexiones)
+		private readonly apisConexionesRepository: Repository<ApisConexiones>
 	) {}
 
 	async encryptWompiIntegrity(data: EncryptWompiIntegrityDto) {
@@ -195,6 +199,13 @@ export class MySQLStorePaymentMethodsService {
 					storeId,
 					createdAt: new Date()
 				})
+
+				await this.apisConexionesRepository.update(
+					{
+						id: storeId
+					},
+					{ addiAllySlug: addi.ally_slug }
+				)
 			}
 
 			if (pMethod === StorePaymentGateawayMethods.FLOW) {
