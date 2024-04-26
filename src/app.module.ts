@@ -4,6 +4,7 @@ import { ConfigModule } from "@nestjs/config"
 import { EventEmitterModule } from "@nestjs/event-emitter"
 import { JwtModule } from "@nestjs/jwt"
 import { MongooseModule } from "@nestjs/mongoose"
+import { ScheduleModule } from "@nestjs/schedule"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { pinoConfig } from "@shared/infrastructure/configs/logs"
 import { MongooseConfigService } from "@shared/infrastructure/database/mongoose"
@@ -18,6 +19,7 @@ import { AuthModule } from "./modules/auth/auth.module"
 import { CommonModule } from "./modules/common/common.module"
 import { CouponsModule } from "./modules/coupons/coupons.module"
 import { HooksModule } from "./modules/hooks/hooks.module"
+import { JobsModule } from "./modules/jobs/jobs.module"
 import { MailsModule } from "./modules/mails/mails.module"
 import { NotificationsModule } from "./modules/notifications/notifications.module"
 import { OrdersModule } from "./modules/orders/orders.module"
@@ -32,6 +34,7 @@ import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
 
 @Module({
 	imports: [
+		ScheduleModule.forRoot(),
 		JwtModule.register({
 			secret: process.env.JWT_SECRET,
 			global: true,
@@ -71,7 +74,8 @@ import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
 		NotificationsModule,
 		WhatsappModule,
 		CouponsModule,
-		PaymentGateawaysModule
+		PaymentGateawaysModule,
+		JobsModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]

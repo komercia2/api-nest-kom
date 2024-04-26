@@ -97,6 +97,26 @@ export class SuperService {
 		private readonly logTiendasRepository: Repository<LogTiendas>
 	) {}
 
+	async removeEntity(storeId: number, entityId: number) {
+		const entity = await this.entidadesTiendasRepository.findOne({
+			where: { tiendaId: storeId, entidadId: entityId }
+		})
+
+		if (!entity) throw new BadRequestException("Entity not found")
+
+		await this.entidadesTiendasRepository.delete({ tiendaId: storeId, entidadId: entityId })
+		return { message: "Entity removed" }
+	}
+
+	async addEntity(storeId: number, entityId: number) {
+		const entity = new EntidadesTiendas()
+		entity.tiendaId = storeId
+		entity.entidadId = entityId
+
+		await this.entidadesTiendasRepository.save(entity)
+		return { message: "Entity added" }
+	}
+
 	async deleteUser(deleteUserDto: DeleteUserDto) {
 		const { userId, key } = deleteUserDto
 
