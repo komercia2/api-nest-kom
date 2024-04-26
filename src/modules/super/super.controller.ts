@@ -53,6 +53,18 @@ export class SuperController {
 	) {}
 
 	@UseGuards(SuperJwtAuthGuard)
+	@Delete("entities/:storeId/:entityId")
+	unassignEntityToStore(@Param("storeId") storeId: number, @Param("entityId") entityId: number) {
+		return this.superService.removeEntity(+storeId, +entityId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Post("entities/:storeId/:entityId")
+	assignEntityToStore(@Param("storeId") storeId: number, @Param("entityId") entityId: number) {
+		return this.superService.addEntity(+storeId, +entityId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
 	@Post("multiple-subscriptions")
 	@HttpCode(HttpStatus.CREATED)
 	createMultipleSubscriptionCoupons(
