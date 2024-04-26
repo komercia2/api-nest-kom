@@ -21,6 +21,7 @@ import {
 } from "src/entities"
 import { DataSource, In, Repository } from "typeorm"
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
+import { validate as isValidUUID } from "uuid"
 
 import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
@@ -161,15 +162,13 @@ export class SuperService {
 		let uniqueCoupon = null
 		let multipleCoupon = null
 
-		if (typeof id === "string") {
+		if (typeof id === "string" && isValidUUID(id)) {
 			uniqueCoupon = await this.subscriptionCouponRepository.findOne({
 				where: { id }
 			})
-		}
-
-		if (typeof id === "number") {
+		} else if (typeof +id === "number") {
 			multipleCoupon = await this.multipleSubscriptionCouponRepository.findOne({
-				where: { id }
+				where: { id: +id }
 			})
 		}
 
@@ -181,9 +180,9 @@ export class SuperService {
 		}
 
 		if (multipleCoupon) {
-			await this.multipleSubscriptionCouponRepository.delete(multipleCoupon.id)
+			await this.multipleSubscriptionCouponRepository.delete(+multipleCoupon.id)
 			await this.multipleSubscriptionCouponToStoreRepository.delete({
-				couponId: multipleCoupon.id
+				couponId: +multipleCoupon.id
 			})
 			return { message: "Coupon deleted" }
 		}
