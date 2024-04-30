@@ -7,6 +7,7 @@ import { MensajesContacto } from "src/entities"
 import { Repository } from "typeorm"
 
 import { CreateMailDto } from "./dto/create-mail.dto"
+import { SendMassiveEmailsDto } from "./dto/send-massive-emails.dto"
 
 @Injectable()
 export class MailsService {
@@ -21,6 +22,21 @@ export class MailsService {
 		private readonly mensajesContactoRepository: Repository<MensajesContacto>
 	) {
 		mailService.setApiKey(this.sendgridApiKey as string)
+	}
+
+	async sendMassiveEmail(sendMassiveEmailsDto: SendMassiveEmailsDto): Promise<void> {
+		const { to, templateId, dynamicTemplateData } = sendMassiveEmailsDto
+		try {
+			await this.mailService.send({
+				to: to,
+				from: this.sendgridFrom as string,
+				templateId,
+				dynamicTemplateData
+			})
+			this.logger.log(`Email sent successfully to ${to.length} recipients`)
+		} catch (error) {
+			this.logger.error(error)
+		}
 	}
 
 	async sendCustomEmail(createMailDto: CreateMailDto): Promise<{ success: boolean }> {

@@ -7,6 +7,8 @@ import { Repository } from "typeorm"
 
 import { MailsService } from "../mails/mails.service"
 
+const TIME_ZONE = "America/Bogota"
+
 @Injectable()
 export class JobsService {
 	constructor(
@@ -15,19 +17,30 @@ export class JobsService {
 		private readonly mailsService: MailsService
 	) {}
 
-	async handleMembershipsExpired() {
-		const stores = await this.findStoresWithExpiredMemberships()
+	@Cron(CronExpression.EVERY_DAY_AT_2PM, { timeZone: TIME_ZONE })
+	async handleMembershipIsAboutToExpire() {
+		this.logger.log("[handleMembershipIsAboutToExpire] Running")
+		const storesToNotify = await this.findStoresAboutToExpire()
 
-		if (stores.length === 0) {
-			this.logger.warn("No stores with expired memberships found")
+		if (storesToNotify.length === 0) {
+			this.logger.warn("No stores about to expire found")
 			return
 		}
 
-		this.logger.log(`Found ${stores.length} stores with expired memberships`)
+		this.logger.log(`Found ${storesToNotify.length} stores about to expire`)
 	}
 
-	async handleMembershipIsAboutToExpire() {
-		console.log("Membership is about to expire")
+	async findStoresAboutToExpire() {
+		const currentDate = new Date()
+		currentDate.setDate(currentDate.getDate() + 15)
+
+		return await this.tiendasRepository
+			.createQueryBuilder("store")
+			.where("store.fechaExpiracion <= :date", { date: currentDate })
+			.andWhere("store.notifiedAsAboutToExpire = :sent", { sent: false })
+			.innerJoin("store.tiendasInfo", "storeInfo")
+			.select(["store.id", "store.nombre", "storeInfo.emailTienda", "store.fechaExpiracion"])
+			.getMany()
 	}
 
 	async findStoresWithExpiredMemberships() {
@@ -36,7 +49,9 @@ export class JobsService {
 		return await this.tiendasRepository
 			.createQueryBuilder("store")
 			.where("store.fechaExpiracion <= :date", { date: currentDate })
-			.select(["store.id"])
+			.andWhere("store.notifiedAsExpired = :sent", { sent: false })
+			.innerJoin("store.tiendasInfo", "storeInfo")
+			.select(["store.id", "store.nombre", "storeInfo.emailTienda"])
 			.getMany()
 	}
 }
