@@ -14,6 +14,10 @@ export interface CreateOrderDto {
 	comentario: string | null
 	descuento: number
 	cupon: string
+	datosCliente: {
+		indicativo: string
+		phone: string
+	}
 	metodo_pago: string
 	emailCliente?: string
 	datosTienda: {
