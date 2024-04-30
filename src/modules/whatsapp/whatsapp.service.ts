@@ -23,7 +23,7 @@ export class WhatsappService {
 
 	sendWhatsappMessage = (number: string, message: string) => {
 		const sanitized_number = number.toString().replace(/[- )(]/g, "")
-		const final_number = `57${sanitized_number.substring(sanitized_number.length - 10)}`
+		const final_number = sanitized_number.replace("+", "")
 
 		this.instance.getNumberId(final_number).then((number_details) => {
 			if (number_details) {
