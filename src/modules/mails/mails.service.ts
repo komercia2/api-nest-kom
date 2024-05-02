@@ -25,13 +25,12 @@ export class MailsService {
 	}
 
 	async sendMassiveEmail(sendMassiveEmailsDto: SendMassiveEmailsDto): Promise<void> {
-		const { to, templateId, dynamicTemplateData } = sendMassiveEmailsDto
+		const { to, templateId } = sendMassiveEmailsDto
 		try {
 			await this.mailService.send({
 				to: to,
 				from: this.sendgridFrom as string,
-				templateId,
-				dynamicTemplateData
+				templateId
 			})
 			this.logger.log(`Email sent successfully to ${to.length} recipients`)
 		} catch (error) {

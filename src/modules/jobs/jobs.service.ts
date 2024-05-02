@@ -8,6 +8,7 @@ import { Repository } from "typeorm"
 import { MailsService } from "../mails/mails.service"
 
 const TIME_ZONE = "America/Bogota"
+const MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID = "d-497493aec9b449cc82576a448600d859"
 
 @Injectable()
 export class JobsService {
@@ -28,30 +29,47 @@ export class JobsService {
 		}
 
 		this.logger.log(`Found ${storesToNotify.length} stores about to expire`)
+
+		const emails = storesToNotify
+			.map((store) => store?.tiendasInfo?.emailTienda)
+			.filter((email) => email !== null)
+
+		// await this.mailsService.sendMassiveEmail({
+		// 	to: emails,
+		// 	templateId: MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID
+		// })
+
+		// await this.tiendasRepository.update(
+		// 	storesToNotify.map((store) => store.id),
+		// 	{ notifiedAsAboutToExpire: true }
+		// )
+
+		this.logger.log("Emails sent successfully")
+
+		this.logger.log("[handleMembershipIsAboutToExpire] Finished")
 	}
 
 	async findStoresAboutToExpire() {
-		const currentDate = new Date()
-		currentDate.setDate(currentDate.getDate() + 15)
+		const date15DaysBefore = this.getDateNDaysBeforeFromNow(15)
+		const date10DaysLater = this.getDateNDaysLaterFromNow(10).toISOString()
 
 		return await this.tiendasRepository
 			.createQueryBuilder("store")
-			.where("store.fechaExpiracion <= :date", { date: currentDate })
+			.andWhere("DATE(store.createdAt) = DATE(:date15DaysAgo)", { date15DaysAgo: date15DaysBefore })
+			.andWhere("store.fechaExpiracion <= DATE(:date10DaysLater)", { date10DaysLater })
 			.andWhere("store.notifiedAsAboutToExpire = :sent", { sent: false })
 			.innerJoin("store.tiendasInfo", "storeInfo")
 			.select(["store.id", "store.nombre", "storeInfo.emailTienda", "store.fechaExpiracion"])
 			.getMany()
 	}
 
-	async findStoresWithExpiredMemberships() {
+	private getDateNDaysBeforeFromNow(n: number) {
 		const currentDate = new Date()
+		return new Date(currentDate.setDate(currentDate.getDate() - n))
+	}
 
-		return await this.tiendasRepository
-			.createQueryBuilder("store")
-			.where("store.fechaExpiracion <= :date", { date: currentDate })
-			.andWhere("store.notifiedAsExpired = :sent", { sent: false })
-			.innerJoin("store.tiendasInfo", "storeInfo")
-			.select(["store.id", "store.nombre", "storeInfo.emailTienda"])
-			.getMany()
+	private getDateNDaysLaterFromNow(n: number) {
+		const currentDate = new Date()
+		return new Date(currentDate.setDate(currentDate.getDate() + n))
 	}
 }

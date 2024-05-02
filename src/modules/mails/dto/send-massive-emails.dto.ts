@@ -1,4 +1,4 @@
-import { IsArray, IsNotEmpty, IsObject, IsOptional, IsString } from "class-validator"
+import { IsArray, IsNotEmpty, IsString } from "class-validator"
 
 export class SendMassiveEmailsDto {
 	@IsArray()
@@ -8,8 +8,4 @@ export class SendMassiveEmailsDto {
 	@IsString()
 	@IsNotEmpty()
 	readonly templateId: string
-
-	@IsOptional()
-	@IsObject()
-	readonly dynamicTemplateData?: Record<string, unknown>
 }
