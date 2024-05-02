@@ -850,6 +850,11 @@ export class SuperService {
 			.leftJoin("store.categoria2", "categoria2")
 			.leftJoin("store.entidadesTiendas", "entidadesTiendas")
 			.leftJoinAndMapMany("store.tareasTiendas", "store.tareasTiendas", "tasks")
+			.leftJoinAndSelect("store.subscriptionsCoupons", "subscriptionsCoupons")
+			.leftJoinAndSelect(
+				"store.multipleSubscriptionCouponsToStore",
+				"multipleSubscriptionCouponsToStore"
+			)
 			.loadRelationCountAndMap("store.productos", "store.productos")
 			.loadRelationCountAndMap("store.carritos", "store.carritos")
 			.orderBy("store.createdAt", date)
