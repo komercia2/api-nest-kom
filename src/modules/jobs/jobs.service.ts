@@ -18,7 +18,7 @@ export class JobsService {
 		private readonly mailsService: MailsService
 	) {}
 
-	@Cron(CronExpression.EVERY_DAY_AT_2PM, { timeZone: TIME_ZONE })
+	@Cron(CronExpression.EVERY_DAY_AT_7PM, { timeZone: TIME_ZONE })
 	async handleMembershipIsAboutToExpire() {
 		this.logger.log("[handleMembershipIsAboutToExpire] Running")
 		const storesToNotify = await this.findStoresAboutToExpire()
@@ -30,19 +30,19 @@ export class JobsService {
 
 		this.logger.log(`Found ${storesToNotify.length} stores about to expire`)
 
-		const emails = storesToNotify
+		const filteredMails = storesToNotify
 			.map((store) => store?.tiendasInfo?.emailTienda)
 			.filter((email) => email !== null)
 
-		// await this.mailsService.sendMassiveEmail({
-		// 	to: emails,
-		// 	templateId: MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID
-		// })
+		await this.mailsService.sendMassiveEmail({
+			to: filteredMails as string[],
+			templateId: MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID
+		})
 
-		// await this.tiendasRepository.update(
-		// 	storesToNotify.map((store) => store.id),
-		// 	{ notifiedAsAboutToExpire: true }
-		// )
+		await this.tiendasRepository.update(
+			storesToNotify.map(({ id }) => id),
+			{ notifiedAsAboutToExpire: true }
+		)
 
 		this.logger.log("Emails sent successfully")
 
