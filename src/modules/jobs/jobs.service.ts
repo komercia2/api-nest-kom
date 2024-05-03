@@ -7,6 +7,9 @@ import { Repository } from "typeorm"
 
 import { MailsService } from "../mails/mails.service"
 
+const TIME_ZONE = "America/Bogota"
+const MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID = "d-497493aec9b449cc82576a448600d859"
+
 @Injectable()
 export class JobsService {
 	constructor(
@@ -15,28 +18,58 @@ export class JobsService {
 		private readonly mailsService: MailsService
 	) {}
 
-	async handleMembershipsExpired() {
-		const stores = await this.findStoresWithExpiredMemberships()
+	@Cron(CronExpression.EVERY_DAY_AT_7PM, { timeZone: TIME_ZONE })
+	async handleMembershipIsAboutToExpire() {
+		this.logger.log("[handleMembershipIsAboutToExpire] Running")
+		const storesToNotify = await this.findStoresAboutToExpire()
 
-		if (stores.length === 0) {
-			this.logger.warn("No stores with expired memberships found")
+		if (storesToNotify.length === 0) {
+			this.logger.warn("No stores about to expire found")
 			return
 		}
 
-		this.logger.log(`Found ${stores.length} stores with expired memberships`)
+		this.logger.log(`Found ${storesToNotify.length} stores about to expire`)
+
+		const filteredMails = storesToNotify
+			.map((store) => store?.tiendasInfo?.emailTienda)
+			.filter((email) => email !== null)
+
+		await this.mailsService.sendMassiveEmail({
+			to: filteredMails as string[],
+			templateId: MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID
+		})
+
+		await this.tiendasRepository.update(
+			storesToNotify.map(({ id }) => id),
+			{ notifiedAsAboutToExpire: true }
+		)
+
+		this.logger.log("Emails sent successfully")
+
+		this.logger.log("[handleMembershipIsAboutToExpire] Finished")
 	}
 
-	async handleMembershipIsAboutToExpire() {
-		console.log("Membership is about to expire")
-	}
-
-	async findStoresWithExpiredMemberships() {
-		const currentDate = new Date()
+	async findStoresAboutToExpire() {
+		const date15DaysBefore = this.getDateNDaysBeforeFromNow(15)
+		const date10DaysLater = this.getDateNDaysLaterFromNow(10).toISOString()
 
 		return await this.tiendasRepository
 			.createQueryBuilder("store")
-			.where("store.fechaExpiracion <= :date", { date: currentDate })
-			.select(["store.id"])
+			.andWhere("DATE(store.createdAt) = DATE(:date15DaysAgo)", { date15DaysAgo: date15DaysBefore })
+			.andWhere("store.fechaExpiracion <= DATE(:date10DaysLater)", { date10DaysLater })
+			.andWhere("store.notifiedAsAboutToExpire = :sent", { sent: false })
+			.innerJoin("store.tiendasInfo", "storeInfo")
+			.select(["store.id", "store.nombre", "storeInfo.emailTienda", "store.fechaExpiracion"])
 			.getMany()
+	}
+
+	private getDateNDaysBeforeFromNow(n: number) {
+		const currentDate = new Date()
+		return new Date(currentDate.setDate(currentDate.getDate() - n))
+	}
+
+	private getDateNDaysLaterFromNow(n: number) {
+		const currentDate = new Date()
+		return new Date(currentDate.setDate(currentDate.getDate() + n))
 	}
 }
