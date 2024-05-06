@@ -8,16 +8,19 @@ export class WompiEntity implements IWompiEntity {
 	timestamp: number
 	sent_at: string
 
-	private constructor(props: IWompiEntity) {
-		this.event = props.event
-		this.data = props.data
-		this.environment = props.environment
-		this.signature = props.signature
-		this.timestamp = props.timestamp
-		this.sent_at = props.sent_at
-	}
-
-	static create(props: IWompiEntity): WompiEntity {
-		return new WompiEntity(props)
+	constructor(
+		event: string,
+		data: Data,
+		environment: string,
+		signature: Signature,
+		timestamp: number,
+		sent_at: string
+	) {
+		this.event = event
+		this.data = data
+		this.environment = environment
+		this.signature = signature
+		this.timestamp = timestamp
+		this.sent_at = sent_at
 	}
 }
