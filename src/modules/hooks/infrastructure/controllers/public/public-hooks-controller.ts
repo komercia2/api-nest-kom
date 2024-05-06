@@ -12,9 +12,12 @@ import {
 import { ApiTags } from "@nestjs/swagger"
 import { handlerHttpResponse } from "@shared/infrastructure/handlers"
 import { Request, Response } from "express"
-import { ProccessAddiApplicationStatusCommand } from "src/modules/hooks/application/command"
+import {
+	ProccessAddiApplicationStatusCommand,
+	ProccessWompiPaymentStatusCommand
+} from "src/modules/hooks/application/command"
 import { NotifyOrderCreatedQuery } from "src/modules/hooks/application/query"
-import { AddiHookEntity } from "src/modules/hooks/domain/entities"
+import { AddiHookEntity, WompiEntity } from "src/modules/hooks/domain/entities"
 
 import { NotifyOrderCreatedDto } from "../../dtos"
 import { AddiApplicationCallbackGuard } from "../../guard"
@@ -28,8 +31,21 @@ export class PublicHooksController {
 		private readonly notifyOrderCreatedQuery: NotifyOrderCreatedQuery,
 
 		@Inject(HooksInfrastructureInjectionTokens.ProccessAddiApplicationStatusCommand)
-		private readonly proccessAdiApplicationStatusCommand: ProccessAddiApplicationStatusCommand
+		private readonly proccessAdiApplicationStatusCommand: ProccessAddiApplicationStatusCommand,
+
+		@Inject(HooksInfrastructureInjectionTokens.ProccessWompiPaymentStatusCommand)
+		private readonly proccessWompiPaymentStatusCommand: ProccessWompiPaymentStatusCommand
 	) {}
+
+	@Post("proccess-wompi-payment-status")
+	@HttpCode(HttpStatus.OK)
+	async proccessWompiPaymentStatus(@Body() wompiEvent: WompiEntity) {
+		try {
+			return await this.proccessWompiPaymentStatusCommand.execute(wompiEvent)
+		} catch (error) {
+			throw error
+		}
+	}
 
 	@UseGuards(AddiApplicationCallbackGuard)
 	@Post("proccess-adi-application-status")
