@@ -7,6 +7,8 @@ export interface IWompiEntity {
 	sent_at: string
 }
 
+export type EventStatus = "APPROVED" | "VOIDED" | "DECLINED" | "ERROR"
+
 export interface Data {
 	transaction: Transaction
 }
@@ -19,7 +21,7 @@ export interface Transaction {
 	currency: string
 	payment_method_type: string
 	redirect_url: string
-	status: string
+	status: EventStatus
 	shipping_address: string | null
 	payment_link_id: string | null
 	payment_source_id: string | null
