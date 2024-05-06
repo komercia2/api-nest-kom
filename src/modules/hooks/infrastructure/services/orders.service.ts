@@ -20,7 +20,6 @@ export class OrdersService {
 	) {}
 
 	async processWompiPaymentStatus(order: WompiEntity) {
-		console.log(order)
 		const { status, reference } = order.data.transaction
 
 		this.logger.log(`Processing Wompi payment status for order ${reference} with status ${status}`)
