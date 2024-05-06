@@ -3,7 +3,7 @@ import { PusherNotificationsService } from "@shared/infrastructure/services"
 import { Logger } from "nestjs-pino"
 import { NotificationsService } from "src/modules/notifications/notifications.service"
 
-import { AddiHookEntity, OrderHookEntity } from "../../domain/entities"
+import { AddiHookEntity, OrderHookEntity, WompiEntity } from "../../domain/entities"
 import { IHookRepository } from "../../domain/repositories"
 import { HooksInfrastructureInjectionTokens } from "../hooks-infrastructure-injection-tokens"
 import { OrdersService } from "../services/orders.service"
@@ -20,6 +20,10 @@ export class HooksRepository implements IHookRepository {
 		@Inject(HooksInfrastructureInjectionTokens.OrdersService)
 		private readonly ordersService: OrdersService
 	) {}
+
+	async processWompiPaymentStatus(order: WompiEntity): Promise<void> {
+		await this.ordersService.processWompiPaymentStatus(order)
+	}
 
 	async proccessAddiApplicationStatus(order: AddiHookEntity): Promise<AddiHookEntity> {
 		return await this.ordersService.processAddiApplicationStatus(order)
