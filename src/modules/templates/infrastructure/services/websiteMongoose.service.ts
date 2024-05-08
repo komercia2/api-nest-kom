@@ -261,6 +261,7 @@ export class WebsiteMongooseService {
 			const websites = await this.websiteModel.find({ storeId })
 			return websites.map((website) => this.fromModelToEntity(website.toObject()))
 		} catch (error) {
+			console.log(error)
 			throw new DatabaseTransactionErrorException("Has been an error getting the websites")
 		}
 	}
