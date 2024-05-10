@@ -12,12 +12,11 @@ export class GetPagedStoreBlogsQuery {
 
 	async execute(storeId: number, options: GetPagedStoreBlogsDto, filter: StoreBlogsFilterDTO) {
 		const blogs = await this.storeBlogRepository.getPagedStoreBlogs(storeId, options, filter)
-		const { data, count, limit } = blogs
+		const { data, count } = blogs
 		const blogsWihooutContent = data.map((blog) => ({ ...blog, content: undefined }))
 		return {
 			data: blogsWihooutContent,
-			count,
-			limit
+			count
 		}
 	}
 }

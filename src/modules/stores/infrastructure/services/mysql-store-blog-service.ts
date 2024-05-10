@@ -17,9 +17,6 @@ export class MySQLStoreBlogService {
 		options: GetPagedStoreBlogsDto,
 		filter?: StoreBlogsFilterDTO
 	) {
-		const { page, limit } = options
-		const skip = (page - 1) * limit
-		const take = limit
 		const title = filter?.title
 		const titleQuery = title ? Like(`%${title}%`) : Like("%%")
 
@@ -37,14 +34,11 @@ export class MySQLStoreBlogService {
 				updatedAt: true,
 				titulo: true,
 				tiendasId: true
-			},
-			skip,
-			take
+			}
 		})
 
 		return {
 			count: results.length,
-			limit,
 			data: results
 		}
 	}
