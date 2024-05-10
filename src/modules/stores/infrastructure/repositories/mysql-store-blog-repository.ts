@@ -22,11 +22,10 @@ export class MySQLStoreBlogRepository implements IStoreBlogRepository {
 		storeId: number,
 		options: GetPagedStoreBlogsDto,
 		filter?: StoreBlogsFilterDTO
-	): Promise<{ count: number; limit: number; data: StoreBlogEntity[] }> {
+	): Promise<{ count: number; data: StoreBlogEntity[] }> {
 		const pagedBlogs = await this.storeBlogService.getPagedStoreBlogs(storeId, options, filter)
 		return {
 			count: pagedBlogs.count,
-			limit: pagedBlogs.limit,
 			data: pagedBlogs.data.map(this.toEntity)
 		}
 	}
