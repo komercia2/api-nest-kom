@@ -53,6 +53,18 @@ export class SuperController {
 	) {}
 
 	@UseGuards(SuperJwtAuthGuard)
+	@Delete("user-stores/:userId/:storeId")
+	removeUserAdmin(@Param("userId") userId: number, @Param("storeId") storeId: number) {
+		return this.superService.removeUserAdmin(+userId, +storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Post("user-stores/:userId/:storeId")
+	addUserAdmin(@Param("userId") userId: number, @Param("storeId") storeId: number) {
+		return this.superService.addUserAdmin(+userId, +storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
 	@Get("user-stores/:id")
 	getAdmins(@Param("id") id: number) {
 		return this.superService.getStoreUsers(+id)
