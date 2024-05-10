@@ -17,6 +17,7 @@ import {
 	Tiendas,
 	TiendasInfo,
 	TiendaSuscripcionStripe,
+	TiendasUsuarios,
 	Users
 } from "src/entities"
 import { DataSource, In, Repository } from "typeorm"
@@ -94,9 +95,20 @@ export class SuperService {
 		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>,
 
 		@InjectRepository(LogTiendas)
-		private readonly logTiendasRepository: Repository<LogTiendas>
+		private readonly logTiendasRepository: Repository<LogTiendas>,
+
+		@InjectRepository(TiendasUsuarios)
+		private readonly tiendasUsuariosRepository: Repository<TiendasUsuarios>
 	) {}
 
+	async getStoreUsers(userId: number) {
+		const stores = await this.tiendasUsuariosRepository.find({
+			where: { usersId: userId },
+			relations: { tiendas: true }
+		})
+
+		return stores
+	}
 	async removeEntity(storeId: number, entityId: number) {
 		const entity = await this.entidadesTiendasRepository.findOne({
 			where: { tiendaId: storeId, entidadId: entityId }
@@ -920,7 +932,9 @@ export class SuperService {
 		}
 
 		if (expired) {
-			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: new Date() })
+			const currentDate = new Date()
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 50))
+			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
 		}
 
 		if (withoutExpire) {
@@ -933,7 +947,7 @@ export class SuperService {
 
 		if (toExpire) {
 			const currentDate = new Date()
-			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 15))
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 20))
 
 			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
 		}
