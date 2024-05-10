@@ -101,6 +101,38 @@ export class SuperService {
 		private readonly tiendasUsuariosRepository: Repository<TiendasUsuarios>
 	) {}
 
+	async removeUserAdmin(userId: number, storeId: number) {
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		await this.tiendasUsuariosRepository.delete({ tiendasId: storeId, usersId: userId })
+
+		return { message: "User unlinked from store" }
+	}
+
+	async addUserAdmin(userId: number, storeId: number) {
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		const storeUser = new TiendasUsuarios()
+		storeUser.tiendas = store
+		storeUser.users = user
+
+		await this.tiendasUsuariosRepository.save(storeUser)
+
+		return { message: "User linked to store" }
+	}
+
 	async getStoreUsers(userId: number) {
 		const stores = await this.tiendasUsuariosRepository.find({
 			where: { usersId: userId },
