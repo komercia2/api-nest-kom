@@ -920,7 +920,9 @@ export class SuperService {
 		}
 
 		if (expired) {
-			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: new Date() })
+			const currentDate = new Date()
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 50))
+			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
 		}
 
 		if (withoutExpire) {
@@ -933,7 +935,7 @@ export class SuperService {
 
 		if (toExpire) {
 			const currentDate = new Date()
-			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 15))
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 20))
 
 			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
 		}
