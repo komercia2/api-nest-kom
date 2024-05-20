@@ -607,8 +607,8 @@ export class SuperService {
 				"usersInfo.telefono"
 			])
 			.orderBy("users.createdAt", "DESC")
-			.innerJoin("users.tienda2", "tienda")
-			.innerJoin("users.usersInfo", "usersInfo")
+			.leftJoin("users.tienda2", "tienda")
+			.leftJoin("users.usersInfo", "usersInfo")
 			.skip((page - 1) * limit)
 			.take(limit)
 
