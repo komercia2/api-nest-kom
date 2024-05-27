@@ -28,6 +28,12 @@ export class CouponsController {
 		return this.couponsService.storeHasCoupon(storeId)
 	}
 
+	@Get("check/multiple")
+	@HttpCode(HttpStatus.OK)
+	checkCouponMultiple(@Query("coupon") coupon: string) {
+		return this.multipleSubscriptionCouponsService.isCouponAvailable(coupon)
+	}
+
 	@Get("check/coupon")
 	@HttpCode(HttpStatus.OK)
 	checkCoupon(@Query("coupon") coupon: string) {
