@@ -354,7 +354,6 @@ export class SuperService {
 		await queryRunner.connect()
 		await queryRunner.startTransaction()
 		try {
-			await this.usersRepository.delete({ tienda: storeId })
 			await this.storeRepository.delete(storeId)
 
 			await queryRunner.commitTransaction()
@@ -369,7 +368,7 @@ export class SuperService {
 	}
 
 	async editUser(edituserDto: EditUserDto) {
-		const { userId, newPassword, email, name } = edituserDto
+		const { userId, newPassword, email, name, phone } = edituserDto
 
 		const user = await this.usersRepository.findOne({ where: { id: userId } })
 
@@ -385,7 +384,8 @@ export class SuperService {
 		const params: QueryDeepPartialEntity<Users> = {
 			password: hashedPassword,
 			email,
-			nombre: name
+			nombre: name,
+			usersInfo: { telefono: phone }
 		}
 
 		await this.usersRepository.update({ id: userId }, { ...params })
@@ -965,8 +965,11 @@ export class SuperService {
 
 		if (expired) {
 			const currentDate = new Date()
-			const targetDate = new Date(currentDate.setDate(currentDate.getDate() - 50))
-			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
+			const date45DaysAgo = new Date(currentDate.setDate(currentDate.getDate() - 45))
+			queryBuilder.andWhere("store.fechaExpiracion BETWEEN :date AND :currentDate", {
+				date: date45DaysAgo,
+				currentDate: new Date()
+			})
 		}
 
 		if (withoutExpire) {
@@ -981,7 +984,10 @@ export class SuperService {
 			const currentDate = new Date()
 			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 20))
 
-			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
+			queryBuilder.andWhere("store.fechaExpiracion BETWEEN :date AND :currentDate", {
+				date: new Date(),
+				currentDate: targetDate
+			})
 		}
 
 		const [stores, total] = await queryBuilder.getManyAndCount()
