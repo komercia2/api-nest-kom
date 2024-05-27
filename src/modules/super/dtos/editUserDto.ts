@@ -23,6 +23,5 @@ export class EditUserDto {
 
 	@IsOptional()
 	@IsString()
-	@IsEmail()
 	readonly phone: string
 }
