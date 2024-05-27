@@ -23,6 +23,13 @@ export class MultipleSubscriptionCouponsService {
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>
 	) {}
 
+	async isCouponAvailable(coupon: string) {
+		const couponOnDb = await this.multipleSubscriptionCouponsRepository.findOne({
+			where: { coupon }
+		})
+		return { available: !!couponOnDb && couponOnDb.amount > 0 }
+	}
+
 	async findAll(filterSubscriptionCouponsDto: FilterSubscriptionCouponsDto) {
 		const { page, limit, avaible, validMonths, plan, amount, coupon } = filterSubscriptionCouponsDto
 		const skip = (page - 1) * limit
