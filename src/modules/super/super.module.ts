@@ -17,6 +17,7 @@ import {
 	TiendaSuscripcionStripe,
 	TiendasUsuarios,
 	Users,
+	UsersInfo,
 	Ventas
 } from "src/entities"
 
@@ -44,7 +45,8 @@ import { SuperService } from "./super.service"
 			MultipleSubscriptionCouponToStore,
 			SubscriptionCoupon,
 			LogTiendas,
-			TiendasUsuarios
+			TiendasUsuarios,
+			UsersInfo
 		])
 	],
 	controllers: [SuperController],

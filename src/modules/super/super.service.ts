@@ -18,7 +18,8 @@ import {
 	TiendasInfo,
 	TiendaSuscripcionStripe,
 	TiendasUsuarios,
-	Users
+	Users,
+	UsersInfo
 } from "src/entities"
 import { DataSource, In, Repository } from "typeorm"
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
@@ -98,7 +99,10 @@ export class SuperService {
 		private readonly logTiendasRepository: Repository<LogTiendas>,
 
 		@InjectRepository(TiendasUsuarios)
-		private readonly tiendasUsuariosRepository: Repository<TiendasUsuarios>
+		private readonly tiendasUsuariosRepository: Repository<TiendasUsuarios>,
+
+		@InjectRepository(UsersInfo)
+		private readonly usersInfoRepository: Repository<UsersInfo>
 	) {}
 
 	async removeUserAdmin(userId: number, storeId: number) {
@@ -370,7 +374,9 @@ export class SuperService {
 	async editUser(edituserDto: EditUserDto) {
 		const { userId, newPassword, email, name, phone } = edituserDto
 
-		const user = await this.usersRepository.findOne({ where: { id: userId } })
+		const user = await this.usersRepository.findOne({
+			where: { id: userId }
+		})
 
 		if (!user) throw new BadRequestException("User not found")
 
@@ -384,11 +390,11 @@ export class SuperService {
 		const params: QueryDeepPartialEntity<Users> = {
 			password: hashedPassword,
 			email,
-			nombre: name,
-			usersInfo: { telefono: phone }
+			nombre: name
 		}
 
 		await this.usersRepository.update({ id: userId }, { ...params })
+		await this.usersInfoRepository.update({ idUser: userId }, { telefono: phone })
 		return { message: "User updated" }
 	}
 
