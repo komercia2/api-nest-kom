@@ -23,6 +23,11 @@ export class MultipleSubscriptionCouponsService {
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>
 	) {}
 
+	async storeHasCoupon(storeId: number) {
+		const storeHasCoupon = await this.lookupIfStoreHasCoupon(storeId)
+		return { hasCoupon: !!storeHasCoupon }
+	}
+
 	async isCouponAvailable(coupon: string) {
 		const couponOnDb = await this.multipleSubscriptionCouponsRepository.findOne({
 			where: { coupon }
