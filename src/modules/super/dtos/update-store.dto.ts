@@ -1,7 +1,8 @@
 import { Type } from "class-transformer"
-import { IsEmail, IsNumber, IsOptional, IsPhoneNumber, IsString } from "class-validator"
+import { IsEmail, IsNotEmpty, IsNumber, IsOptional, IsString } from "class-validator"
 
 export class UpdateStoreDto {
+	@IsNotEmpty()
 	@IsString()
 	readonly storeName: string
 
@@ -29,7 +30,6 @@ export class UpdateStoreDto {
 	readonly email: string
 
 	@IsOptional()
-	@IsPhoneNumber()
 	readonly phone: string
 
 	@IsOptional()
