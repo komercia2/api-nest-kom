@@ -885,6 +885,7 @@ export class SuperService {
 			country,
 			city,
 			expired,
+			withSuscriptionCoupon,
 			withoutExpire,
 			toExpire
 		} = filter
@@ -994,6 +995,11 @@ export class SuperService {
 				date: new Date(),
 				currentDate: targetDate
 			})
+		}
+
+		if (withSuscriptionCoupon) {
+			queryBuilder.andWhere("subscriptionsCoupons.id IS NOT NULL")
+			queryBuilder.orWhere("multipleSubscriptionCouponsToStore.id IS NOT NULL")
 		}
 
 		const [stores, total] = await queryBuilder.getManyAndCount()
