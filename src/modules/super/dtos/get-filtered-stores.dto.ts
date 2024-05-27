@@ -42,6 +42,9 @@ export class GetFilteredStoresDto {
 	readonly withoutExpire: boolean
 
 	@Type(() => Boolean)
+	readonly withSuscriptionCoupon: boolean
+
+	@Type(() => Boolean)
 	readonly toExpire: boolean
 
 	@IsString({ each: true })
