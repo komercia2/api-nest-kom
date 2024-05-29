@@ -31,6 +31,7 @@ import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
 import { UsersModule } from "./modules/users/users.module"
 import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
+import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
 	imports: [
@@ -75,7 +76,8 @@ import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
 		WhatsappModule,
 		CouponsModule,
 		PaymentGateawaysModule,
-		JobsModule
+		JobsModule,
+		AnalyticsModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
