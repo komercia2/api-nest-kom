@@ -8,7 +8,6 @@ import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemp
 import {
 	DomainNotAvaibleException,
 	SubDomainNotAvaibleException,
-	TemplateNotAvaibleException,
 	WebsiteNotAvaibleException
 } from "@templates/domain/exceptions"
 import { isValidObjectId, Model, ObjectId } from "mongoose"
@@ -64,7 +63,8 @@ export class WebsiteMongooseService {
 				websiteCreated = await this.saveWebSite(data, null)
 			} else {
 				try {
-					_id = (await repository.create2())._id
+					const { templateNumber, demoId } = data
+					_id = (await repository.create2(templateNumber, demoId))._id
 					websiteCreated = await this.saveWebSite(data, _id)
 				} catch (error) {
 					console.log(error)

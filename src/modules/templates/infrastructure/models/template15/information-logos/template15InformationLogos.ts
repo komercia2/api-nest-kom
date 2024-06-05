@@ -14,7 +14,7 @@ export class Template15InformationLogos {
 	@Prop({ required: true })
 	img: string
 
-	@Prop({ required: true })
+	@Prop({ required: false })
 	title: string
 
 	@Prop({ required: true })

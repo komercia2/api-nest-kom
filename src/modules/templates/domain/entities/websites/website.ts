@@ -9,6 +9,7 @@ export interface WebSiteEntityProps {
 	subdomain: string | null
 	templateNumber: number
 	templateId?: string | null
+	demoId?: number | string
 	domain: string | null
 	isMain: boolean
 	active: boolean
