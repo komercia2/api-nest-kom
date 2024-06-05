@@ -1,9 +1,7 @@
 import { Injectable } from "@nestjs/common"
-import { OnEvent } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { Template15 as Template15Entity } from "@templates/domain/entities/template15"
-import { WebSiteEntity } from "@templates/domain/entities/websites"
 import { WebSiteTemplate } from "@templates/domain/entities/websites/webSiteTemplate"
 import { Template15Model } from "@templates/infrastructure/models/template15/template15"
 import { plainToClass } from "class-transformer"
@@ -29,14 +27,31 @@ export class Template15MongoService {
 		}
 	}
 
-	create2 = async () => {
+	create2 = async (templateNumber?: number, demoId?: number | string) => {
 		try {
-			const defaultSettings = new Template15Entity()
+			let defaultSettings
+
+			if (templateNumber && demoId && typeof demoId === "string") {
+				const templateSearched = await this.template15Model
+					.findOne({ _id: createObjectIdFromHexString(demoId) })
+					.select({ _id: 0, __v: 0 })
+					.exec()
+
+				if (!templateSearched) throw new Error("Template not found")
+
+				defaultSettings = templateSearched.toObject()
+			}
+
+			if (!demoId) {
+				defaultSettings = new Template15Entity()
+			}
+
 			const settings = Object.assign(defaultSettings, {})
 			const template15Created = await new this.template15Model({ ...settings }).save()
 
 			return template15Created.toObject()
 		} catch (error) {
+			console.log(error)
 			throw new DatabaseTransactionErrorException("Has been an error creating the template15")
 		}
 	}
