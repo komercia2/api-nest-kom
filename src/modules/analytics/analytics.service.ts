@@ -44,7 +44,7 @@ export class AnalyticsService {
 		const query = this.productosRepository
 			.createQueryBuilder("products")
 			.select(["products.id", "products.nombre", "products.fotoCloudinary"])
-			.leftJoinAndSelect("products.analytics", "analytics")
+			.innerJoinAndSelect("products.analytics", "analytics")
 			.where("products.tienda = :storeId", { storeId })
 			.andWhere("products.deletedAt IS NULL")
 			.andWhere("products.activo = true")
