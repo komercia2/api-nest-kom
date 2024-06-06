@@ -6,7 +6,7 @@ import { Repository } from "typeorm"
 import { StoreAnalyticsEvent } from "../stores/domain/entities"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { FilterProductAnalyticsDto } from "./dto/filter-product-analytics.dto"
-import { GetStoreViewsHistoryDto } from "./dto/get-store-views-history.dto"
+import { GetEventHistoryDto } from "./dto/get-event-history.dto"
 
 @Injectable()
 export class AnalyticsService {
@@ -17,8 +17,8 @@ export class AnalyticsService {
 		@InjectRepository(Productos) private productosRepository: Repository<Productos>
 	) {}
 
-	async getStoreViewsHistory(getStoreViewsHistoryDto: GetStoreViewsHistoryDto) {
-		const { startDate, endDate, storeId } = getStoreViewsHistoryDto
+	async getEventHistory(storeId: number, getEventHistoryDto: GetEventHistoryDto) {
+		const { startDate, endDate, event } = getEventHistoryDto
 
 		const query = this.storeAnalyticsRepository
 			.createQueryBuilder("storeAnalytics")
@@ -28,7 +28,7 @@ export class AnalyticsService {
 			.addSelect("CAST(COUNT(storeAnalytics.occurredAt) AS UNSIGNED)", "count")
 			.addSelect("DATE_FORMAT(storeAnalytics.occurredAt, '%Y-%m-%d')", "date")
 			.where("storeAnalytics.storeId = :storeId", { storeId })
-			.andWhere("storeAnalytics.event = :event", { event: StoreAnalyticsEvent.VISITED_PAGE })
+			.andWhere("storeAnalytics.event = :event", { event })
 			.groupBy("year")
 			.addGroupBy("month")
 			.addGroupBy("day")
@@ -39,7 +39,7 @@ export class AnalyticsService {
 		if (startDate) {
 			query.andWhere("storeAnalytics.occurredAt >= :startDate", { startDate })
 		} else {
-			query.andWhere("storeAnalytics.occurredAt >= DATE_SUB(CURDATE(), INTERVAL 1 WEEK)")
+			query.andWhere("storeAnalytics.occurredAt >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)")
 		}
 
 		if (endDate) {

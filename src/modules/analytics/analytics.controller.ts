@@ -3,17 +3,15 @@ import { Controller, Get, Param, Query } from "@nestjs/common"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { AnalyticsService } from "./analytics.service"
 import { FilterProductAnalyticsDto } from "./dto/filter-product-analytics.dto"
+import { GetEventHistoryDto } from "./dto/get-event-history.dto"
 
 @Controller("analytics")
 export class AnalyticsController {
 	constructor(private readonly analyticsService: AnalyticsService) {}
 
-	@Get("/:storeId/views-history")
-	getStoreViewsHistory(
-		@Param("storeId") storeId: number,
-		@Query() filters: FilterProductAnalyticsDto
-	) {
-		return this.analyticsService.getStoreViewsHistory({ ...filters, storeId: +storeId })
+	@Get("/:storeId/history")
+	getEventHistory(@Param("storeId") storeId: number, @Query() filters: GetEventHistoryDto) {
+		return this.analyticsService.getEventHistory(+storeId, filters)
 	}
 
 	@Get("/:storeId/clients/top-ten")
