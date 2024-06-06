@@ -40,6 +40,7 @@ import {
 import {
 	ChangePaymentGatewayStatusCommand,
 	CreatePaymentGatewayCommand,
+	SaveClickedPayCartCommand,
 	SaveStoreAnalyticCommand
 } from "./application/command"
 import { UpdatePaymentGatewayCommand } from "./application/command/update-payment-gateway-command"
@@ -316,6 +317,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.GetStoreShippingMeansQuery,
 		useClass: GetStoreShippingMeansQuery
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.SaveClickedPayCartCommand,
+		useClass: SaveClickedPayCartCommand
 	},
 	{
 		provide: StoresInfrastructureInjectionTokens.MySQLStoreHeadquartersService,
