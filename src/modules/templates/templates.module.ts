@@ -2,7 +2,6 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/c
 import { MongooseModule } from "@nestjs/mongoose"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { LaravelAuthMiddleware } from "@shared/infrastructure/middlewares/auth"
-import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import {
 	Template_5Settings,
 	TemplateGeneral,
@@ -43,6 +42,7 @@ import {
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
 import { Template6Model, Template6Schema } from "./infrastructure/models/template6/template6-model"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
+import { WapiModel, WapiSchema } from "./infrastructure/models/wapi"
 import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
 import {
 	MySQLTemplate5Repository,
@@ -58,6 +58,7 @@ import {
 	MysqlTemplate99Service,
 	MysqlTemplatesService,
 	Template15MongoService,
+	WapiTemplateMongooseService,
 	WebSiteMockService,
 	WebsiteMongooseService
 } from "./infrastructure/services"
@@ -164,6 +165,10 @@ const infrastructure = [
 		useClass: MongooseTemplate6Repository
 	},
 	{
+		provide: ApplicationInjectionTokens.IWapiTemplateRepository,
+		useClass: WapiTemplateMongooseService
+	},
+	{
 		provide: InfrastructureInjectionTokens.MySqlTemplateRepository,
 		useClass: MySQLTemplateRepository
 	},
@@ -202,6 +207,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.MongooseTemplate6Service,
 		useClass: MongooseTemplate6Service
+	},
+	{
+		provide: InfrastructureInjectionTokens.WapiTemplateMongooseService,
+		useClass: WapiTemplateMongooseService
 	}
 ]
 
@@ -210,7 +219,8 @@ const infrastructure = [
 		MongooseModule.forFeature([
 			{ name: Template15Model.name, schema: Template15Schema },
 			{ name: WebSiteModel.name, schema: WebsitesSchema },
-			{ name: Template6Model.name, schema: Template6Schema }
+			{ name: Template6Model.name, schema: Template6Schema },
+			{ name: WapiModel.name, schema: WapiSchema }
 		]),
 		TypeOrmModule.forFeature([
 			Tiendas,
@@ -218,7 +228,8 @@ const infrastructure = [
 			Template_5Settings,
 			TemplateWhatsappSettings,
 			TemplateGeneral,
-			VisitasTienda
+			VisitasTienda,
+			TemplateWhatsappSettings
 		])
 	],
 	controllers: [Template15Controller, WebsitesController, PublicStoreTemplateSettingsController],
