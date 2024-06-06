@@ -54,5 +54,6 @@ export enum StoresInfrastructureInjectionTokens {
 	UpdatePaymentGatewayCommand = "UpdatePaymentGatewayCommand",
 	CreatePaymentGatewayCommand = "CreatePaymentGatewayCommand",
 	EncryptWompiIntegrityQuery = "EncryptWompiIntegrityQuery",
-	GetStoreIntegrationsQuery = "GetStoreIntegrationsQuery"
+	GetStoreIntegrationsQuery = "GetStoreIntegrationsQuery",
+	SaveClickedPayCartCommand = "SaveClickedPayCartCommand"
 }

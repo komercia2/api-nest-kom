@@ -14,6 +14,22 @@ export class MySQLStoreAnalyticsService {
 		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
 
+	async saveClickedPayCart(ids: number[], storeId: number) {
+		const unrepeatedIds = new Set(ids)
+
+		const cleanedIDs = Array.from(unrepeatedIds)
+
+		const storeAnalytics = cleanedIDs.map((id) => ({
+			id: UuidUtil.uuid,
+			storeId,
+			productId: id,
+			event: StoreAnalyticsEvent.CLICKED_PAY_CART,
+			occurredAt: new Date()
+		}))
+
+		await this.storeAnalyticsRepository.insert(storeAnalytics)
+	}
+
 	async countDevices(storeId: number) {
 		const query = this.storeAnalyticsRepository
 			.createQueryBuilder("storeAnalytics")
