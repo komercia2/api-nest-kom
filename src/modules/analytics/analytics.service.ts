@@ -44,7 +44,7 @@ export class AnalyticsService {
 		const query = this.productosRepository
 			.createQueryBuilder("products")
 			.select(["products.id", "products.nombre", "products.fotoCloudinary"])
-			.leftJoinAndSelect("products.analytics", "analytics")
+			.innerJoinAndSelect("products.analytics", "analytics")
 			.where("products.tienda = :storeId", { storeId })
 			.andWhere("products.deletedAt IS NULL")
 			.andWhere("products.activo = true")
@@ -57,18 +57,21 @@ export class AnalyticsService {
 
 		const adddToCartEvent = StoreAnalyticsEvent.ADDED_PRODUCT_TO_CART
 		const viewedProductEvent = StoreAnalyticsEvent.VIEWED_PRODUCT
+		const clickedPayCartEvent = StoreAnalyticsEvent.CLICKED_PAY_CART
 
 		const productsWithAnalyticsCount = productsWithAnalytics.map((product) => {
 			const productAnalytics = product?.analytics
 
 			const addedToCart = productAnalytics.filter(({ event }) => event === adddToCartEvent)
 			const viewedProduct = productAnalytics.filter(({ event }) => event === viewedProductEvent)
+			const clickedPayCart = productAnalytics.filter(({ event }) => event === clickedPayCartEvent)
 
 			return {
 				...product,
 				analytics: {
 					addedToCart: addedToCart.length,
-					viewedProduct: viewedProduct.length
+					viewedProduct: viewedProduct.length,
+					clickedPayCart: clickedPayCart.length
 				}
 			}
 		})
