@@ -17,15 +17,17 @@ import { WebSiteModel } from "../models/website"
 import { createObjectIdFromHexString } from "../util"
 import { MongooseTemplate6Service } from "./mongoose-template6-service"
 import { Template15MongoService } from "./template15Mongoose.service"
+import { WapiTemplateMongooseService } from "./wapi-template-mongoose.service"
 
 @Injectable()
 export class WebsiteMongooseService {
 	private readonly validServices = new Map<
 		number,
-		Template15MongoService | MongooseTemplate6Service
+		Template15MongoService | MongooseTemplate6Service | WapiTemplateMongooseService
 	>([
 		[15, this.template15MongoService],
-		[6, this.template6MongoService]
+		[6, this.template6MongoService],
+		[99, this.wapiTemplateMongooseService]
 	])
 
 	constructor(
@@ -36,6 +38,9 @@ export class WebsiteMongooseService {
 
 		@Inject(InfrastructureInjectionTokens.MongooseTemplate6Service)
 		private readonly template6MongoService: MongooseTemplate6Service,
+
+		@Inject(InfrastructureInjectionTokens.WapiTemplateMongooseService)
+		private readonly wapiTemplateMongooseService: WapiTemplateMongooseService,
 
 		private readonly eventEmitter: EventEmitter2
 	) {}
@@ -203,6 +208,8 @@ export class WebsiteMongooseService {
 	updateSettings = async (_id: string, templateNumber: number, props: WebSiteTemplate) => {
 		try {
 			const repository = this.getRepositoryByTemplateNumber(templateNumber)
+
+			console.log("repository", repository)
 
 			if (!repository) return false
 
