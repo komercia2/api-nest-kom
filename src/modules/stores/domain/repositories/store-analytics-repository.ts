@@ -4,6 +4,8 @@ import { StoreAnalyticsEntity, StoreAnalyticsEvent } from "../entities"
 export interface IStoreAnalyticsRepository {
 	save(storeAnalytics: CreateStoreAnalyticsDto): Promise<void>
 
+	saveClickedPayCart(ids: number[], storeId: number): Promise<void>
+
 	getFiltered(
 		storeId: number,
 		filter: GetFilteredStoreAnalyticsDto
