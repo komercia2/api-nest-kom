@@ -8,6 +8,14 @@ import { FilterProductAnalyticsDto } from "./dto/filter-product-analytics.dto"
 export class AnalyticsController {
 	constructor(private readonly analyticsService: AnalyticsService) {}
 
+	@Get("/:storeId/views-history")
+	getStoreViewsHistory(
+		@Param("storeId") storeId: number,
+		@Query() filters: FilterProductAnalyticsDto
+	) {
+		return this.analyticsService.getStoreViewsHistory({ ...filters, storeId: +storeId })
+	}
+
 	@Get("/:storeId/clients/top-ten")
 	getClientsTopTen(@Param("storeId") storeId: number) {
 		return this.analyticsService.getClientsTopTen(+storeId)
