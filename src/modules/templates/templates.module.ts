@@ -41,6 +41,7 @@ import {
 } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
 import { Template6Model, Template6Schema } from "./infrastructure/models/template6/template6-model"
+import { Template12Model, Template12Schema } from "./infrastructure/models/template12"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
 import { WapiModel, WapiSchema } from "./infrastructure/models/wapi"
 import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
@@ -62,6 +63,7 @@ import {
 	WebSiteMockService,
 	WebsiteMongooseService
 } from "./infrastructure/services"
+import { Template12MongooseService } from "./infrastructure/services/template12-mongoose.service"
 
 const application = [
 	{
@@ -211,6 +213,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.WapiTemplateMongooseService,
 		useClass: WapiTemplateMongooseService
+	},
+	{
+		provide: InfrastructureInjectionTokens.Template12MongooseService,
+		useClass: Template12MongooseService
 	}
 ]
 
@@ -220,7 +226,8 @@ const infrastructure = [
 			{ name: Template15Model.name, schema: Template15Schema },
 			{ name: WebSiteModel.name, schema: WebsitesSchema },
 			{ name: Template6Model.name, schema: Template6Schema },
-			{ name: WapiModel.name, schema: WapiSchema }
+			{ name: WapiModel.name, schema: WapiSchema },
+			{ name: Template12Model.name, schema: Template12Schema }
 		]),
 		TypeOrmModule.forFeature([
 			Tiendas,
