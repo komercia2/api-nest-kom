@@ -16,6 +16,7 @@ import { InfrastructureInjectionTokens } from "../infrastructure-injection.token
 import { WebSiteModel } from "../models/website"
 import { createObjectIdFromHexString } from "../util"
 import { MongooseTemplate6Service } from "./mongoose-template6-service"
+import { Template12MongooseService } from "./template12-mongoose.service"
 import { Template15MongoService } from "./template15Mongoose.service"
 import { WapiTemplateMongooseService } from "./wapi-template-mongoose.service"
 
@@ -23,11 +24,15 @@ import { WapiTemplateMongooseService } from "./wapi-template-mongoose.service"
 export class WebsiteMongooseService {
 	private readonly validServices = new Map<
 		number,
-		Template15MongoService | MongooseTemplate6Service | WapiTemplateMongooseService
+		| Template15MongoService
+		| MongooseTemplate6Service
+		| WapiTemplateMongooseService
+		| Template12MongooseService
 	>([
 		[15, this.template15MongoService],
 		[6, this.template6MongoService],
-		[99, this.wapiTemplateMongooseService]
+		[99, this.wapiTemplateMongooseService],
+		[12, this.template12MongooseService]
 	])
 
 	constructor(
@@ -41,6 +46,9 @@ export class WebsiteMongooseService {
 
 		@Inject(InfrastructureInjectionTokens.WapiTemplateMongooseService)
 		private readonly wapiTemplateMongooseService: WapiTemplateMongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template12MongooseService)
+		private readonly template12MongooseService: Template12MongooseService,
 
 		private readonly eventEmitter: EventEmitter2
 	) {}
