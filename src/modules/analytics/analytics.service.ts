@@ -73,6 +73,7 @@ export class AnalyticsService {
 		paginationDto: PaginationDto
 	) {
 		const { limit, page } = paginationDto
+		const { name, startDate, endDate } = filters
 
 		const query = this.productosRepository
 			.createQueryBuilder("products")
@@ -84,7 +85,19 @@ export class AnalyticsService {
 			.skip((page - 1) * limit)
 			.take(limit)
 
-		if (filters?.name) query.andWhere("products.nombre LIKE :name", { name: `%${filters.name}%` })
+		if (name) {
+			query.andWhere("products.nombre LIKE :name", { name: `%${name}%` })
+		}
+
+		if (startDate) {
+			query.andWhere("analytics.occurredAt >= :startDate", { startDate })
+		} else {
+			query.andWhere("analytics.occurredAt >= DATE_SUB(CURDATE(), INTERVAL 1 MONTH)")
+		}
+
+		if (endDate) {
+			query.andWhere("analytics.occurredAt <= :endDate", { endDate })
+		}
 
 		const [productsWithAnalytics, total] = await query.getManyAndCount()
 
