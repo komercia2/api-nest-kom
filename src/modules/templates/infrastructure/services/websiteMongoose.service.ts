@@ -17,6 +17,7 @@ import { WebSiteModel } from "../models/website"
 import { createObjectIdFromHexString } from "../util"
 import { MongooseTemplate6Service } from "./mongoose-template6-service"
 import { Template7MongooseService } from "./template7-mongoose.service"
+import { Template9MongooseService } from "./template9-mongoose.service"
 import { Template12MongooseService } from "./template12-mongoose.service"
 import { Template15MongoService } from "./template15Mongoose.service"
 import { WapiTemplateMongooseService } from "./wapi-template-mongoose.service"
@@ -30,12 +31,14 @@ export class WebsiteMongooseService {
 		| WapiTemplateMongooseService
 		| Template12MongooseService
 		| Template7MongooseService
+		| Template9MongooseService
 	>([
 		[15, this.template15MongoService],
 		[6, this.template6MongoService],
 		[99, this.wapiTemplateMongooseService],
 		[12, this.template12MongooseService],
-		[7, this.template7MongooseService]
+		[7, this.template7MongooseService],
+		[9, this.template9MongooseService]
 	])
 
 	constructor(
@@ -55,6 +58,9 @@ export class WebsiteMongooseService {
 
 		@Inject(InfrastructureInjectionTokens.Template7MongooseService)
 		private readonly template7MongooseService: Template7MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template9MongooseService)
+		private readonly template9MongooseService: Template9MongooseService,
 
 		private readonly eventEmitter: EventEmitter2
 	) {}
