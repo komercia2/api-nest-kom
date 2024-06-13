@@ -41,7 +41,19 @@ export class WapiTemplateMongooseService {
 			const { id: _, ...rest } = settings
 
 			const templateWapiCreated = await new this.wapiModel({
-				...rest
+				banner: rest.banner,
+				descripcion: rest.descripcion,
+				logo_cuadrado: rest.logoCuadrado,
+				color_primario: rest.colorPrimario,
+				color_secundario: rest.colorSecundario,
+				color_icon: rest.colorIcon,
+				tema: rest.tema,
+				pago_online: rest.pagoOnline,
+				mensaje_principal: rest.mensajePrincipal,
+				estilo_productos: rest.estiloProductos,
+				estilo_categorias: rest.estiloCategorias,
+				watermark: rest.watermark,
+				state_subcategorias: rest.stateSubcategorias
 			}).save()
 
 			return templateWapiCreated.toObject()
