@@ -20,7 +20,7 @@ export class Template11MongooseService {
 			let defaultSettings: Partial<Template11Entity> = {}
 
 			if (templateNumber && demoId && typeof demoId === "number") {
-				const template = await getExternalTemplateSettings(10, demoId)
+				const template = await getExternalTemplateSettings(11, demoId)
 
 				if (!template) throw new DatabaseTransactionErrorException("Template not found")
 
