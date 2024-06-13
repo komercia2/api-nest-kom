@@ -49,6 +49,7 @@ import { Template12Model, Template12Schema } from "./infrastructure/models/templ
 import { Template13Model, Template13Schema } from "./infrastructure/models/template13"
 import { Template14Model, Template14Schema } from "./infrastructure/models/template14"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
+import { Template16Model, Template16Schema } from "./infrastructure/models/template16"
 import { WapiModel, WapiSchema } from "./infrastructure/models/wapi"
 import { WebSiteModel, WebsitesSchema } from "./infrastructure/models/website"
 import {
@@ -76,6 +77,7 @@ import { Template11MongooseService } from "./infrastructure/services/template11-
 import { Template12MongooseService } from "./infrastructure/services/template12-mongoose.service"
 import { Template13MongooseService } from "./infrastructure/services/template13-mongoose.service"
 import { Template14MongooseService } from "./infrastructure/services/template14-mongoose.service"
+import { Template16MongooseService } from "./infrastructure/services/template16-mongoose.service"
 
 const application = [
 	{
@@ -154,6 +156,10 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: ApplicationInjectionTokens.ITemplate16Repository,
+		useClass: Template16MongooseService
+	},
 	{
 		provide: ApplicationInjectionTokens.ITemplate14Repository,
 		useClass: Template14MongooseService
@@ -277,6 +283,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.Template14MongooseService,
 		useClass: Template14MongooseService
+	},
+	{
+		provide: InfrastructureInjectionTokens.Template16MongooseService,
+		useClass: Template16MongooseService
 	}
 ]
 
@@ -293,7 +303,8 @@ const infrastructure = [
 			{ name: Template10Model.name, schema: Template10Schema },
 			{ name: Template11Model.name, schema: Template11Schema },
 			{ name: Template13Model.name, schema: Template13Schema },
-			{ name: Template14Model.name, schema: Template14Schema }
+			{ name: Template14Model.name, schema: Template14Schema },
+			{ name: Template16Model.name, schema: Template16Schema }
 		]),
 		TypeOrmModule.forFeature([
 			Tiendas,
