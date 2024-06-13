@@ -44,6 +44,7 @@ import { Template6Model, Template6Schema } from "./infrastructure/models/templat
 import { Template7Model, Template7Schema } from "./infrastructure/models/template7"
 import { Template9Model, Template9Schema } from "./infrastructure/models/template9"
 import { Template10Model, Template10Schema } from "./infrastructure/models/template10"
+import { Template11Model, Template11Schema } from "./infrastructure/models/template11"
 import { Template12Model, Template12Schema } from "./infrastructure/models/template12"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
 import { WapiModel, WapiSchema } from "./infrastructure/models/wapi"
@@ -69,6 +70,7 @@ import {
 import { Template7MongooseService } from "./infrastructure/services/template7-mongoose.service"
 import { Template9MongooseService } from "./infrastructure/services/template9-mongoose.service"
 import { Template10MongooseService } from "./infrastructure/services/template10-mongoose.service"
+import { Template11MongooseService } from "./infrastructure/services/template11-mongoose.service"
 import { Template12MongooseService } from "./infrastructure/services/template12-mongoose.service"
 
 const application = [
@@ -148,6 +150,10 @@ const application = [
 ]
 
 const infrastructure = [
+	{
+		provide: ApplicationInjectionTokens.ITemplate11Repository,
+		useClass: Template11MongooseService
+	},
 	{
 		provide: ApplicationInjectionTokens.ITemplate10Repository,
 		useClass: Template10MongooseService
@@ -247,6 +253,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.Template10MongooseService,
 		useClass: Template10MongooseService
+	},
+	{
+		provide: InfrastructureInjectionTokens.Template11MongooseService,
+		useClass: Template11MongooseService
 	}
 ]
 
@@ -260,7 +270,8 @@ const infrastructure = [
 			{ name: Template12Model.name, schema: Template12Schema },
 			{ name: Template7Model.name, schema: Template7Schema },
 			{ name: Template9Model.name, schema: Template9Schema },
-			{ name: Template10Model.name, schema: Template10Schema }
+			{ name: Template10Model.name, schema: Template10Schema },
+			{ name: Template11Model.name, schema: Template11Schema }
 		]),
 		TypeOrmModule.forFeature([
 			Tiendas,
