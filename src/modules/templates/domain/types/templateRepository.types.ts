@@ -2,6 +2,7 @@ import {
 	ITemplate6Repository,
 	ITemplate7Repository,
 	ITemplate9Repository,
+	ITemplate10Repository,
 	ITemplate12Repository,
 	ITemplate15Repository,
 	IWapiTemplateRepository
@@ -14,3 +15,4 @@ export type TemplateRepository =
 	| ITemplate12Repository
 	| ITemplate7Repository
 	| ITemplate9Repository
+	| ITemplate10Repository
