@@ -9,5 +9,6 @@ export enum ApplicationInjectionTokens {
 	ITemplate7Repository = "ITemplate7Repository",
 	ITemplate9Repository = "ITemplate9Repository",
 	ITemplate10Repository = "ITemplate10Repository",
-	ITemplate11Repository = "ITemplate11Repository"
+	ITemplate11Repository = "ITemplate11Repository",
+	ITemplate13Repository = "ITemplate13Repository"
 }
