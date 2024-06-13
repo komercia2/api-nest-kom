@@ -30,5 +30,12 @@ export enum InfrastructureInjectionTokens {
 	MongooseTemplate6Service = "MongooseTemplate6Service",
 	IncrementViewsCommand = "IncrementViewsCommand",
 	WapiTemplateMongooseService = "WapiTemplateMongooseService",
-	Template12MongooseService = "Template12MongooseService"
+	Template12MongooseService = "Template12MongooseService",
+	Template7MongooseService = "Template7MongooseService",
+	Template9MongooseService = "Template9MongooseService",
+	Template10MongooseService = "Template10MongooseService",
+	Template11MongooseService = "Template11MongooseService",
+	Template13MongooseService = "Template13MongooseService",
+	Template14MongooseService = "Template14MongooseService",
+	Template16MongooseService = "Template16MongooseService"
 }

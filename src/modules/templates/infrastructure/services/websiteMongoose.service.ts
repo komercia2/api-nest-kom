@@ -16,8 +16,15 @@ import { InfrastructureInjectionTokens } from "../infrastructure-injection.token
 import { WebSiteModel } from "../models/website"
 import { createObjectIdFromHexString } from "../util"
 import { MongooseTemplate6Service } from "./mongoose-template6-service"
+import { Template7MongooseService } from "./template7-mongoose.service"
+import { Template9MongooseService } from "./template9-mongoose.service"
+import { Template10MongooseService } from "./template10-mongoose.service"
+import { Template11MongooseService } from "./template11-mongoose.service"
 import { Template12MongooseService } from "./template12-mongoose.service"
+import { Template13MongooseService } from "./template13-mongoose.service"
+import { Template14MongooseService } from "./template14-mongoose.service"
 import { Template15MongoService } from "./template15Mongoose.service"
+import { Template16MongooseService } from "./template16-mongoose.service"
 import { WapiTemplateMongooseService } from "./wapi-template-mongoose.service"
 
 @Injectable()
@@ -28,11 +35,25 @@ export class WebsiteMongooseService {
 		| MongooseTemplate6Service
 		| WapiTemplateMongooseService
 		| Template12MongooseService
+		| Template7MongooseService
+		| Template9MongooseService
+		| Template10MongooseService
+		| Template11MongooseService
+		| Template13MongooseService
+		| Template14MongooseService
+		| Template16MongooseService
 	>([
 		[15, this.template15MongoService],
 		[6, this.template6MongoService],
 		[99, this.wapiTemplateMongooseService],
-		[12, this.template12MongooseService]
+		[12, this.template12MongooseService],
+		[7, this.template7MongooseService],
+		[9, this.template9MongooseService],
+		[10, this.template10MongooseService],
+		[11, this.template11MongooseService],
+		[13, this.template13MongooseService],
+		[14, this.template14MongooseService],
+		[16, this.template16MongooseService]
 	])
 
 	constructor(
@@ -49,6 +70,27 @@ export class WebsiteMongooseService {
 
 		@Inject(InfrastructureInjectionTokens.Template12MongooseService)
 		private readonly template12MongooseService: Template12MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template7MongooseService)
+		private readonly template7MongooseService: Template7MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template9MongooseService)
+		private readonly template9MongooseService: Template9MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template10MongooseService)
+		private readonly template10MongooseService: Template10MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template11MongooseService)
+		private readonly template11MongooseService: Template11MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template13MongooseService)
+		private readonly template13MongooseService: Template13MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template14MongooseService)
+		private readonly template14MongooseService: Template14MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template16MongooseService)
+		private readonly template16MongooseService: Template16MongooseService,
 
 		private readonly eventEmitter: EventEmitter2
 	) {}

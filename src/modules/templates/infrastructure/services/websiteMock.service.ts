@@ -2,7 +2,13 @@ import { Inject, Injectable } from "@nestjs/common"
 import { ApplicationInjectionTokens } from "@templates/application/application-injection.tokens"
 import {
 	ITemplate6Repository,
+	ITemplate7Repository,
+	ITemplate9Repository,
+	ITemplate10Repository,
+	ITemplate11Repository,
+	ITemplate13Repository,
 	ITemplate15Repository,
+	ITemplate16Repository,
 	IWapiTemplateRepository
 } from "@templates/domain/repositories"
 import { TemplateRepository } from "@templates/domain/types"
@@ -11,11 +17,25 @@ import { TemplateRepository } from "@templates/domain/types"
 export class WebSiteMockService {
 	private readonly allowedTemplatesRepositories = new Map<
 		number,
-		ITemplate6Repository | ITemplate15Repository | IWapiTemplateRepository
+		| ITemplate6Repository
+		| ITemplate15Repository
+		| IWapiTemplateRepository
+		| ITemplate7Repository
+		| ITemplate9Repository
+		| ITemplate10Repository
+		| ITemplate11Repository
+		| ITemplate13Repository
+		| ITemplate16Repository
 	>([
 		[15, this.template15Repository],
 		[6, this.template6Repository],
-		[99, this.wapiTemplateRepository]
+		[99, this.wapiTemplateRepository],
+		[7, this.template7Repository],
+		[9, this.template9Repository],
+		[10, this.template10Repository],
+		[11, this.template11Repository],
+		[13, this.template13Repository],
+		[16, this.template16Repository]
 	])
 
 	constructor(
@@ -26,7 +46,25 @@ export class WebSiteMockService {
 		private readonly template6Repository: ITemplate6Repository,
 
 		@Inject(ApplicationInjectionTokens.IWapiTemplateRepository)
-		private readonly wapiTemplateRepository: IWapiTemplateRepository
+		private readonly wapiTemplateRepository: IWapiTemplateRepository,
+
+		@Inject(ApplicationInjectionTokens.ITemplate7Repository)
+		private readonly template7Repository: ITemplate7Repository,
+
+		@Inject(ApplicationInjectionTokens.ITemplate9Repository)
+		private readonly template9Repository: ITemplate9Repository,
+
+		@Inject(ApplicationInjectionTokens.ITemplate10Repository)
+		private readonly template10Repository: ITemplate10Repository,
+
+		@Inject(ApplicationInjectionTokens.ITemplate11Repository)
+		private readonly template11Repository: ITemplate11Repository,
+
+		@Inject(ApplicationInjectionTokens.ITemplate13Repository)
+		private readonly template13Repository: ITemplate13Repository,
+
+		@Inject(ApplicationInjectionTokens.ITemplate16Repository)
+		private readonly template16Repository: ITemplate16Repository
 	) {}
 
 	getWebSiteRepository = async (templateNumber: number): Promise<TemplateRepository | null> => {
