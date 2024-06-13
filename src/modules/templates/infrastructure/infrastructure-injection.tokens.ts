@@ -33,5 +33,6 @@ export enum InfrastructureInjectionTokens {
 	Template12MongooseService = "Template12MongooseService",
 	Template7MongooseService = "Template7MongooseService",
 	Template9MongooseService = "Template9MongooseService",
-	Template10MongooseService = "Template10MongooseService"
+	Template10MongooseService = "Template10MongooseService",
+	Template11MongooseService = "Template11MongooseService"
 }
