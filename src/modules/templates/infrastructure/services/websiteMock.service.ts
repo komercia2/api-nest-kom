@@ -4,6 +4,7 @@ import {
 	ITemplate6Repository,
 	ITemplate7Repository,
 	ITemplate9Repository,
+	ITemplate10Repository,
 	ITemplate15Repository,
 	IWapiTemplateRepository
 } from "@templates/domain/repositories"
@@ -18,12 +19,14 @@ export class WebSiteMockService {
 		| IWapiTemplateRepository
 		| ITemplate7Repository
 		| ITemplate9Repository
+		| ITemplate10Repository
 	>([
 		[15, this.template15Repository],
 		[6, this.template6Repository],
 		[99, this.wapiTemplateRepository],
 		[7, this.template7Repository],
-		[9, this.template9Repository]
+		[9, this.template9Repository],
+		[10, this.template10Repository]
 	])
 
 	constructor(
@@ -40,7 +43,10 @@ export class WebSiteMockService {
 		private readonly template7Repository: ITemplate7Repository,
 
 		@Inject(ApplicationInjectionTokens.ITemplate9Repository)
-		private readonly template9Repository: ITemplate9Repository
+		private readonly template9Repository: ITemplate9Repository,
+
+		@Inject(ApplicationInjectionTokens.ITemplate10Repository)
+		private readonly template10Repository: ITemplate10Repository
 	) {}
 
 	getWebSiteRepository = async (templateNumber: number): Promise<TemplateRepository | null> => {
