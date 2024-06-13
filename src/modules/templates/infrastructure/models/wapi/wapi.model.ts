@@ -12,37 +12,37 @@ export class WapiModel {
 	descripcion: string
 
 	@Prop({ type: Boolean, default: null })
-	logoCuadrado: boolean
+	logo_cuadrado: boolean
 
 	@Prop()
-	colorPrimario: string
+	color_primario: string
 
 	@Prop()
-	colorSecundario: string
+	color_secundario: string
 
 	@Prop()
-	colorIcon: string
+	color_icon: string
 
 	@Prop({ type: Number, default: null })
 	tema: number
 
 	@Prop({ type: Boolean, default: null })
-	pagoOnline: boolean
+	pago_online: boolean
 
 	@Prop()
-	mensajePrincipal: string
+	mensaje_principal: string
 
 	@Prop({ type: Number, default: null })
-	estiloProductos: number
+	estilo_productos: number
 
 	@Prop({ type: Number, default: null })
-	estiloCategorias: number
+	estilo_categorias: number
 
 	@Prop({ required: false })
 	watermark: boolean
 
 	@Prop({ required: false })
-	stateSubcategorias: boolean
+	state_subcategorias: boolean
 }
 
 export const WapiSchema = SchemaFactory.createForClass(WapiModel)
