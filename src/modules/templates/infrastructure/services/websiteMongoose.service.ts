@@ -220,7 +220,11 @@ export class WebsiteMongooseService {
 
 			if (!templateData) return false
 
-			if (!templateData.templateId || templateData.templateId === null) return true
+			if (templateData.templateId === null) {
+				await this.websiteModel.deleteOne({ _id }).exec()
+
+				return true
+			}
 
 			const { templateNumber } = templateData
 
