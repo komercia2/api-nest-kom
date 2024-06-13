@@ -41,6 +41,7 @@ import {
 } from "./infrastructure/controllers"
 import { InfrastructureInjectionTokens } from "./infrastructure/infrastructure-injection.tokens"
 import { Template6Model, Template6Schema } from "./infrastructure/models/template6/template6-model"
+import { Template7Model, Template7Schema } from "./infrastructure/models/template7"
 import { Template12Model, Template12Schema } from "./infrastructure/models/template12"
 import { Template15Model, Template15Schema } from "./infrastructure/models/template15"
 import { WapiModel, WapiSchema } from "./infrastructure/models/wapi"
@@ -63,6 +64,7 @@ import {
 	WebSiteMockService,
 	WebsiteMongooseService
 } from "./infrastructure/services"
+import { Template7MongooseService } from "./infrastructure/services/template7-mongoose.service"
 import { Template12MongooseService } from "./infrastructure/services/template12-mongoose.service"
 
 const application = [
@@ -167,6 +169,10 @@ const infrastructure = [
 		useClass: MongooseTemplate6Repository
 	},
 	{
+		provide: ApplicationInjectionTokens.ITemplate7Repository,
+		useClass: Template7MongooseService
+	},
+	{
 		provide: ApplicationInjectionTokens.IWapiTemplateRepository,
 		useClass: WapiTemplateMongooseService
 	},
@@ -217,6 +223,10 @@ const infrastructure = [
 	{
 		provide: InfrastructureInjectionTokens.Template12MongooseService,
 		useClass: Template12MongooseService
+	},
+	{
+		provide: InfrastructureInjectionTokens.Template7MongooseService,
+		useClass: Template7MongooseService
 	}
 ]
 
@@ -227,7 +237,8 @@ const infrastructure = [
 			{ name: WebSiteModel.name, schema: WebsitesSchema },
 			{ name: Template6Model.name, schema: Template6Schema },
 			{ name: WapiModel.name, schema: WapiSchema },
-			{ name: Template12Model.name, schema: Template12Schema }
+			{ name: Template12Model.name, schema: Template12Schema },
+			{ name: Template7Model.name, schema: Template7Schema }
 		]),
 		TypeOrmModule.forFeature([
 			Tiendas,
