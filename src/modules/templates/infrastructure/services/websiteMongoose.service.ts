@@ -220,6 +220,8 @@ export class WebsiteMongooseService {
 
 			if (!templateData) return false
 
+			if (!templateData.templateId || templateData.templateId === null) return true
+
 			const { templateNumber } = templateData
 
 			const isValidTemplateNumber = this.validServices.has(templateNumber)
