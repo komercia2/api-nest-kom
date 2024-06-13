@@ -220,7 +220,7 @@ export class WebsiteMongooseService {
 
 			if (!templateData) return false
 
-			if (templateData.templateId === null || templateId === null) {
+			if (templateData.templateId === null || templateId === null || !templateId) {
 				await this.websiteModel.deleteOne({ _id }).exec()
 
 				return true
