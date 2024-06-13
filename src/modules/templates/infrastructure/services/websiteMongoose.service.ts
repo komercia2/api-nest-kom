@@ -22,6 +22,7 @@ import { Template10MongooseService } from "./template10-mongoose.service"
 import { Template11MongooseService } from "./template11-mongoose.service"
 import { Template12MongooseService } from "./template12-mongoose.service"
 import { Template13MongooseService } from "./template13-mongoose.service"
+import { Template14MongooseService } from "./template14-mongoose.service"
 import { Template15MongoService } from "./template15Mongoose.service"
 import { WapiTemplateMongooseService } from "./wapi-template-mongoose.service"
 
@@ -38,6 +39,7 @@ export class WebsiteMongooseService {
 		| Template10MongooseService
 		| Template11MongooseService
 		| Template13MongooseService
+		| Template14MongooseService
 	>([
 		[15, this.template15MongoService],
 		[6, this.template6MongoService],
@@ -47,7 +49,8 @@ export class WebsiteMongooseService {
 		[9, this.template9MongooseService],
 		[10, this.template10MongooseService],
 		[11, this.template11MongooseService],
-		[13, this.template13MongooseService]
+		[13, this.template13MongooseService],
+		[14, this.template14MongooseService]
 	])
 
 	constructor(
@@ -79,6 +82,9 @@ export class WebsiteMongooseService {
 
 		@Inject(InfrastructureInjectionTokens.Template13MongooseService)
 		private readonly template13MongooseService: Template13MongooseService,
+
+		@Inject(InfrastructureInjectionTokens.Template14MongooseService)
+		private readonly template14MongooseService: Template14MongooseService,
 
 		private readonly eventEmitter: EventEmitter2
 	) {}
