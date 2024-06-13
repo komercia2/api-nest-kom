@@ -1,4 +1,5 @@
 interface ITemplate11Entity {
+	_id: string
 	header: Record<string, object>
 	pages: Record<string, object>
 	banner: Record<string, object>
@@ -17,6 +18,7 @@ interface ITemplate11Entity {
 }
 
 export class Template11Entity implements ITemplate11Entity {
+	_id: string
 	header: Record<string, object>
 	pages: Record<string, object>
 	banner: Record<string, object>
@@ -34,6 +36,7 @@ export class Template11Entity implements ITemplate11Entity {
 	settingGeneral: Record<string, object>
 
 	constructor(data: ITemplate11Entity) {
+		this._id = data._id
 		this.header = data.header
 		this.pages = data.pages
 		this.banner = data.banner
