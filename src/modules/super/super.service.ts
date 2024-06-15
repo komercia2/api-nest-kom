@@ -887,7 +887,8 @@ export class SuperService {
 			expired,
 			withSuscriptionCoupon,
 			withoutExpire,
-			toExpire
+			toExpire,
+			phone
 		} = filter
 
 		const queryBuilder = this.storeRepository
@@ -1001,6 +1002,8 @@ export class SuperService {
 			queryBuilder.andWhere("subscriptionsCoupons.id IS NOT NULL")
 			queryBuilder.orWhere("multipleSubscriptionCouponsToStore.id IS NOT NULL")
 		}
+
+		if (phone) queryBuilder.andWhere("tiendasInfo.telefono LIKE :phone", { phone: `%${phone}%` })
 
 		const [stores, total] = await queryBuilder.getManyAndCount()
 

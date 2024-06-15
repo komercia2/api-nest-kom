@@ -50,4 +50,6 @@ export class GetFilteredStoresDto {
 	@IsString({ each: true })
 	@IsIn(["ASC", "DESC"], { each: true })
 	readonly date: "ASC" | "DESC"
+
+	readonly phone: string
 }
