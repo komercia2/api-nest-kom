@@ -9,6 +9,7 @@ import { MailsService } from "../mails/mails.service"
 
 const MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID = "d-497493aec9b449cc82576a448600d859"
 const MEMBERSHIP_EXPIRED_SENDGRID_TEMPLATE_ID = "d-850e71d007ca45c391f9da41afd605cb"
+const MEMBERSHIP_EXPIRED_DISCOUNT_SENDGRID_TEMPLATE_ID = "d-843ed8e8a41d482a81cad55c1781beed"
 
 @Injectable()
 export class JobsService {
@@ -17,6 +18,33 @@ export class JobsService {
 		private readonly logger: Logger,
 		private readonly mailsService: MailsService
 	) {}
+
+	@Cron(CronExpression.EVERY_DAY_AT_5PM)
+	async handleMembershipDiscount() {
+		this.logger.log("[handleMembershipDiscount] Running")
+		const storesToNotify = await this.handleMembershipExpiredDiscount()
+
+		if (storesToNotify.length === 0) {
+			this.logger.warn("No stores with discount found")
+			return
+		}
+
+		this.logger.log(`Found ${storesToNotify.length} stores with discount`)
+
+		const filteredMails = storesToNotify
+			.map((store) => store?.tiendasInfo?.emailTienda)
+			.filter((email) => email !== null)
+
+		await this.mailsService.sendMassiveEmail({
+			to: filteredMails as string[],
+			templateId: MEMBERSHIP_EXPIRED_DISCOUNT_SENDGRID_TEMPLATE_ID
+		})
+
+		await this.tiendasRepository.update(
+			storesToNotify.map(({ id }) => id),
+			{ notifiedAsDiscount: true }
+		)
+	}
 
 	@Cron(CronExpression.EVERY_DAY_AT_6PM)
 	async handleMembershipExpired() {
@@ -79,6 +107,19 @@ export class JobsService {
 		this.logger.log("Emails sent successfully")
 
 		this.logger.log("[handleMembershipIsAboutToExpire] Finished")
+	}
+
+	async handleMembershipExpiredDiscount() {
+		const date40DaysBefore = this.getDateNDaysBeforeFromNow(40)
+		const currentDate = new Date().toISOString()
+
+		return await this.tiendasRepository
+			.createQueryBuilder("store")
+			.andWhere("DATE(store.createdAt) = DATE(:date40DaysBefore)", { date40DaysBefore })
+			.andWhere("store.fechaExpiracion <= DATE(:currentDate)", { currentDate })
+			.innerJoin("store.tiendasInfo", "storeInfo")
+			.select(["store.id", "store.nombre", "storeInfo.emailTienda", "store.fechaExpiracion"])
+			.getMany()
 	}
 
 	async findStoresExpired() {
