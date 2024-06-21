@@ -156,6 +156,9 @@ export class Tiendas {
 	@Column("tinyint", { name: "notified_as_about_to_expire", nullable: true, default: () => "'0'" })
 	notifiedAsAboutToExpire: boolean | null
 
+	@Column("tinyint", { name: "notified_as_discount", nullable: true, default: () => "'0'" })
+	notifiedAsDiscount: boolean | null
+
 	@OneToMany(() => ApisConexiones, (apisConexiones) => apisConexiones.tienda)
 	apisConexiones: ApisConexiones[]
 
