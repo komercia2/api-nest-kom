@@ -11,7 +11,10 @@ export class MySQLStoreAnalyticsRepository implements IStoreAnalyticsRepository 
 		@Inject(StoresInfrastructureInjectionTokens.MySQLStoreAnalyticsService)
 		private readonly storeAnalyticsService: MySQLStoreAnalyticsService
 	) {}
-	async saveClickedPayCart(ids: number[], storeId: number): Promise<void> {
+	async saveClickedPayCart(
+		ids: [{ productId: number; units: number }],
+		storeId: number
+	): Promise<void> {
 		await this.storeAnalyticsService.saveClickedPayCart(ids, storeId)
 	}
 
