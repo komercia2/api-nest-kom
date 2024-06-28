@@ -10,7 +10,7 @@ export class SaveClickedPayCartCommand {
 		private readonly storeAnalyticsRepository: IStoreAnalyticsRepository
 	) {}
 
-	async execute(ids: number[], storeId: number): Promise<void> {
+	async execute(ids: [{ productId: number; units: number }], storeId: number): Promise<void> {
 		await this.storeAnalyticsRepository.saveClickedPayCart(ids, storeId)
 	}
 }

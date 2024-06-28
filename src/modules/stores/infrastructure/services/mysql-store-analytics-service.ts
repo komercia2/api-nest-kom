@@ -14,20 +14,21 @@ export class MySQLStoreAnalyticsService {
 		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
 
-	async saveClickedPayCart(ids: number[], storeId: number) {
-		const unrepeatedIds = new Set(ids)
+	async saveClickedPayCart(ids: [{ productId: number; units: number }], storeId: number) {
+		const storeAnalytics = ids.map(({ productId, units }) => {
+			const analytic = new StoreAnalytics()
 
-		const cleanedIDs = Array.from(unrepeatedIds)
+			analytic.id = UuidUtil.uuid
+			analytic.storeId = +storeId
+			analytic.productId = +productId
+			analytic.units = +units
+			analytic.event = StoreAnalyticsEvent.ADDED_PRODUCT_TO_CART
+			analytic.occurredAt = new Date()
 
-		const storeAnalytics = cleanedIDs.map((id) => ({
-			id: UuidUtil.uuid,
-			storeId,
-			productId: id,
-			event: StoreAnalyticsEvent.CLICKED_PAY_CART,
-			occurredAt: new Date()
-		}))
+			return analytic
+		})
 
-		await this.storeAnalyticsRepository.insert(storeAnalytics)
+		await this.storeAnalyticsRepository.save(storeAnalytics)
 	}
 
 	async countDevices(storeId: number) {

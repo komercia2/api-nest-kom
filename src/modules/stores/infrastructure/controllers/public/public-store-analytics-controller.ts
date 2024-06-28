@@ -24,7 +24,7 @@ export class PublicStoreAnalyticsController {
 	@Post("clicked-pay-cart")
 	saveClickedPayCart(
 		@Req() req: Request,
-		@Body() body: { ids: number[]; storeId: number },
+		@Body() body: { ids: [{ productId: number; units: number }]; storeId: number },
 		@Res() res: Response
 	) {
 		const device = req.headers["user-agent"]
