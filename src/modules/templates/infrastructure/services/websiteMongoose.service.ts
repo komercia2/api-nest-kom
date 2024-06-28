@@ -44,16 +44,16 @@ export class WebsiteMongooseService {
 		| Template16MongooseService
 	>([
 		[15, this.template15MongoService],
-		[6, this.template6MongoService],
-		[99, this.wapiTemplateMongooseService],
-		[12, this.template12MongooseService],
-		[7, this.template7MongooseService],
-		[9, this.template9MongooseService],
-		[10, this.template10MongooseService],
-		[11, this.template11MongooseService],
-		[13, this.template13MongooseService],
-		[14, this.template14MongooseService],
-		[16, this.template16MongooseService]
+		[6, this.template6MongoService]
+		// [99, this.wapiTemplateMongooseService],
+		// [12, this.template12MongooseService],
+		// [7, this.template7MongooseService],
+		// [9, this.template9MongooseService],
+		// [10, this.template10MongooseService],
+		// [11, this.template11MongooseService],
+		// [13, this.template13MongooseService],
+		// [14, this.template14MongooseService],
+		// [16, this.template16MongooseService]
 	])
 
 	constructor(

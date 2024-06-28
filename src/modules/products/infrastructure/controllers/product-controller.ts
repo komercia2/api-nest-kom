@@ -158,7 +158,7 @@ export class ProductController {
 		const { ids, storeId } = boody
 
 		try {
-			const products = await this.getManyByIdsQuery.execute(storeId, ids as number[])
+			const products = await this.getManyByIdsQuery.execute(+storeId, ids as number[])
 
 			handlerHttpResponse(res, {
 				data: products,
