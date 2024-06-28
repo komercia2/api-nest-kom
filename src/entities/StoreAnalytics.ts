@@ -31,6 +31,9 @@ export class StoreAnalytics {
 	@Column({ type: "datetime", nullable: false })
 	occurredAt: Date
 
+	@Column({ type: "int", unsigned: true, nullable: true })
+	units: number | null
+
 	@ManyToOne(() => Tiendas, (Tiendas) => Tiendas.analytics, {
 		onDelete: "CASCADE",
 		onUpdate: "CASCADE"
