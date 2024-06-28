@@ -28,14 +28,14 @@ export class WebSiteMockService {
 		| ITemplate16Repository
 	>([
 		[15, this.template15Repository],
-		[6, this.template6Repository],
-		[99, this.wapiTemplateRepository],
-		[7, this.template7Repository],
-		[9, this.template9Repository],
-		[10, this.template10Repository],
-		[11, this.template11Repository],
-		[13, this.template13Repository],
-		[16, this.template16Repository]
+		[6, this.template6Repository]
+		// [99, this.wapiTemplateRepository],
+		// [7, this.template7Repository],
+		// [9, this.template9Repository],
+		// [10, this.template10Repository],
+		// [11, this.template11Repository],
+		// [13, this.template13Repository],
+		// [16, this.template16Repository]
 	])
 
 	constructor(
