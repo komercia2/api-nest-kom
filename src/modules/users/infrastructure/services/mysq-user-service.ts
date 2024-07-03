@@ -28,6 +28,12 @@ export class MysqlUserService {
 
 		if (emailExist) throw new ConflictException("Email already exists")
 
+		const phoneExist = await this.usersInfoRepository.findOne({
+			where: { telefono: createCheckoutUserDto.phone }
+		})
+
+		if (phoneExist) throw new ConflictException("Phone already exists")
+
 		const user = new Users()
 		user.tipoIdentificacion = createCheckoutUserDto.identificationType
 		user.identificacion = createCheckoutUserDto.document
