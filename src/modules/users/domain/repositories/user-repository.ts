@@ -1,3 +1,4 @@
+import { CreateCheckoutUserDto } from "../dtos/create-checkout-user.dto"
 import { IUserAdress, UserAdressEntity } from "../entities"
 
 export interface IUserRepository {
@@ -28,6 +29,26 @@ export interface IUserRepository {
 	getAdressesByUserId(userId: number): Promise<UserAdressEntity[]>
 	deleteUserAdress(userId: number, adressId: number): Promise<void>
 	authenticateCheckoutUser(document: string): Promise<{
+		token: string
+		userData: {
+			id: number
+			activo: boolean
+			ciudad: number
+			create_at: Date | null
+			email: string | null
+			direccion: string | null
+			identificacion: string | null
+			nombre: string
+			apellido: string | null
+			rol: number
+			tienda: number
+			tipo_identificacion: string | null
+			telefono: string | null
+			birthday: string | null
+			barrio: string | null
+		}
+	}>
+	createCheckoutUser(createCheckoutUserDto: CreateCheckoutUserDto): Promise<{
 		token: string
 		userData: {
 			id: number

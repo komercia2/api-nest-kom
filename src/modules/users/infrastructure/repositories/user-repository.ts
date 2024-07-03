@@ -2,6 +2,7 @@ import { Inject, UnauthorizedException } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 
+import { CreateCheckoutUserDto } from "../../domain/dtos/create-checkout-user.dto"
 import { IUserAdress, UserAdressEntity } from "../../domain/entities"
 import { IUserRepository } from "../../domain/repositories"
 import { MysqlUserService } from "../services"
@@ -16,6 +17,54 @@ export class UserRepository implements IUserRepository {
 
 		private readonly configService: ConfigService
 	) {}
+	async createCheckoutUser(createCheckoutUserDto: CreateCheckoutUserDto): Promise<{
+		token: string
+		userData: {
+			id: number
+			activo: boolean
+			ciudad: number
+			create_at: Date | null
+			email: string | null
+			direccion: string | null
+			identificacion: string | null
+			nombre: string
+			apellido: string | null
+			rol: number
+			tienda: number
+			tipo_identificacion: string | null
+			telefono: string | null
+			birthday: string | null
+			barrio: string | null
+		}
+	}> {
+		const user = await this.mysqlUserService.createCheckoutUser(createCheckoutUserDto)
+
+		const token = this.jwtService.sign(
+			{ userId: user.id },
+			{ expiresIn: "1h", privateKey: this.configService.get<string>("JWT_SECRET") }
+		)
+
+		return {
+			token,
+			userData: {
+				id: user.id,
+				activo: user.activo,
+				ciudad: user.ciudad,
+				direccion: user.usersInfo.direccion,
+				create_at: user.createdAt,
+				email: user.email,
+				identificacion: user.identificacion,
+				nombre: user.nombre,
+				apellido: user.usersInfo.apellido,
+				rol: user.rol,
+				tienda: user.tienda,
+				tipo_identificacion: user.tipoIdentificacion,
+				telefono: user.usersInfo.telefono,
+				birthday: user.usersInfo.birthday,
+				barrio: user.usersInfo.barrio
+			}
+		}
+	}
 
 	async authenticateCheckoutUser(document: string): Promise<{
 		token: string
@@ -52,12 +101,12 @@ export class UserRepository implements IUserRepository {
 				id: user.id,
 				activo: user.activo,
 				ciudad: user.ciudad,
-				direccion: user.usersInfo.direccion,
+				direccion: user?.usersInfo?.direccion,
 				create_at: user.createdAt,
 				email: user.email,
 				identificacion: user.identificacion,
 				nombre: user.nombre,
-				apellido: user.usersInfo.apellido,
+				apellido: user?.usersInfo?.apellido,
 				rol: user.rol,
 				tienda: user.tienda,
 				tipo_identificacion: user.tipoIdentificacion,
