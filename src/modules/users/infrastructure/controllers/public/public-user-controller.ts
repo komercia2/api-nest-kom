@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpException,
 	HttpStatus,
 	Inject,
 	Param,
@@ -56,7 +57,6 @@ export class PublicUserController {
 		@Body() body: CreateCheckoutUserDto
 	) {
 		try {
-			console.log(body)
 			const user = await this.createCheckoutUserCommand.execute(body)
 
 			return handlerHttpResponse(res, {
@@ -66,6 +66,15 @@ export class PublicUserController {
 				success: true
 			})
 		} catch (error) {
+			if (error instanceof HttpException) {
+				return handlerHttpResponse(res, {
+					data: null,
+					message: error.message,
+					statusCode: error.getStatus(),
+					success: false
+				})
+			}
+
 			console.log(error)
 			return handlerHttpResponse(res, {
 				data: null,

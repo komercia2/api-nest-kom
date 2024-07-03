@@ -1,4 +1,4 @@
-import { Injectable, InternalServerErrorException } from "@nestjs/common"
+import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { DireccionesUsuario, Users, UsersInfo } from "src/entities"
 import { Repository } from "typeorm"
@@ -18,6 +18,16 @@ export class MysqlUserService {
 	) {}
 
 	async createCheckoutUser(createCheckoutUserDto: CreateCheckoutUserDto) {
+		const documentExist = await this.searchUserByDocument(createCheckoutUserDto.document)
+
+		if (documentExist) throw new ConflictException("User already exists")
+
+		const emailExist = await this.userRepository.findOne({
+			where: { email: createCheckoutUserDto.email }
+		})
+
+		if (emailExist) throw new ConflictException("Email already exists")
+
 		const user = new Users()
 		user.tipoIdentificacion = createCheckoutUserDto.identificationType
 		user.identificacion = createCheckoutUserDto.document
