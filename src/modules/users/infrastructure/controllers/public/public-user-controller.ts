@@ -3,6 +3,7 @@ import {
 	Controller,
 	Delete,
 	Get,
+	HttpException,
 	HttpStatus,
 	Inject,
 	Param,
@@ -19,10 +20,12 @@ import {
 	CreateUserAdressCommand,
 	DeleteUserAdressCommand
 } from "src/modules/users/application/command"
+import { CreateCheckoutUserCommand } from "src/modules/users/application/command/create-checkout-user.command"
 import {
 	AuthenticateCheckoutUserQuery,
 	GetAdressesByUserIdQuery
 } from "src/modules/users/application/query"
+import { CreateCheckoutUserDto } from "src/modules/users/domain/dtos/create-checkout-user.dto"
 
 import { CreateUserAdressDto } from "../../dtos"
 import { UsersInfrastructureInjectionTokens } from "../../users-infrastructure-injection-tokens"
@@ -41,8 +44,46 @@ export class PublicUserController {
 		private readonly createUserAdressCommand: CreateUserAdressCommand,
 
 		@Inject(UsersInfrastructureInjectionTokens.AuthenticateCheckoutUserQuery)
-		private readonly authenticateCheckoutUserQuery: AuthenticateCheckoutUserQuery
+		private readonly authenticateCheckoutUserQuery: AuthenticateCheckoutUserQuery,
+
+		@Inject(UsersInfrastructureInjectionTokens.CreateCheckoutUserCommand)
+		private readonly createCheckoutUserCommand: CreateCheckoutUserCommand
 	) {}
+
+	@Post("users")
+	async createCheckoutUser(
+		@Req() _req: Request,
+		@Res() res: Response,
+		@Body() body: CreateCheckoutUserDto
+	) {
+		try {
+			const user = await this.createCheckoutUserCommand.execute(body)
+
+			return handlerHttpResponse(res, {
+				data: user,
+				message: "User created successfully",
+				statusCode: HttpStatus.CREATED,
+				success: true
+			})
+		} catch (error) {
+			if (error instanceof HttpException) {
+				return handlerHttpResponse(res, {
+					data: null,
+					message: error.message,
+					statusCode: error.getStatus(),
+					success: false
+				})
+			}
+
+			console.log(error)
+			return handlerHttpResponse(res, {
+				data: null,
+				message: "Error creating user",
+				statusCode: HttpStatus.INTERNAL_SERVER_ERROR,
+				success: false
+			})
+		}
+	}
 
 	@Post("users/authenticate-checkout")
 	async authenticateCheckoutUser(

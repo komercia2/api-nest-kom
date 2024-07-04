@@ -3,5 +3,6 @@ export enum UsersInfrastructureInjectionTokens {
 	GetAdressesByUserIdQuery = "GetAdressesByUserIdQuery",
 	DeleteUserAdressCommand = "DeleteUserAdressCommand",
 	CreateUserAdressCommand = "CreateUserAdressCommand",
-	AuthenticateCheckoutUserQuery = "AuthenticateCheckoutUserQuery"
+	AuthenticateCheckoutUserQuery = "AuthenticateCheckoutUserQuery",
+	CreateCheckoutUserCommand = "CreateCheckoutUserCommand"
 }

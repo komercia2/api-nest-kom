@@ -1,9 +1,10 @@
 import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
-import { DireccionesUsuario, Users } from "src/entities"
+import { DireccionesUsuario, Users, UsersInfo } from "src/entities"
 
 import { CreateUserAdressCommand, DeleteUserAdressCommand } from "./application/command"
+import { CreateCheckoutUserCommand } from "./application/command/create-checkout-user.command"
 import { AuthenticateCheckoutUserQuery, GetAdressesByUserIdQuery } from "./application/query"
 import { UsersApplicationInjectionTokens } from "./application/users-application-injection-tokens"
 import { PublicUserController } from "./infrastructure/controllers/public"
@@ -38,11 +39,15 @@ const infrastructure = [
 	{
 		provide: UsersInfrastructureInjectionTokens.AuthenticateCheckoutUserQuery,
 		useClass: AuthenticateCheckoutUserQuery
+	},
+	{
+		provide: UsersInfrastructureInjectionTokens.CreateCheckoutUserCommand,
+		useClass: CreateCheckoutUserCommand
 	}
 ]
 
 @Module({
-	imports: [TypeOrmModule.forFeature([DireccionesUsuario, Users])],
+	imports: [TypeOrmModule.forFeature([DireccionesUsuario, Users, UsersInfo])],
 	controllers: [PublicUserController],
 	providers: [...application, ...infrastructure]
 })
