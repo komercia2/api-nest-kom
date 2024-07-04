@@ -6,6 +6,7 @@ import {
 	NotFoundException
 } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
+import * as crypto from "crypto"
 import { Logger } from "nestjs-pino"
 import {
 	Carritos,
@@ -16,6 +17,7 @@ import {
 	ProductosInfo,
 	ProductosVariantes,
 	ProductosVariantesCombinaciones,
+	TiendaPayuInfo,
 	Tiendas,
 	TiendasInfo,
 	Users
@@ -28,6 +30,7 @@ import { MailsService } from "../mails/mails.service"
 import { WhatsappService } from "../whatsapp/whatsapp.service"
 import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
+import { CreatePayUOrderDto } from "./dtos/create-payu-order.dto"
 import { GetOrderDto } from "./dtos/get-order-dto"
 import { UpdateOrderStatusDto } from "./dtos/update-order-status.dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
@@ -73,6 +76,8 @@ export class OrdersService {
 
 		@InjectRepository(Tiendas) private readonly tiendas: Repository<Tiendas>,
 
+		@InjectRepository(TiendaPayuInfo) private readonly tiendaPayuInfo: Repository<TiendaPayuInfo>,
+
 		private readonly datasource: DataSource,
 
 		private readonly logger: Logger,
@@ -81,6 +86,35 @@ export class OrdersService {
 
 		private readonly whatsappService: WhatsappService
 	) {}
+
+	async cratePayUOrder(data: CreatePayUOrderDto) {
+		const { cartId, storeId, total } = data
+
+		const cart = await this.carritosRepository.findOne({ where: { id: cartId, tienda: storeId } })
+
+		if (!cart) throw new BadRequestException("Cart not found")
+
+		const store = await this.tiendasInfoRepository.findOne({ where: { tiendaInfo: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		const storePayUInfo = await this.tiendaPayuInfo.findOne({ where: { tiendaId: storeId } })
+
+		if (!storePayUInfo) throw new BadRequestException("Store PayU info not found")
+
+		const { apiKey, merchantId, accountId } = storePayUInfo
+
+		const signature = crypto
+			.createHash("md5")
+			.update(`${apiKey}~${merchantId}~${cartId}~${total}~COP`)
+			.digest("hex")
+
+		return {
+			merchantId,
+			accountId,
+			signature
+		}
+	}
 
 	async updateOrderStatus(updateOrderStatusDto: UpdateOrderStatusDto) {
 		const { orderId, userId, status, method } = updateOrderStatusDto

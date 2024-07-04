@@ -3,6 +3,7 @@ import { ApiTags } from "@nestjs/swagger"
 import { CheckoutJwtGuard } from "@shared/infrastructure/guards"
 
 import { CreateOrderDto } from "./dtos/create-order-dto"
+import { CreatePayUOrderDto } from "./dtos/create-payu-order.dto"
 import { GetOrderDto } from "./dtos/get-order-dto"
 import { UpdateOrderStatusDto } from "./dtos/update-order-status.dto"
 import { OrdersService } from "./orders.service"
@@ -11,6 +12,12 @@ import { OrdersService } from "./orders.service"
 @Controller()
 export class OrdersController {
 	constructor(private readonly ordersService: OrdersService) {}
+
+	@UseGuards(CheckoutJwtGuard)
+	@Post("create-payu-order")
+	async createPayuOrder(@Body() createPayUOrderDto: CreatePayUOrderDto) {
+		return this.ordersService.cratePayUOrder(createPayUOrderDto)
+	}
 
 	@UseGuards(CheckoutJwtGuard)
 	@Put("update-order-status")

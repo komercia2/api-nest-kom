@@ -9,6 +9,7 @@ import {
 	ProductosInfo,
 	ProductosVariantes,
 	ProductosVariantesCombinaciones,
+	TiendaPayuInfo,
 	Tiendas,
 	TiendasInfo,
 	Users
@@ -37,7 +38,8 @@ import { OrdersService } from "./orders.service"
 			Users,
 			Clientes,
 			StoreNotification,
-			MensajeOrden
+			MensajeOrden,
+			TiendaPayuInfo
 		])
 	],
 	controllers: [OrdersController],
