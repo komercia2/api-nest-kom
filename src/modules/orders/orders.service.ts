@@ -2,7 +2,8 @@ import {
 	BadRequestException,
 	ConflictException,
 	Injectable,
-	InternalServerErrorException
+	InternalServerErrorException,
+	NotFoundException
 } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Logger } from "nestjs-pino"
@@ -28,6 +29,7 @@ import { WhatsappService } from "../whatsapp/whatsapp.service"
 import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
 import { GetOrderDto } from "./dtos/get-order-dto"
+import { UpdateOrderStatusDto } from "./dtos/update-order-status.dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
 import { prettifyShippingMethod } from "./utils/prettifyShippingMethod"
 
@@ -79,6 +81,20 @@ export class OrdersService {
 
 		private readonly whatsappService: WhatsappService
 	) {}
+
+	async updateOrderStatus(updateOrderStatusDto: UpdateOrderStatusDto) {
+		const { orderId, userId, status, method } = updateOrderStatusDto
+
+		const order = await this.carritosRepository.findOne({ where: { id: orderId, usuario: userId } })
+
+		if (!order) throw new NotFoundException("Order not found")
+
+		order.estado = status
+		order.metodoPago = method
+		order.updatedAt = new Date()
+
+		await this.carritosRepository.save(order)
+	}
 
 	async getOrder(getOrderDto: GetOrderDto) {
 		const { orderId, storeId, userId } = getOrderDto
