@@ -1,63 +1,46 @@
-import { BadRequestException, Injectable } from "@nestjs/common"
+import { Injectable } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
+import axios from "axios"
 import { Logger } from "nestjs-pino"
-import { Client, LocalAuth } from "whatsapp-web.js"
 
-import { NotifyStoreCreationDto } from "./dto/notify-store-creation.dto"
-import { handleCountryID } from "./utils/handle-country-id"
+interface ISendOrderCreatedWhatsappMessage {
+	name: string
+	cartId: string
+	total: number
+	to: string
+	message: string
+}
 
 @Injectable()
 export class WhatsappService {
-	instance: Client = new Client({
-		puppeteer: { headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] },
-		authStrategy: new LocalAuth({
-			dataPath: "./session.json"
-		}),
-		webVersionCache: {
-			type: "remote",
-			remotePath:
-				"https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html"
-		}
-	})
+	constructor(private readonly logger: Logger, private readonly configService: ConfigService) {}
 
-	constructor(private readonly logger: Logger) {}
+	sendOrderCreatedWhatsappMessage = (data: ISendOrderCreatedWhatsappMessage) => {
+		const { name, cartId, total, to, message } = data
 
-	sendWhatsappMessage = (number: string, message: string) => {
-		const sanitized_number = number.toString().replace(/[- )(]/g, "")
+		const sanitized_number = to.toString().replace(/[- )(]/g, "")
 		const final_number = sanitized_number.replace("+", "")
 
-		this.instance.getNumberId(final_number).then((number_details) => {
-			if (number_details) {
-				this.instance.sendMessage(number_details._serialized, message)
-				this.logger.log(`Message sent to ${final_number}`)
-			} else {
-				this.logger.error(`The number ${final_number} is not registered in WhatsApp`)
+		this.logger.log(`Sending message to ${final_number}`)
+
+		const API_URL = this.configService.get<string>("API_WHATSAPP_URL")
+		const USERNAME = this.configService.get<string>("API_WHATSAPP_USERNAME")
+		const PASSWORD = this.configService.get<string>("API_WHATSAPP_PASSWORD")
+
+		return axios.post(
+			`${API_URL}/notify-order-created`,
+			{
+				name,
+				cartId,
+				total,
+				to: final_number,
+				message
+			},
+			{
+				headers: {
+					Authorization: `Basic ${Buffer.from(`${USERNAME}:${PASSWORD}`).toString("base64")}`
+				}
 			}
-		})
-	}
-
-	notifyStoreCreation = (notifyStoreCreation: NotifyStoreCreationDto) => {
-		const { storeName, storeEmail, storeId, clientFullName, targetGroup, countryId } =
-			notifyStoreCreation
-
-		const fullCountry = handleCountryID(countryId)
-		const message = `¡Felicidades! 🎉✨ Se ha creado una nueva tienda en Komercia. 🚀✨\n\n🆔 ID de la tienda: ${storeId}\n🏬 Nombre de la tienda: ${storeName}\n📧 Correo electrónico de la tienda: ${storeEmail}\n🙋 Nombre del cliente: ${clientFullName} \n🌎 País: ${fullCountry}`
-
-		this.sendMessageToGroup(message, targetGroup)
-
-		return { message: "Message sent" }
-	}
-
-	sendMessageToGroup = (message: string, targetGroup: string) => {
-		this.instance.getChats().then((chats) => {
-			const group = chats.find((chat) => chat.isGroup && chat.name === targetGroup)
-
-			if (group) {
-				group.sendMessage(message)
-				this.logger.log(`Message sent to ${targetGroup}`)
-			} else {
-				this.logger.error(`Group ${targetGroup} not found`)
-				throw new BadRequestException(`Group ${targetGroup} not found`)
-			}
-		})
+		)
 	}
 }
