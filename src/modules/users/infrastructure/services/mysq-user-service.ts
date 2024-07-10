@@ -40,6 +40,8 @@ export class MysqlUserService {
 		user.nombre = createCheckoutUserDto.firstName
 		user.email = createCheckoutUserDto.email
 		user.ciudad = createCheckoutUserDto.cityId
+		user.createdAt = new Date()
+		user.updatedAt = new Date()
 
 		await this.userRepository.save(user)
 
@@ -47,7 +49,7 @@ export class MysqlUserService {
 
 		userInfo.apellido = createCheckoutUserDto.lastName
 		userInfo.genero = createCheckoutUserDto.gender
-		userInfo.telefono = createCheckoutUserDto.phone
+		userInfo.telefono = `${createCheckoutUserDto.code}${createCheckoutUserDto.phone}`
 		userInfo.idUser = user.id
 
 		await this.usersInfoRepository.save(userInfo)
