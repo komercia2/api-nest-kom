@@ -367,6 +367,7 @@ export class SuperService {
 		await queryRunner.connect()
 		await queryRunner.startTransaction()
 		try {
+			await this.entidadesTiendasRepository.delete({ tiendaId: storeId })
 			await this.storeRepository.delete(storeId)
 
 			await queryRunner.commitTransaction()
