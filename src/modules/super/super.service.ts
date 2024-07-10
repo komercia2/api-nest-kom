@@ -354,6 +354,15 @@ export class SuperService {
 
 		if (!store) throw new BadRequestException("Store not found")
 
+		const usersWithStore = await this.usersRepository.find({ where: { tienda: storeId } })
+
+		if (usersWithStore.length > 0) {
+			await this.usersRepository.update(
+				usersWithStore.map((user) => user.id),
+				{ tienda: 0 }
+			)
+		}
+
 		const queryRunner = this.datasource.createQueryRunner()
 		await queryRunner.connect()
 		await queryRunner.startTransaction()
