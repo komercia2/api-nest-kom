@@ -34,10 +34,12 @@ export class MysqlUserService {
 
 		if (phoneExist) throw new ConflictException("Phone already exists")
 
+		const fullName = `${createCheckoutUserDto.firstName} ${createCheckoutUserDto.lastName}`
+
 		const user = new Users()
 		user.tipoIdentificacion = createCheckoutUserDto.identificationType
 		user.identificacion = createCheckoutUserDto.document
-		user.nombre = createCheckoutUserDto.firstName
+		user.nombre = fullName
 		user.email = createCheckoutUserDto.email
 		user.ciudad = createCheckoutUserDto.cityId
 		user.createdAt = new Date()
@@ -47,9 +49,8 @@ export class MysqlUserService {
 
 		const userInfo = new UsersInfo()
 
-		userInfo.apellido = createCheckoutUserDto.lastName
 		userInfo.genero = createCheckoutUserDto.gender
-		userInfo.telefono = `${createCheckoutUserDto.code}${createCheckoutUserDto.phone}`
+		userInfo.telefono = `+${createCheckoutUserDto.code}${createCheckoutUserDto.phone}`
 		userInfo.idUser = user.id
 
 		await this.usersInfoRepository.save(userInfo)
