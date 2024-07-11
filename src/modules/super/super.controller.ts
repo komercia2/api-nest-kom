@@ -25,7 +25,6 @@ import { RedeemMultipleSubscriptionDto } from "../coupons/dtos/redeem-multiple-s
 import { MultipleSubscriptionCouponsService } from "../coupons/multiple-subscriptions-coupons.service"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
-	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
 	GetStoreAdminsDto,
@@ -39,6 +38,7 @@ import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
+import { GetFilteredReferralsDto } from "./dtos/get-filtered-referrals.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
 import { SuperService } from "./super.service"
@@ -51,6 +51,12 @@ export class SuperController {
 		private readonly couponsService: CouponsService,
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("referrals")
+	getReferrals(@Query() paginatationDto: PaginationDto, @Query() filters: GetFilteredReferralsDto) {
+		return this.superService.getReferrals(paginatationDto, filters)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Delete("user-stores/:userId/:storeId")
