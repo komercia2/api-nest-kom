@@ -1077,7 +1077,7 @@ export class SuperService {
 
 		if (toExpire) {
 			const currentDate = new Date()
-			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 20))
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 30))
 
 			queryBuilder.andWhere("store.fechaExpiracion BETWEEN :date AND :currentDate", {
 				date: new Date(),
