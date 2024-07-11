@@ -41,6 +41,7 @@ import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
+import { GetFilteredReferralsDto } from "./dtos/get-filtered-referrals.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
 import { CouponsType } from "./enums/coupons"
@@ -104,6 +105,82 @@ export class SuperService {
 		@InjectRepository(UsersInfo)
 		private readonly usersInfoRepository: Repository<UsersInfo>
 	) {}
+
+	async getStoresReferralByExpert(expertId: string) {
+		const stores = await this.tiendasInfoRepository.find({
+			where: { expert: expertId },
+			relations: { tiendaInfo2: true },
+			select: { tiendaInfo2: { nombre: true } }
+		})
+
+		const normaliedStores = stores.map((store) => {
+			return { id: store?.tiendaInfo, name: store.tiendaInfo2?.nombre }
+		})
+
+		return normaliedStores
+	}
+
+	async getReferrals(paginatationDto: PaginationDto, filters: GetFilteredReferralsDto) {
+		const { page, limit } = paginatationDto
+
+		const { name, email, identification } = filters
+
+		const expertsIDs = await this.tiendasInfoRepository
+			.createQueryBuilder("storeInfo")
+			.where("storeInfo.expert IS NOT NULL")
+			.select(["storeInfo.expert"])
+			.distinct(true)
+			.getMany()
+
+		const cleanedExperts = expertsIDs
+			.map((expert) => expert?.expert)
+			.filter((expert): expert is string => Boolean(expert))
+			.filter((expert) => !isNaN(+expert))
+			.map((expert) => +expert)
+
+		const expertsMapOcurrences = cleanedExperts.reduce((acc, expert) => {
+			acc[expert] = (acc[expert] || 0) + 1
+			return acc
+		}, {} as Record<string, number>)
+
+		const expertsListQuery = this.usersRepository
+			.createQueryBuilder("users")
+			.where("users.id IN (:...experts)", { experts: cleanedExperts })
+			.select(["users.id", "users.nombre", "users.email", "users.identificacion"])
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (name) expertsListQuery.andWhere("users.nombre LIKE :name", { name: `%${name}%` })
+
+		if (email) expertsListQuery.andWhere("users.email LIKE :email", { email: `%${email}%` })
+
+		if (identification) {
+			expertsListQuery.andWhere("users.identificacion LIKE :identification", {
+				identification: `%${identification}%`
+			})
+		}
+
+		const [expertsList, count] = await Promise.all([
+			expertsListQuery.getMany(),
+			this.usersRepository.count({ where: { id: In(cleanedExperts) } })
+		])
+
+		const expertsListWithOccurrences = expertsList.map((expert) => {
+			const referrals = expertsMapOcurrences[expert.id] || 0
+			return { ...expert, referrals }
+		})
+
+		return {
+			data: expertsListWithOccurrences,
+			pagination: {
+				total: Math.ceil(count / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(count / limit)
+			}
+		}
+	}
 
 	async removeUserAdmin(userId: number, storeId: number) {
 		const user = await this.usersRepository.findOne({ where: { id: userId } })
@@ -1000,7 +1077,7 @@ export class SuperService {
 
 		if (toExpire) {
 			const currentDate = new Date()
-			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 20))
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 30))
 
 			queryBuilder.andWhere("store.fechaExpiracion BETWEEN :date AND :currentDate", {
 				date: new Date(),
