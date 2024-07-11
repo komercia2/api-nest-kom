@@ -4,6 +4,7 @@ import { NestFactory } from "@nestjs/core"
 import { SwaggerModule } from "@nestjs/swagger"
 import { getSwaggerConfig } from "@shared/infrastructure/docs"
 import * as compression from "compression"
+import { json, urlencoded } from "express"
 import { Logger } from "nestjs-pino"
 import { useNestTreblle } from "treblle"
 
@@ -15,6 +16,8 @@ async function bootstrap() {
 	})
 
 	const configService = app.get(ConfigService)
+	app.use(json({ limit: "50mb" }))
+	app.use(urlencoded({ extended: true, limit: "50mb" }))
 	app.enableCors()
 	const { config, path } = getSwaggerConfig()
 	const document = SwaggerModule.createDocument(app, config)
