@@ -53,6 +53,12 @@ export class SuperController {
 	) {}
 
 	@UseGuards(SuperJwtAuthGuard)
+	@Get("referrals/:expertId")
+	getStoresReferralByExpert(@Param("expertId") expertId: string) {
+		return this.superService.getStoresReferralByExpert(expertId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
 	@Get("referrals")
 	getReferrals(@Query() paginatationDto: PaginationDto, @Query() filters: GetFilteredReferralsDto) {
 		return this.superService.getReferrals(paginatationDto, filters)

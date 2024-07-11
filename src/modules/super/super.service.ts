@@ -106,6 +106,20 @@ export class SuperService {
 		private readonly usersInfoRepository: Repository<UsersInfo>
 	) {}
 
+	async getStoresReferralByExpert(expertId: string) {
+		const stores = await this.tiendasInfoRepository.find({
+			where: { expert: expertId },
+			relations: { tiendaInfo2: true },
+			select: { tiendaInfo2: { nombre: true } }
+		})
+
+		const normaliedStores = stores.map((store) => {
+			return { id: store?.tiendaInfo, name: store.tiendaInfo2?.nombre }
+		})
+
+		return normaliedStores
+	}
+
 	async getReferrals(paginatationDto: PaginationDto, filters: GetFilteredReferralsDto) {
 		const { page, limit } = paginatationDto
 
