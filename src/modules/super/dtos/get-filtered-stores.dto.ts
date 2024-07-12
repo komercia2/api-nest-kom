@@ -52,4 +52,7 @@ export class GetFilteredStoresDto {
 	readonly date: "ASC" | "DESC"
 
 	readonly phone: string
+
+	@Type(() => Boolean)
+	readonly refferal: boolean
 }
