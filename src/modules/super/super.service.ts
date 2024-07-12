@@ -975,7 +975,8 @@ export class SuperService {
 			withSuscriptionCoupon,
 			withoutExpire,
 			toExpire,
-			phone
+			phone,
+			refferal
 		} = filter
 
 		const queryBuilder = this.storeRepository
@@ -1000,7 +1001,8 @@ export class SuperService {
 				"entidadesTiendas.id",
 				"entidadesTiendas.entidadId",
 				"users.nombre",
-				"users.email"
+				"users.email",
+				"tiendasInfo.expert"
 			])
 			.innerJoin("store.tiendasInfo", "tiendasInfo")
 			.leftJoin("store.users", "users")
@@ -1091,6 +1093,8 @@ export class SuperService {
 		}
 
 		if (phone) queryBuilder.andWhere("tiendasInfo.telefono LIKE :phone", { phone: `%${phone}%` })
+
+		if (refferal) queryBuilder.andWhere("tiendasInfo.expert IS NOT NULL")
 
 		const [stores, total] = await queryBuilder.getManyAndCount()
 
