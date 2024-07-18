@@ -6,7 +6,6 @@ import { getSwaggerConfig } from "@shared/infrastructure/docs"
 import { json, urlencoded } from "body-parser"
 import * as compression from "compression"
 import { Logger } from "nestjs-pino"
-import { useNestTreblle } from "treblle"
 
 import { AppModule } from "./app.module"
 
@@ -33,13 +32,6 @@ async function bootstrap() {
 	const expressInstance = app.getHttpAdapter().getInstance()
 
 	expressInstance.disable("x-powered-by")
-
-	if (configService.get<string>("NODE_ENV") === "production") {
-		useNestTreblle(expressInstance, {
-			apiKey: configService.get<string>("TREBLLE_API_KEY") || "",
-			projectId: configService.get<string>("TREBLLE_PROJECT_ID") || ""
-		})
-	}
 
 	app.useGlobalPipes(new ValidationPipe())
 	app.useLogger(app.get(Logger))
