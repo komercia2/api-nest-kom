@@ -1,5 +1,7 @@
 import { Injectable } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
+import { OnEvent } from "@nestjs/event-emitter"
+import { Events } from "@shared/domain/constants/events"
 import axios from "axios"
 import { Logger } from "nestjs-pino"
 
@@ -15,11 +17,16 @@ interface ISendOrderCreatedWhatsappMessage {
 export class WhatsappService {
 	constructor(private readonly logger: Logger, private readonly configService: ConfigService) {}
 
-	sendOrderCreatedWhatsappMessage = (data: ISendOrderCreatedWhatsappMessage) => {
+	@OnEvent(Events.ORDER_CREATED)
+	sendOrderCreatedWhatsappMessage(data: ISendOrderCreatedWhatsappMessage) {
 		const { name, cartId, total, to, message } = data
 
 		const sanitized_number = to.toString().replace(/[- )(]/g, "")
-		const final_number = sanitized_number.replace("+", "")
+		let final_number = sanitized_number.replace("+", "")
+
+		if (final_number.length === 10 && !final_number.startsWith("57")) {
+			final_number = `57${final_number}`
+		}
 
 		this.logger.log(`Sending message to ${final_number}`)
 
