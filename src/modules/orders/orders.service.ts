@@ -5,7 +5,9 @@ import {
 	InternalServerErrorException,
 	NotFoundException
 } from "@nestjs/common"
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { InjectRepository } from "@nestjs/typeorm"
+import { Events } from "@shared/domain/constants/events"
 import * as crypto from "crypto"
 import { Logger } from "nestjs-pino"
 import {
@@ -84,7 +86,9 @@ export class OrdersService {
 
 		private readonly mailsService: MailsService,
 
-		private readonly whatsappService: WhatsappService
+		private readonly whatsappService: WhatsappService,
+
+		private eventEmitter: EventEmitter2
 	) {}
 
 	async cratePayUOrder(data: CreatePayUOrderDto) {
@@ -334,15 +338,14 @@ export class OrdersService {
 
 			if (datosTienda?.telefono) {
 				const whatsappStoreMessage = `🔔Nueva venta en tu tienda\n¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. ¡Revísalo pronto! 💪🏼🥳.\nPuedes ingresar a tu panel de control para ver todos los detalles de la venta 🔍.\n💜 Enviado por Komercia.`
-				notificationsTasks.push(
-					this.whatsappService.sendOrderCreatedWhatsappMessage({
-						name: datosTienda.nombre,
-						cartId: cart.id.toString(),
-						total: cart.total,
-						to: datosTienda.telefono,
-						message: whatsappStoreMessage
-					})
-				)
+
+				this.eventEmitter.emit(Events.ORDER_CREATED, {
+					name: datosTienda.nombre,
+					cartId: cart.id.toString(),
+					total: cart.total,
+					to: datosTienda.telefono,
+					message: whatsappStoreMessage
+				})
 			}
 
 			try {
