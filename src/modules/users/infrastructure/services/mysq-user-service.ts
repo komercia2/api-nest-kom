@@ -4,6 +4,7 @@ import { DireccionesUsuario, Users, UsersInfo } from "src/entities"
 import { Repository } from "typeorm"
 
 import { CreateCheckoutUserDto } from "../../domain/dtos/create-checkout-user.dto"
+import { UpdateIdentificationDocumentDto } from "../../domain/dtos/update-identification-document.dto"
 import { IUserAdress, UserAdressEntity } from "../../domain/entities"
 
 @Injectable()
@@ -16,6 +17,20 @@ export class MysqlUserService {
 
 		@InjectRepository(UsersInfo) private readonly usersInfoRepository: Repository<UsersInfo>
 	) {}
+
+	async updateIdentificationDocument(data: UpdateIdentificationDocumentDto) {
+		const { email, identificationType, oldDocument, newDocument } = data
+
+		const user = await this.userRepository.findOne({
+			where: { email, tipoIdentificacion: identificationType, identificacion: oldDocument }
+		})
+
+		if (!user) throw new ConflictException("User not found")
+
+		user.identificacion = newDocument
+
+		await this.userRepository.save(user)
+	}
 
 	async createCheckoutUser(createCheckoutUserDto: CreateCheckoutUserDto) {
 		const documentExist = await this.searchUserByDocument(createCheckoutUserDto.document)

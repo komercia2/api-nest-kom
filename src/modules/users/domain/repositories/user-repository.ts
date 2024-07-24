@@ -1,4 +1,5 @@
 import { CreateCheckoutUserDto } from "../dtos/create-checkout-user.dto"
+import { UpdateIdentificationDocumentDto } from "../dtos/update-identification-document.dto"
 import { IUserAdress, UserAdressEntity } from "../entities"
 
 export interface IUserRepository {
@@ -68,4 +69,5 @@ export interface IUserRepository {
 			barrio: string | null
 		}
 	}>
+	updateIdentificationDocument(data: UpdateIdentificationDocumentDto): Promise<void>
 }
