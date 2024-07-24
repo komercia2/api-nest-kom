@@ -3,6 +3,7 @@ import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 
 import { CreateCheckoutUserDto } from "../../domain/dtos/create-checkout-user.dto"
+import { UpdateIdentificationDocumentDto } from "../../domain/dtos/update-identification-document.dto"
 import { IUserAdress, UserAdressEntity } from "../../domain/entities"
 import { IUserRepository } from "../../domain/repositories"
 import { MysqlUserService } from "../services"
@@ -17,6 +18,11 @@ export class UserRepository implements IUserRepository {
 
 		private readonly configService: ConfigService
 	) {}
+
+	async updateIdentificationDocument(data: UpdateIdentificationDocumentDto): Promise<void> {
+		await this.mysqlUserService.updateIdentificationDocument(data)
+	}
+
 	async createCheckoutUser(createCheckoutUserDto: CreateCheckoutUserDto): Promise<{
 		token: string
 		userData: {
