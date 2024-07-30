@@ -5,7 +5,7 @@ import { Configuration, OpenAIApi } from "openai"
 export class OpenAIProducSuggetionsServices {
 	private configuration: Configuration
 
-	private readonly MODEL = "gpt-3.5-turbo"
+	private readonly MODEL = "gpt-4o-mini"
 	private readonly ROLE = "assistant"
 
 	async getProductDescriptionSuggetion(apiKey: string, prompt: string) {
