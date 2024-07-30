@@ -28,7 +28,9 @@ export class WhatsappService {
 			}
 		})
 
-		return response.data
+		const { data } = response
+
+		return { status: data }
 	}
 
 	@OnEvent(Events.ORDER_CREATED)
