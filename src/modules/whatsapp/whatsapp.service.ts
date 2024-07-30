@@ -17,6 +17,20 @@ interface ISendOrderCreatedWhatsappMessage {
 export class WhatsappService {
 	constructor(private readonly logger: Logger, private readonly configService: ConfigService) {}
 
+	async getStaatus() {
+		const API_URL = this.configService.get<string>("API_WHATSAPP_URL")
+		const USERNAME = this.configService.get<string>("API_WHATSAPP_USERNAME")
+		const PASSWORD = this.configService.get<string>("API_WHATSAPP_PASSWORD")
+
+		const response = await axios.get(`${API_URL}/status`, {
+			headers: {
+				Authorization: `Basic ${Buffer.from(`${USERNAME}:${PASSWORD}`).toString("base64")}`
+			}
+		})
+
+		return response.data
+	}
+
 	@OnEvent(Events.ORDER_CREATED)
 	sendOrderCreatedWhatsappMessage(data: ISendOrderCreatedWhatsappMessage) {
 		const { name, cartId, total, to, message } = data
