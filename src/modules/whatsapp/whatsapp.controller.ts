@@ -1,4 +1,4 @@
-import { Controller } from "@nestjs/common"
+import { Controller, Get } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 
 import { WhatsappService } from "./whatsapp.service"
@@ -7,4 +7,9 @@ import { WhatsappService } from "./whatsapp.service"
 @Controller()
 export class WhatsappController {
 	constructor(private readonly whatsappService: WhatsappService) {}
+
+	@Get("status")
+	async getStatus() {
+		return this.whatsappService.getStaatus()
+	}
 }
