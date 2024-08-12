@@ -103,21 +103,22 @@ export class AnalyticsService {
 
 		const adddToCartEvent = StoreAnalyticsEvent.ADDED_PRODUCT_TO_CART
 		const viewedProductEvent = StoreAnalyticsEvent.VIEWED_PRODUCT
-		const clickedPayCartEvent = StoreAnalyticsEvent.CLICKED_PAY_CART
 
 		const productsWithAnalyticsCount = productsWithAnalytics.map((product) => {
 			const productAnalytics = product?.analytics
 
 			const addedToCart = productAnalytics.filter(({ event }) => event === adddToCartEvent)
 			const viewedProduct = productAnalytics.filter(({ event }) => event === viewedProductEvent)
-			const clickedPayCart = productAnalytics.filter(({ event }) => event === clickedPayCartEvent)
+			const cartsWithUnits = addedToCart.filter(({ units }) => units !== null && units > 0)
+
+			const totalUnits = cartsWithUnits.reduce((acc, { units }) => acc + (units || 0), 0)
 
 			return {
 				...product,
 				analytics: {
 					addedToCart: addedToCart.length,
 					viewedProduct: viewedProduct.length,
-					clickedPayCart: clickedPayCart.length
+					clickedPayCart: totalUnits
 				}
 			}
 		})
