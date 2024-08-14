@@ -21,7 +21,7 @@ export class AnalyticsService {
 	async getClients(storeId: number, paginationDto: PaginationDto, filters: FilterClientDto) {
 		const { limit, page } = paginationDto
 
-		const { name } = filters
+		const { name, sortByName, sortByTotal, sortByTotalCarts } = filters
 
 		const query = this.carritosRepository
 			.createQueryBuilder("carts")
@@ -41,6 +41,9 @@ export class AnalyticsService {
 			.orderBy("total", "DESC")
 
 		if (name) query.andWhere("usuario.nombre LIKE :name", { name: `%${name}%` })
+		if (String(sortByName) === "1") query.orderBy("usuario.nombre", "ASC")
+		if (String(sortByTotal) === "1") query.orderBy("total", "DESC")
+		if (String(sortByTotalCarts) === "1") query.orderBy("count", "DESC")
 
 		const clients = await query.getRawMany()
 
