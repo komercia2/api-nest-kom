@@ -5,6 +5,7 @@ import { Repository } from "typeorm"
 
 import { StoreAnalyticsEvent } from "../stores/domain/entities"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
+import { FilterClientDto } from "./dto/filter-client.dto"
 import { FilterProductAnalyticsDto } from "./dto/filter-product-analytics.dto"
 import { GetEventHistoryDto } from "./dto/get-event-history.dto"
 
@@ -16,6 +17,48 @@ export class AnalyticsService {
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
 		@InjectRepository(Productos) private productosRepository: Repository<Productos>
 	) {}
+
+	async getClients(storeId: number, paginationDto: PaginationDto, filters: FilterClientDto) {
+		const { limit, page } = paginationDto
+
+		const { name } = filters
+
+		const query = this.carritosRepository
+			.createQueryBuilder("carts")
+			.select("carts.usuario")
+			.addSelect("usuario.nombre", "name")
+			.addSelect("usuario.email", "email")
+			.addSelect("ciudad.nombreCiu", "city")
+			.addSelect("COUNT(carts.usuario)", "count")
+			.addSelect("SUM(carts.total)", "total")
+			.innerJoin("carts.usuario2", "usuario")
+			.innerJoin("usuario.ciudad2", "ciudad")
+			.where("carts.tienda = :storeId", { storeId })
+			.andWhere("carts.estado = '1'")
+			.andWhere("carts.deletedAt IS NULL")
+			.groupBy("carts.usuario")
+			.orderBy("count", "DESC")
+			.orderBy("total", "DESC")
+
+		if (name) query.andWhere("usuario.nombre LIKE :name", { name: `%${name}%` })
+
+		const clients = await query.getRawMany()
+
+		const total = clients.length
+
+		const paginatedClients = clients.slice((page - 1) * limit, page * limit)
+
+		return {
+			data: paginatedClients,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
 
 	async getEventHistory(storeId: number, getEventHistoryDto: GetEventHistoryDto) {
 		const { startDate, endDate, event } = getEventHistoryDto
