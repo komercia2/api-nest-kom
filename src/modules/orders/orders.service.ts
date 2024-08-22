@@ -325,7 +325,9 @@ export class OrdersService {
 				const clientEmailData: OrderEmailDto = {
 					...(await this.formatDataForEmail(createOrderDto, cart, true))
 				}
-				notificationsTasks.push(this.sendOrderEmail(emailCliente, tienda, clientEmailData))
+				notificationsTasks.push(
+					this.sendOrderEmail(emailCliente, tienda, clientEmailData, "¡Tu pedido fue recibido!")
+				)
 			}
 
 			if (datosTienda?.email_tienda) {
@@ -333,7 +335,9 @@ export class OrdersService {
 				const storeEmailData: OrderEmailDto = {
 					...(await this.formatDataForEmail(createOrderDto, cart, false))
 				}
-				notificationsTasks.push(this.sendOrderEmail(emailTienda, tienda, storeEmailData))
+				notificationsTasks.push(
+					this.sendOrderEmail(emailTienda, tienda, storeEmailData, "¡Nueva venta en tu tienda!")
+				)
 			}
 
 			if (datosTienda?.telefono) {
@@ -382,12 +386,18 @@ export class OrdersService {
 		}
 	}
 
-	private async sendOrderEmail(email: string, storeId: number, data: OrderEmailDto) {
+	private async sendOrderEmail(
+		email: string,
+		storeId: number,
+		data: OrderEmailDto,
+		subject: string
+	) {
 		return await this.mailsService.sendCustomEmail({
 			to: email,
 			storeId,
 			templateId: "d-31bcbff48b1841f29782d02a9904a177",
-			dynamicTemplateData: data
+			dynamicTemplateData: data,
+			subject
 		})
 	}
 

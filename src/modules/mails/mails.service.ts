@@ -39,13 +39,17 @@ export class MailsService {
 	}
 
 	async sendCustomEmail(createMailDto: CreateMailDto): Promise<{ success: boolean }> {
-		const { to, templateId, dynamicTemplateData } = createMailDto
+		const { to, templateId, dynamicTemplateData, subject } = createMailDto
 		try {
 			await this.mailService.send({
 				to: to,
 				from: this.sendgridFrom as string,
 				templateId,
-				dynamicTemplateData
+				dynamicTemplateData: {
+					...dynamicTemplateData,
+					subject
+				},
+				subject
 			})
 			this.logger.log(`Email sent successfully to ${to}`)
 			return { success: true }
