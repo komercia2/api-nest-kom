@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsNumber, IsObject, IsString } from "class-validator"
+import { IsNotEmpty, IsNumber, IsObject, IsOptional, IsString } from "class-validator"
 
 import { ContactMailWithManyFields } from "../types/mails"
 
@@ -6,6 +6,10 @@ export class CreateMailDto {
 	@IsString()
 	@IsNotEmpty()
 	readonly to: string
+
+	@IsString()
+	@IsOptional()
+	readonly subject?: string
 
 	readonly userId?: number
 
