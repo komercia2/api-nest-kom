@@ -3,54 +3,71 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Productos, Tiendas } from "src/entities"
 import { Repository } from "typeorm"
 
-import { GetProductsDto } from "./dto/get-products.dto"
-
 @Injectable()
 export class ChatbotsService {
 	constructor(
 		@InjectRepository(Tiendas) private readonly storeRepository: Repository<Tiendas>,
-		@InjectRepository(Productos) private readonly productRepository: Repository<Productos>
+		@InjectRepository(Productos) private readonly productPrository: Repository<Productos>
 	) {}
 
-	async getProducts(storeID: number, getProductDto: GetProductsDto) {
-		const { name } = getProductDto
-
-		const query = this.productRepository
+	async getProducts(storeId: number) {
+		const queryBuilder = this.productPrository
 			.createQueryBuilder("productos")
+			.where("productos.tienda = :storeId", { storeId })
+			.andWhere("productos.activo = 1")
+			.andWhere("productos.deletedAt IS NULL")
+			.innerJoin("productos.productosInfo", "productosInfo")
+			.innerJoin("productos.productosVariantes", "productosVariantes")
+			.innerJoin(
+				"productosVariantes.productosVariantesCombinaciones",
+				"productosVariantesCombinaciones"
+			)
 			.select([
-				"productos.id",
 				"productos.nombre",
 				"productos.precio",
-				"productos.activo",
-				"productos.envioGratis",
-				"productos.categoriaProducto2"
+				"productosInfo.inventario",
+				"productosVariantes.variantes"
 			])
-			.where("productos.deletedAt IS NULL")
-			.where("productos.activo = 1")
-			.andWhere("productos.tienda = :storeID", { storeID })
-			.leftJoin("productos.categoriaProducto2", "categoriaProducto2")
 
-		if (name) query.andWhere("productos.nombre LIKE :name", { name: `%${name}%` })
+		const products = await queryBuilder.getMany()
 
-		return await query.getMany()
+		console.log(products)
+
+		return products.map((product) => ({
+			name: product.nombre,
+			price: product.precio,
+			stock: product.productosInfo.inventario,
+			variants: product.productosVariantes.map((variant) => JSON.parse(variant.variantes || "[]"))
+		}))
 	}
 
-	async getStoreBasicInfo(storeID: number) {
-		const query = this.storeRepository
-			.createQueryBuilder("tiendas")
+	async getBasicInfo(storeId: number) {
+		const queryBuilder = this.storeRepository
+			.createQueryBuilder("store")
+			.where("store.id = :storeId", { storeId })
+			.leftJoin("store.categoriaProductos", "categoriaProductos")
+			.leftJoin("store.tiendasInfo", "tiendasInfo")
+			.leftJoin("store.tags", "tags")
 			.select([
-				"tiendas.id",
-				"tiendas.nombre",
+				"store.nombre",
 				"tags.name",
-				"categoria2.nombreCategoria",
-				"tiendasInfo.descripcion"
+				"categoriaProductos.nombreCategoriaProducto",
+				"tiendasInfo.descripcion",
+				"store.subdominio",
+				"tiendasInfo.dominio"
 			])
-			.andWhere("tiendas.activo = 1")
-			.where("tiendas.id = :storeID", { storeID })
-			.leftJoin("tiendas.tags", "tags")
-			.leftJoin("tiendas.categoria2", "categoria2")
-			.leftJoin("tiendas.tiendasInfo", "tiendasInfo")
 
-		return await query.getOne()
+		const storeInfo = await queryBuilder.getOne()
+
+		if (!storeInfo) return null
+
+		return {
+			name: storeInfo.nombre,
+			description: storeInfo.tiendasInfo.descripcion,
+			domain: storeInfo.subdominio,
+			subdomain: storeInfo.tiendasInfo.dominio,
+			tags: storeInfo.tags.map((tag) => tag.name),
+			categories: storeInfo.categoriaProductos.map((categoria) => categoria.nombreCategoriaProducto)
+		}
 	}
 }
