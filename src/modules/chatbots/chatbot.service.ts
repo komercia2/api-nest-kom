@@ -16,28 +16,14 @@ export class ChatbotsService {
 			.where("productos.tienda = :storeId", { storeId })
 			.andWhere("productos.activo = 1")
 			.andWhere("productos.deletedAt IS NULL")
-			.innerJoin("productos.productosInfo", "productosInfo")
-			.innerJoin("productos.productosVariantes", "productosVariantes")
-			.innerJoin(
-				"productosVariantes.productosVariantesCombinaciones",
-				"productosVariantesCombinaciones"
-			)
-			.select([
-				"productos.nombre",
-				"productos.precio",
-				"productosInfo.inventario",
-				"productosVariantes.variantes"
-			])
+			.select(["productos.id", "productos.nombre", "productos.fotoCloudinary"])
 
 		const products = await queryBuilder.getMany()
 
-		console.log(products)
-
 		return products.map((product) => ({
+			id: product.id,
 			name: product.nombre,
-			price: product.precio,
-			stock: product.productosInfo.inventario,
-			variants: product.productosVariantes.map((variant) => JSON.parse(variant.variantes || "[]"))
+			image: product.fotoCloudinary
 		}))
 	}
 
@@ -57,7 +43,10 @@ export class ChatbotsService {
 				"tiendasInfo.dominio"
 			])
 
-		const storeInfo = await queryBuilder.getOne()
+		const [storeInfo, products] = await Promise.all([
+			queryBuilder.getOne(),
+			this.getProducts(storeId)
+		])
 
 		if (!storeInfo) return null
 
@@ -67,7 +56,10 @@ export class ChatbotsService {
 			domain: storeInfo.subdominio,
 			subdomain: storeInfo.tiendasInfo.dominio,
 			tags: storeInfo.tags.map((tag) => tag.name),
-			categories: storeInfo.categoriaProductos.map((categoria) => categoria.nombreCategoriaProducto)
+			categories: storeInfo.categoriaProductos.map(
+				(categoria) => categoria.nombreCategoriaProducto
+			),
+			products
 		}
 	}
 }
