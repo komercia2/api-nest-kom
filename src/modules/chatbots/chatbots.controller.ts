@@ -6,6 +6,11 @@ import { ChatbotsService } from "./chatbot.service"
 export class ChatbotsController {
 	constructor(private readonly chatbotService: ChatbotsService) {}
 
+	@Get("/product/:productID")
+	async getProductInfo(@Param("productID") productID: string) {
+		return await this.chatbotService.getProductInfo(+productID)
+	}
+
 	@Get("/products/:storeID")
 	async getStoreProducts(@Param("storeID") storeID: string) {
 		return await this.chatbotService.getProducts(+storeID)
