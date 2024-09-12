@@ -28,11 +28,14 @@ import { PasswordUtil } from "./utils/password.util"
 
 @Injectable()
 export class AuthService {
+	private readonly PHONE_TEST = "3999999993"
+
 	constructor(
 		private readonly jwtService: JwtService,
 		private readonly configService: ConfigService,
 		@InjectRepository(Users) private readonly usersRepository: Repository<Users>,
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
+		@InjectRepository(UsersInfo) private readonly usersInfoRepository: Repository<UsersInfo>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
@@ -52,7 +55,14 @@ export class AuthService {
 
 		const subdomain = await this.getSubdomain(dto.nombre_tienda)
 
-		const userExists = await this.userEmailExists(dto.email)
+		const [userExists, phoneExists] = await Promise.all([
+			this.userEmailExists(dto.email),
+			this.userPhoneExists(dto.celular)
+		])
+
+		if (phoneExists && phoneExists.telefono !== this.PHONE_TEST) {
+			throw new ConflictException("Phone already in use")
+		}
 
 		if (userExists) {
 			if (userExists.tienda !== 0) throw new ConflictException("Email already in use")
@@ -311,6 +321,10 @@ export class AuthService {
 
 	async userEmailExists(email: string) {
 		return await this.usersRepository.findOne({ where: { email } })
+	}
+
+	async userPhoneExists(phone: string) {
+		return await this.usersInfoRepository.findOne({ where: { telefono: phone } })
 	}
 
 	getCurrentDayCustomDaysAfter(customDays: number) {
