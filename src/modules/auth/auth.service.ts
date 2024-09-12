@@ -29,6 +29,7 @@ import { PasswordUtil } from "./utils/password.util"
 @Injectable()
 export class AuthService {
 	private readonly PHONE_TEST = "3999999993"
+	private readonly PHONE_PREFIXES = ["+57", "+52", "+54", "+56", "+1", "+51", "+507"]
 
 	constructor(
 		private readonly jwtService: JwtService,
@@ -60,7 +61,9 @@ export class AuthService {
 			this.userPhoneExists(dto.celular)
 		])
 
-		if (phoneExists && phoneExists.telefono !== this.PHONE_TEST) {
+		const isPrefixValid = this.PHONE_PREFIXES.some((prefix) => prefix === dto.celular)
+
+		if (phoneExists && !isPrefixValid && dto?.celular?.length < 4) {
 			throw new ConflictException("Phone already in use")
 		}
 
