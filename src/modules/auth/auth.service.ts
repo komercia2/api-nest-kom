@@ -114,7 +114,7 @@ export class AuthService {
 
 			this.logger.log("Payment methods saved")
 
-			paymentMethods.idMedios = 1
+			paymentMethods.idMedios = store.id
 			paymentMethods.convenir = true
 			paymentMethods.consignacion = false
 			paymentMethods.payu = false
@@ -132,6 +132,7 @@ export class AuthService {
 			paymentMethods.credibanco = false
 			paymentMethods.flow = false
 			paymentMethods.paymentsWay = false
+			paymentMethods.createdAt = new Date()
 
 			await queryRunner.manager.save(paymentMethods)
 
@@ -194,10 +195,12 @@ export class AuthService {
 					if (dto.entidad) await this.assignStoreEntity(store.id, dto.entidad)
 				}
 			} else {
+				const hashedPasswordNode = PasswordUtil.hash(dto.password)
+
 				const user = new Users()
 				user.nombre = dto.nombre
 				user.email = dto.email
-				user.password = PasswordUtil.toLaravelHash(dto.password)
+				user.password = PasswordUtil.toLaravelHash(hashedPasswordNode)
 				user.foto = "user.jpg"
 				user.ciudad = dto.ciudad ?? 0
 				user.tienda = store.id ?? 0
