@@ -163,7 +163,7 @@ export class SuperController {
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Put("users")
+	@Put("users/change-password")
 	editPassword(@Body() editUserDto: EditUserDto) {
 		return this.superService.editUser(editUserDto)
 	}
