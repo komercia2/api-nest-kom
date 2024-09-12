@@ -25,6 +25,7 @@ import { RedeemMultipleSubscriptionDto } from "../coupons/dtos/redeem-multiple-s
 import { MultipleSubscriptionCouponsService } from "../coupons/multiple-subscriptions-coupons.service"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
+	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
 	GetStoreAdminsDto,
@@ -51,6 +52,12 @@ export class SuperController {
 		private readonly couponsService: CouponsService,
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("change-password")
+	changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+		return this.superService.changePassword(changePasswordDto)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Get("referrals/:expertId")
@@ -163,7 +170,7 @@ export class SuperController {
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
-	@Put("users/change-password")
+	@Put("users")
 	editPassword(@Body() editUserDto: EditUserDto) {
 		return this.superService.editUser(editUserDto)
 	}

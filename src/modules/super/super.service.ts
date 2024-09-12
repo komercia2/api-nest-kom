@@ -28,6 +28,7 @@ import { validate as isValidUUID } from "uuid"
 import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
+	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
 	GetStoreAdminsDto,
@@ -483,6 +484,21 @@ export class SuperService {
 		await this.usersRepository.update({ id: userId }, { ...params })
 		await this.usersInfoRepository.update({ idUser: userId }, { telefono: phone })
 		return { message: "User updated" }
+	}
+
+	async changePassword(changePasswordDto: ChangePasswordDto) {
+		const { userId, newPassword } = changePasswordDto
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const bcryptHash = PasswordUtil.hash(newPassword)
+		const hashedPassword = PasswordUtil.toLaravelHash(bcryptHash)
+
+		await this.usersRepository.update({ id: userId }, { password: hashedPassword })
+
+		return { message: "Password changed" }
 	}
 
 	async updateStore(updateStoreDto: UpdateStoreDto) {
