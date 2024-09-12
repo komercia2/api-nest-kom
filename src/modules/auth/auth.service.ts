@@ -151,6 +151,8 @@ export class AuthService {
 			const taks: TareasTienda[] = []
 
 			for (let i = 1; i < 11; i++) {
+				if (i === 2) continue
+
 				const task = new TareasTienda()
 				task.idTienda = store.id
 				task.idTarea = i
