@@ -15,6 +15,7 @@ import { LoggerModule } from "nestjs-pino"
 
 import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
+import { AnalyticsModule } from "./modules/analytics/analytics.module"
 import { AuthModule } from "./modules/auth/auth.module"
 import { CommonModule } from "./modules/common/common.module"
 import { CouponsModule } from "./modules/coupons/coupons.module"
@@ -29,9 +30,9 @@ import { ProductModule } from "./modules/products/products.module"
 import { SalesModule } from "./modules/sales/sales.module"
 import { StoresModule } from "./modules/stores/stores.module"
 import { SuperModule } from "./modules/super/super.module"
+import { TwilioModule } from "./modules/twilio/twilio.module"
 import { UsersModule } from "./modules/users/users.module"
 import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
-import { AnalyticsModule } from './modules/analytics/analytics.module';
 
 @Module({
 	imports: [
@@ -77,7 +78,8 @@ import { AnalyticsModule } from './modules/analytics/analytics.module';
 		CouponsModule,
 		PaymentGateawaysModule,
 		JobsModule,
-		AnalyticsModule
+		AnalyticsModule,
+		TwilioModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
