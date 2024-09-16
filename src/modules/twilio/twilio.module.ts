@@ -1,12 +1,12 @@
 import { Module } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
-import { Users, UsersInfo } from "src/entities"
+import { UsersInfo } from "src/entities"
 
 import { TwilioController } from "./twilio.controller"
 import { TwilioService } from "./twilio.service"
 
 @Module({
-	imports: [TypeOrmModule.forFeature([UsersInfo, Users])],
+	imports: [TypeOrmModule.forFeature([UsersInfo])],
 	controllers: [TwilioController],
 	providers: [TwilioService]
 })

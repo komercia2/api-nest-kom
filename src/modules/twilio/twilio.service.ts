@@ -1,7 +1,8 @@
 import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Users, UsersInfo } from "src/entities"
+import { Logger } from "nestjs-pino"
+import { UsersInfo } from "src/entities"
 import { Twilio } from "twilio"
 import { Repository } from "typeorm"
 
@@ -14,8 +15,8 @@ export class TwilioService {
 
 	constructor(
 		@InjectRepository(UsersInfo) private readonly usersInfoRepository: Repository<UsersInfo>,
-		@InjectRepository(Users) private readonly usersRepository: Repository<Users>,
-		private readonly configService: ConfigService
+		private readonly configService: ConfigService,
+		private readonly logger: Logger
 	) {
 		const accountSid = this.configService.get<string>("TWILIO_ACCOUNT_SID")
 		const authToken = this.configService.get<string>("TWILIO_AUTH_TOKEN")
@@ -38,11 +39,9 @@ export class TwilioService {
 		try {
 			await this.twilioInstance.verify.v2
 				.services(this.configService.get<string>("TWILIO_VERIFY_SERVICE_SID") ?? "")
-				.verifications.create({
-					to: phoneNumber,
-					channel: channel
-				})
+				.verifications.create({ to: phoneNumber, channel })
 		} catch (error) {
+			this.logger.error(`Error sending verification code: ${error}`)
 			throw new InternalServerErrorException("Error sending verification code")
 		}
 	}
@@ -53,11 +52,9 @@ export class TwilioService {
 		try {
 			await this.twilioInstance.verify.v2
 				.services(this.configService.get<string>("TWILIO_VERIFY_SERVICE_SID") ?? "")
-				.verificationChecks.create({
-					to: phoneNumber,
-					code: code
-				})
+				.verificationChecks.create({ to: phoneNumber, code })
 		} catch (error) {
+			this.logger.error(`Error verifying code: ${error}`)
 			throw new InternalServerErrorException("Error verifying code")
 		}
 	}
