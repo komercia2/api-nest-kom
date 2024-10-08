@@ -17,6 +17,7 @@ import { AppController } from "./app.controller"
 import { AiSuggetionsModule } from "./modules/ai-suggetions/ai-suggetions.module"
 import { AnalyticsModule } from "./modules/analytics/analytics.module"
 import { AuthModule } from "./modules/auth/auth.module"
+import { ChatbotsModule } from "./modules/chatbots/chatbots.module"
 import { CommonModule } from "./modules/common/common.module"
 import { CouponsModule } from "./modules/coupons/coupons.module"
 import { HooksModule } from "./modules/hooks/hooks.module"
@@ -78,6 +79,8 @@ import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
 		CouponsModule,
 		PaymentGateawaysModule,
 		JobsModule,
+		AnalyticsModule,
+		ChatbotsModule,
 		AnalyticsModule,
 		TwilioModule
 	],

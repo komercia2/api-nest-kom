@@ -4,6 +4,7 @@ import { TemplatesModule } from "@templates/templates.module"
 import { AppModule } from "src/app.module"
 import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.module"
 import { AuthModule } from "src/modules/auth/auth.module"
+import { ChatbotsModule } from "src/modules/chatbots/chatbots.module"
 import { CommonModule } from "src/modules/common/common.module"
 import { CouponsModule } from "src/modules/coupons/coupons.module"
 import { HooksModule } from "src/modules/hooks/hooks.module"
@@ -98,6 +99,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/payment-gateaways`,
 		module: PaymentGateawaysModule
+	},
+	{
+		path: `${apiVersions.v1}/chatbots`,
+		module: ChatbotsModule
 	}
 ]
 
