@@ -15,6 +15,10 @@ export class MySQLStoreAnalyticsService {
 	) {}
 
 	async saveClickedPayCart(ids: [{ productId: number; units: number }], storeId: number) {
+		const containsNaN = ids.some(({ productId, units }) => isNaN(productId) || isNaN(units))
+
+		if (containsNaN) return
+
 		const storeAnalytics = ids.map(({ productId, units }) => {
 			const analytic = new StoreAnalytics()
 
