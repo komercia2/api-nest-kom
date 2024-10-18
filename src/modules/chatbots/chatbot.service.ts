@@ -12,6 +12,74 @@ export class ChatbotsService {
 		private readonly geolocalizacionRepository: Repository<Geolocalizacion>
 	) {}
 
+	async getProductsDetailed(storeID: number) {
+		const queryBuilder = this.productPrository
+			.createQueryBuilder("productos")
+			.where("productos.tienda = :storeID", { storeID })
+			.andWhere("productos.activo = 1")
+			.andWhere("productos.deletedAt IS NULL")
+			.innerJoinAndSelect("productos.productosInfo", "productosInfo")
+			.leftJoinAndSelect("productos.productosVariantes", "productosVariantes")
+			.leftJoinAndSelect(
+				"productosVariantes.productosVariantesCombinaciones",
+				"productosVariantesCombinaciones"
+			)
+			.innerJoin("productos.tienda2", "tiendas")
+			.innerJoin("tiendas.tiendasInfo", "tiendasInfo")
+			.select([
+				"tiendas.subdominio",
+				"tiendasInfo.dominio",
+				"productos.id",
+				"productos.nombre",
+				"productos.fotoCloudinary",
+				"productos.precio",
+				"productos.slug",
+				"productosInfo.descripcionCorta",
+				"productosInfo.inventario",
+				"productosInfo.marca",
+				"productosInfo.peso",
+				"productosInfo.garantia",
+				"productosVariantes.variantes",
+				"productosVariantesCombinaciones.combinaciones"
+			])
+
+		const products = await queryBuilder.getMany()
+
+		return products.map((product) => {
+			let productUrl = ""
+
+			if (product.tienda2?.subdominio && !product.tienda2?.tiendasInfo?.dominio) {
+				productUrl = `https://${product.tienda2.subdominio}.komercia.store/productos/${product.slug}`
+			} else if (product.tienda2?.tiendasInfo?.dominio) {
+				productUrl = `${product.tienda2.tiendasInfo.dominio}/productos/${product.slug}`
+			}
+
+			return {
+				id: product.id,
+				url: productUrl,
+				name: product.nombre,
+				price: product.precio,
+				image: product.fotoCloudinary,
+				shortDescription: product.productosInfo.descripcionCorta,
+				inventory: product.productosInfo.inventario,
+				brand: product.productosInfo.marca,
+				weight: product.productosInfo.peso,
+				warranty: product.productosInfo.garantia,
+				sku: product.slug,
+				variantsType: product.productosVariantes
+					.flatMap(({ variantes }) => JSON.parse(variantes || "[]"))
+					.flat(1),
+				combinations: product.productosVariantes
+					.map(({ productosVariantesCombinaciones }) =>
+						productosVariantesCombinaciones.map(({ combinaciones }) =>
+							JSON.parse(combinaciones || "[]")
+						)
+					)
+					.flat(2)
+			}
+		})
+	}
+
 	async getProductInfo(productId: number) {
 		const queryBuilder = this.productPrository
 			.createQueryBuilder("productos")
