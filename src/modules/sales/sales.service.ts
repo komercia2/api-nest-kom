@@ -154,7 +154,6 @@ export class SalesService {
 			.addSelect(["user.id", "user.nombre", "user.identificacion"])
 			.where("carritos.tienda = :storeId", { storeId })
 			.andWhere("carritos.deletedAt IS NULL")
-			.andWhere("carritos.canal != '0'")
 			.leftJoin("carritos.usuario2", "user")
 			.skip(skip)
 			.take(limit)
