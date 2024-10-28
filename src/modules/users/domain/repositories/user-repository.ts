@@ -1,3 +1,5 @@
+import { CreateCheckoutUserDto } from "../dtos/create-checkout-user.dto"
+import { UpdateIdentificationDocumentDto } from "../dtos/update-identification-document.dto"
 import { IUserAdress, UserAdressEntity } from "../entities"
 
 export interface IUserRepository {
@@ -47,4 +49,25 @@ export interface IUserRepository {
 			barrio: string | null
 		}
 	}>
+	createCheckoutUser(createCheckoutUserDto: CreateCheckoutUserDto): Promise<{
+		token: string
+		userData: {
+			id: number
+			activo: boolean
+			ciudad: number
+			create_at: Date | null
+			email: string | null
+			direccion: string | null
+			identificacion: string | null
+			nombre: string
+			apellido: string | null
+			rol: number
+			tienda: number
+			tipo_identificacion: string | null
+			telefono: string | null
+			birthday: string | null
+			barrio: string | null
+		}
+	}>
+	updateIdentificationDocument(data: UpdateIdentificationDocumentDto): Promise<void>
 }

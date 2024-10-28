@@ -24,6 +24,7 @@ interface IStoreAnalyticsEntity {
 	categoryId?: number
 	device?: string
 	occuredAt: Date
+	units?: number | null
 }
 
 export class StoreAnalyticsEntity implements IStoreAnalyticsEntity {
@@ -34,6 +35,7 @@ export class StoreAnalyticsEntity implements IStoreAnalyticsEntity {
 	categoryId?: number
 	device?: string
 	occuredAt: Date
+	units?: number | null
 
 	constructor(props: IStoreAnalyticsEntity) {
 		this.id = props.id
@@ -43,6 +45,7 @@ export class StoreAnalyticsEntity implements IStoreAnalyticsEntity {
 		this.categoryId = props.categoryId
 		this.device = this.identifyDevice(props.device)
 		this.occuredAt = new Date()
+		this.units = props.units
 	}
 
 	static create(dto: CreateStoreAnalyticsDto) {

@@ -39,6 +39,7 @@ import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
+import { GetFilteredReferralsDto } from "./dtos/get-filtered-referrals.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
 import { SuperService } from "./super.service"
@@ -51,6 +52,42 @@ export class SuperController {
 		private readonly couponsService: CouponsService,
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Put("change-password")
+	changePassword(@Body() changePasswordDto: ChangePasswordDto) {
+		return this.superService.changePassword(changePasswordDto)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("referrals/:expertId")
+	getStoresReferralByExpert(@Param("expertId") expertId: string) {
+		return this.superService.getStoresReferralByExpert(expertId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("referrals")
+	getReferrals(@Query() paginatationDto: PaginationDto, @Query() filters: GetFilteredReferralsDto) {
+		return this.superService.getReferrals(paginatationDto, filters)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Delete("user-stores/:userId/:storeId")
+	removeUserAdmin(@Param("userId") userId: number, @Param("storeId") storeId: number) {
+		return this.superService.removeUserAdmin(+userId, +storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Post("user-stores/:userId/:storeId")
+	addUserAdmin(@Param("userId") userId: number, @Param("storeId") storeId: number) {
+		return this.superService.addUserAdmin(+userId, +storeId)
+	}
+
+	@UseGuards(SuperJwtAuthGuard)
+	@Get("user-stores/:id")
+	getAdmins(@Param("id") id: number) {
+		return this.superService.getStoreUsers(+id)
+	}
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Delete("entities/:storeId/:entityId")

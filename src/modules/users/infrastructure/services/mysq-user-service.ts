@@ -1,8 +1,10 @@
-import { Injectable } from "@nestjs/common"
+import { ConflictException, Injectable, InternalServerErrorException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { DireccionesUsuario, Users } from "src/entities"
+import { DireccionesUsuario, Users, UsersInfo } from "src/entities"
 import { Repository } from "typeorm"
 
+import { CreateCheckoutUserDto } from "../../domain/dtos/create-checkout-user.dto"
+import { UpdateIdentificationDocumentDto } from "../../domain/dtos/update-identification-document.dto"
 import { IUserAdress, UserAdressEntity } from "../../domain/entities"
 
 @Injectable()
@@ -11,8 +13,69 @@ export class MysqlUserService {
 		@InjectRepository(DireccionesUsuario)
 		private readonly userAdressRepository: Repository<DireccionesUsuario>,
 
-		@InjectRepository(Users) private readonly userRepository: Repository<Users>
+		@InjectRepository(Users) private readonly userRepository: Repository<Users>,
+
+		@InjectRepository(UsersInfo) private readonly usersInfoRepository: Repository<UsersInfo>
 	) {}
+
+	async updateIdentificationDocument(data: UpdateIdentificationDocumentDto) {
+		const { email, identificationType, oldDocument, newDocument } = data
+
+		const user = await this.userRepository.findOne({
+			where: { email, tipoIdentificacion: identificationType, identificacion: oldDocument }
+		})
+
+		if (!user) throw new ConflictException("User not found")
+
+		user.identificacion = newDocument
+
+		await this.userRepository.save(user)
+	}
+
+	async createCheckoutUser(createCheckoutUserDto: CreateCheckoutUserDto) {
+		const documentExist = await this.searchUserByDocument(createCheckoutUserDto.document)
+
+		if (documentExist) throw new ConflictException("User already exists")
+
+		const emailExist = await this.userRepository.findOne({
+			where: { email: createCheckoutUserDto.email }
+		})
+
+		if (emailExist) throw new ConflictException("Email already exists")
+
+		const phoneExist = await this.usersInfoRepository.findOne({
+			where: { telefono: createCheckoutUserDto.phone }
+		})
+
+		if (phoneExist) throw new ConflictException("Phone already exists")
+
+		const fullName = `${createCheckoutUserDto.firstName} ${createCheckoutUserDto.lastName}`
+
+		const user = new Users()
+		user.tipoIdentificacion = createCheckoutUserDto.identificationType
+		user.identificacion = createCheckoutUserDto.document
+		user.nombre = fullName
+		user.email = createCheckoutUserDto.email
+		user.ciudad = createCheckoutUserDto.cityId
+		user.createdAt = new Date()
+		user.updatedAt = new Date()
+
+		await this.userRepository.save(user)
+
+		const userInfo = new UsersInfo()
+
+		userInfo.genero = createCheckoutUserDto.gender
+		userInfo.telefono = `+${createCheckoutUserDto.code}${createCheckoutUserDto.phone}`
+		userInfo.idUser = user.id
+
+		await this.usersInfoRepository.save(userInfo)
+
+		const savedUser = await this.searchUserByDocument(createCheckoutUserDto.document)
+
+		if (!savedUser) throw new InternalServerErrorException("Error creating user")
+
+		return savedUser
+	}
 
 	async searchUserByDocument(document: string) {
 		const user = await this.userRepository.findOne({

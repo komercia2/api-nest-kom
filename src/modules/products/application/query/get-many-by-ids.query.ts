@@ -1,4 +1,4 @@
-import { BadRequestException, Inject, Injectable } from "@nestjs/common"
+import { Inject, Injectable } from "@nestjs/common"
 
 import { IProductRepository } from "../../domain/repositories"
 import { ProductsApplicationInjectionTokens } from "../application-injection-tokens"

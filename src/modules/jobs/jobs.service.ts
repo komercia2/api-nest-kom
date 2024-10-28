@@ -47,7 +47,7 @@ export class JobsService {
 		)
 	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_6PM)
+	@Cron(CronExpression.EVERY_DAY_AT_6AM)
 	async handleMembershipExpired() {
 		this.logger.log("[handleMembershipExpired] Running")
 		const storesExpired = await this.findStoresExpired()
@@ -79,7 +79,7 @@ export class JobsService {
 		this.logger.log("[handleMembershipExpired] Finished")
 	}
 
-	@Cron(CronExpression.EVERY_DAY_AT_7PM)
+	@Cron(CronExpression.EVERY_DAY_AT_7AM)
 	async handleMembershipIsAboutToExpire() {
 		this.logger.log("[handleMembershipIsAboutToExpire] Running")
 		const storesToNotify = await this.findStoresAboutToExpire()

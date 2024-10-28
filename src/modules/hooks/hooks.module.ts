@@ -2,10 +2,13 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from "@nestjs/c
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { PublicApiKeyAuthMiddleware } from "@shared/infrastructure/middlewares/keys"
 import { PusherNotificationsService } from "@shared/infrastructure/services"
-import { Carritos } from "src/entities"
+import { Carritos, TiendaWompiInfo } from "src/entities"
 
 import { NotificationsModule } from "../notifications/notifications.module"
-import { ProccessAddiApplicationStatusCommand } from "./application/command"
+import {
+	ProccessAddiApplicationStatusCommand,
+	ProccessWompiPaymentStatusCommand
+} from "./application/command"
 import { HooksApplicationInjectionTokens } from "./application/hooks-application-injection-tokens"
 import { NotifyOrderCreatedQuery } from "./application/query"
 import { PublicHooksController } from "./infrastructure/controllers/public"
@@ -36,11 +39,15 @@ const infrastructure = [
 	{
 		provide: HooksInfrastructureInjectionTokens.OrdersService,
 		useClass: OrdersService
+	},
+	{
+		provide: HooksInfrastructureInjectionTokens.ProccessWompiPaymentStatusCommand,
+		useClass: ProccessWompiPaymentStatusCommand
 	}
 ]
 
 @Module({
-	imports: [NotificationsModule, TypeOrmModule.forFeature([Carritos])],
+	imports: [NotificationsModule, TypeOrmModule.forFeature([Carritos, TiendaWompiInfo])],
 	controllers: [PublicHooksController],
 	providers: [...application, ...infrastructure, PusherNotificationsService]
 })

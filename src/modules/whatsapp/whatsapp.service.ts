@@ -1,63 +1,69 @@
-import { BadRequestException, Injectable } from "@nestjs/common"
+import { Injectable } from "@nestjs/common"
+import { ConfigService } from "@nestjs/config"
+import { OnEvent } from "@nestjs/event-emitter"
+import { Events } from "@shared/domain/constants/events"
+import axios from "axios"
 import { Logger } from "nestjs-pino"
-import { Client, LocalAuth } from "whatsapp-web.js"
 
-import { NotifyStoreCreationDto } from "./dto/notify-store-creation.dto"
-import { handleCountryID } from "./utils/handle-country-id"
+interface ISendOrderCreatedWhatsappMessage {
+	name: string
+	cartId: string
+	total: number
+	to: string
+	message: string
+}
 
 @Injectable()
 export class WhatsappService {
-	instance: Client = new Client({
-		puppeteer: { headless: true, args: ["--no-sandbox", "--disable-setuid-sandbox"] },
-		authStrategy: new LocalAuth({
-			dataPath: "./session.json"
-		}),
-		webVersionCache: {
-			type: "remote",
-			remotePath:
-				"https://raw.githubusercontent.com/wppconnect-team/wa-version/main/html/2.2412.54.html"
+	constructor(private readonly logger: Logger, private readonly configService: ConfigService) {}
+
+	async getStaatus() {
+		const API_URL = this.configService.get<string>("API_WHATSAPP_URL")
+		const USERNAME = this.configService.get<string>("API_WHATSAPP_USERNAME")
+		const PASSWORD = this.configService.get<string>("API_WHATSAPP_PASSWORD")
+
+		const response = await axios.get(`${API_URL}/status`, {
+			headers: {
+				Authorization: `Basic ${Buffer.from(`${USERNAME}:${PASSWORD}`).toString("base64")}`
+			}
+		})
+
+		const { data } = response
+
+		return { status: data }
+	}
+
+	@OnEvent(Events.ORDER_CREATED)
+	sendOrderCreatedWhatsappMessage(data: ISendOrderCreatedWhatsappMessage) {
+		const { name, cartId, total, to, message } = data
+
+		const sanitized_number = to.toString().replace(/[- )(]/g, "")
+		let final_number = sanitized_number.replace("+", "")
+
+		if (final_number.length === 10 && !final_number.startsWith("57")) {
+			final_number = `57${final_number}`
 		}
-	})
 
-	constructor(private readonly logger: Logger) {}
+		this.logger.log(`Sending message to ${final_number}`)
 
-	sendWhatsappMessage = (number: string, message: string) => {
-		const sanitized_number = number.toString().replace(/[- )(]/g, "")
-		const final_number = `57${sanitized_number.substring(sanitized_number.length - 10)}`
+		const API_URL = this.configService.get<string>("API_WHATSAPP_URL")
+		const USERNAME = this.configService.get<string>("API_WHATSAPP_USERNAME")
+		const PASSWORD = this.configService.get<string>("API_WHATSAPP_PASSWORD")
 
-		this.instance.getNumberId(final_number).then((number_details) => {
-			if (number_details) {
-				this.instance.sendMessage(number_details._serialized, message)
-				this.logger.log(`Message sent to ${final_number}`)
-			} else {
-				this.logger.error(`The number ${final_number} is not registered in WhatsApp`)
+		return axios.post(
+			`${API_URL}/notify-order-created`,
+			{
+				name,
+				cartId,
+				total,
+				to: final_number,
+				message
+			},
+			{
+				headers: {
+					Authorization: `Basic ${Buffer.from(`${USERNAME}:${PASSWORD}`).toString("base64")}`
+				}
 			}
-		})
-	}
-
-	notifyStoreCreation = (notifyStoreCreation: NotifyStoreCreationDto) => {
-		const { storeName, storeEmail, storeId, clientFullName, targetGroup, countryId } =
-			notifyStoreCreation
-
-		const fullCountry = handleCountryID(countryId)
-		const message = `¡Felicidades! 🎉✨ Se ha creado una nueva tienda en Komercia. 🚀✨\n\n🆔 ID de la tienda: ${storeId}\n🏬 Nombre de la tienda: ${storeName}\n📧 Correo electrónico de la tienda: ${storeEmail}\n🙋 Nombre del cliente: ${clientFullName} \n🌎 País: ${fullCountry}`
-
-		this.sendMessageToGroup(message, targetGroup)
-
-		return { message: "Message sent" }
-	}
-
-	sendMessageToGroup = (message: string, targetGroup: string) => {
-		this.instance.getChats().then((chats) => {
-			const group = chats.find((chat) => chat.isGroup && chat.name === targetGroup)
-
-			if (group) {
-				group.sendMessage(message)
-				this.logger.log(`Message sent to ${targetGroup}`)
-			} else {
-				this.logger.error(`Group ${targetGroup} not found`)
-				throw new BadRequestException(`Group ${targetGroup} not found`)
-			}
-		})
+		)
 	}
 }

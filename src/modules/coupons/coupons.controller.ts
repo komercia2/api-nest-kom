@@ -14,6 +14,12 @@ export class CouponsController {
 		private readonly multipleSubscriptionCouponsService: MultipleSubscriptionCouponsService
 	) {}
 
+	@Get("/multiple-subscriptions")
+	@HttpCode(HttpStatus.OK)
+	storeHasCoupon(@Query("storeId") storeId: number) {
+		return this.multipleSubscriptionCouponsService.storeHasCoupon(+storeId)
+	}
+
 	@Post("/multiple-subscriptions")
 	@HttpCode(HttpStatus.CREATED)
 	createMultipleSubscriptionCoupons(
@@ -26,6 +32,12 @@ export class CouponsController {
 	@HttpCode(HttpStatus.OK)
 	checkStore(@Query("storeId") storeId: number) {
 		return this.couponsService.storeHasCoupon(storeId)
+	}
+
+	@Get("check/multiple")
+	@HttpCode(HttpStatus.OK)
+	checkCouponMultiple(@Query("coupon") coupon: string) {
+		return this.multipleSubscriptionCouponsService.isCouponAvailable(coupon)
 	}
 
 	@Get("check/coupon")

@@ -42,9 +42,17 @@ export class GetFilteredStoresDto {
 	readonly withoutExpire: boolean
 
 	@Type(() => Boolean)
+	readonly withSuscriptionCoupon: boolean
+
+	@Type(() => Boolean)
 	readonly toExpire: boolean
 
 	@IsString({ each: true })
 	@IsIn(["ASC", "DESC"], { each: true })
 	readonly date: "ASC" | "DESC"
+
+	readonly phone: string
+
+	@Type(() => Boolean)
+	readonly refferal: boolean
 }

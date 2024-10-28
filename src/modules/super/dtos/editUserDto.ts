@@ -20,4 +20,8 @@ export class EditUserDto {
 	@IsString()
 	@IsEmail()
 	readonly email: string
+
+	@IsOptional()
+	@IsString()
+	readonly phone: string
 }

@@ -1,20 +1,92 @@
 import { ConflictException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { PusherNotificationsService } from "@shared/infrastructure/services"
+import { createHash } from "crypto"
 import { Logger } from "nestjs-pino"
-import { Carritos } from "src/entities"
+import { Carritos, TiendaWompiInfo } from "src/entities"
 import { Repository } from "typeorm"
 
-import { AddiHookEntity } from "../../domain/entities"
+import { AddiHookEntity, WompiEntity } from "../../domain/entities"
 import { AddiApplicationStatus } from "../../domain/enums/addi-application-status"
 
 @Injectable()
 export class OrdersService {
 	constructor(
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
+		@InjectRepository(TiendaWompiInfo)
+		private tiendaWompiInfoRepository: Repository<TiendaWompiInfo>,
 		private readonly pusherNotificationsService: PusherNotificationsService,
 		private readonly logger: Logger
 	) {}
+
+	async processWompiPaymentStatus(order: WompiEntity) {
+		const { status, reference } = order.data.transaction
+
+		this.logger.log(`Processing Wompi payment status for order ${reference} with status ${status}`)
+
+		const cart = await this.carritosRepository.findOne({ where: { id: +reference } })
+
+		if (!cart) {
+			this.logger.error(`Cart with id ${reference} not found`)
+			throw new NotFoundException(`Cart with id ${reference} not found`)
+		}
+
+		const wompiCredentials = await this.tiendaWompiInfoRepository.findOne({
+			where: { idTienda: cart.tienda }
+		})
+
+		if (!wompiCredentials?.eventSecret) {
+			this.logger.error(`Wompi credentials not found for order ${reference}`)
+			throw new NotFoundException(`Wompi credentials not found for order ${reference}`)
+		}
+
+		const { eventSecret } = wompiCredentials
+
+		const signature = this.generateWompiSignature(order, eventSecret)
+
+		const checksum = createHash("sha256").update(signature).digest("hex")
+
+		if (checksum !== order.signature.checksum) {
+			this.logger.error(`Invalid signature for order ${reference}`)
+			throw new ConflictException(`Invalid signature for order ${reference}`)
+		}
+
+		if (status === "APPROVED") {
+			await this.carritosRepository.update(
+				{ id: +reference },
+				{ estado: "1", updatedAt: new Date() }
+			)
+		}
+
+		if (status === "DECLINED") {
+			await this.carritosRepository.update(
+				{ id: +reference },
+				{ estado: "2", updatedAt: new Date() }
+			)
+		}
+
+		if (status === "ERROR") {
+			await this.carritosRepository.update(
+				{ id: +reference },
+				{ estado: "3", updatedAt: new Date() }
+			)
+		}
+
+		if (status === "VOIDED") {
+			await this.carritosRepository.update(
+				{ id: +reference },
+				{ estado: "11", updatedAt: new Date() }
+			)
+		}
+
+		const normalizedStatus = this.normalizeWompiStatus(status)
+
+		await this.pusherNotificationsService.trigger(
+			`store-${cart.tienda}`,
+			"payment-status",
+			JSON.stringify({ addiOrder: +reference, normalizedStatus })
+		)
+	}
 
 	async processAddiApplicationStatus(addiOrder: AddiHookEntity) {
 		const { orderId, status } = addiOrder
@@ -56,6 +128,21 @@ export class OrdersService {
 			this.logger.error(`Error processing addi application status , ${error}`)
 			throw error
 		}
+	}
+
+	private generateWompiSignature(order: WompiEntity, eventSecret: string) {
+		const { id, status, amount_in_cents } = order.data.transaction
+		const { timestamp } = order
+
+		return `${id}${status}${amount_in_cents}${timestamp}${eventSecret}`
+	}
+
+	private normalizeWompiStatus(status: string) {
+		if (status === "APPROVED") return "1"
+		if (status === "DECLINED") return "2"
+		if (status === "ERROR") return "3"
+		if (status === "VOIDED") return "11"
+		throw new ConflictException(`Invalid status ${status}`)
 	}
 
 	private normalizeAddiStatus(addiStatus: AddiApplicationStatus) {

@@ -1,5 +1,4 @@
 import { Injectable } from "@nestjs/common"
-import { OnEvent } from "@nestjs/event-emitter"
 import { InjectModel } from "@nestjs/mongoose"
 import { DatabaseTransactionErrorException } from "@shared/infrastructure/exceptions"
 import { Template6Entity } from "@templates/domain/entities/template6/template6"

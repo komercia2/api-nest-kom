@@ -1,4 +1,4 @@
-import { Body, HttpStatus, Inject, Param, Query, Req, Res } from "@nestjs/common"
+import { Body, HttpStatus, Inject, Param, Post, Query, Req, Res } from "@nestjs/common"
 import { Get } from "@nestjs/common"
 import { Controller } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
@@ -149,7 +149,7 @@ export class ProductController {
 		}
 	}
 
-	@Get("public/checkout/many")
+	@Post("public/checkout/many")
 	async getManyByIds(
 		@Req() _req: Request,
 		@Res() res: Response,
@@ -158,7 +158,7 @@ export class ProductController {
 		const { ids, storeId } = boody
 
 		try {
-			const products = await this.getManyByIdsQuery.execute(storeId, ids as number[])
+			const products = await this.getManyByIdsQuery.execute(+storeId, ids as number[])
 
 			handlerHttpResponse(res, {
 				data: products,

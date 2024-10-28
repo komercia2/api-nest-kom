@@ -2,9 +2,13 @@ import {
 	BadRequestException,
 	ConflictException,
 	Injectable,
-	InternalServerErrorException
+	InternalServerErrorException,
+	NotFoundException
 } from "@nestjs/common"
+import { EventEmitter2 } from "@nestjs/event-emitter"
 import { InjectRepository } from "@nestjs/typeorm"
+import { Events } from "@shared/domain/constants/events"
+import * as crypto from "crypto"
 import { Logger } from "nestjs-pino"
 import {
 	Carritos,
@@ -15,6 +19,7 @@ import {
 	ProductosInfo,
 	ProductosVariantes,
 	ProductosVariantesCombinaciones,
+	TiendaPayuInfo,
 	Tiendas,
 	TiendasInfo,
 	Users
@@ -27,7 +32,9 @@ import { MailsService } from "../mails/mails.service"
 import { WhatsappService } from "../whatsapp/whatsapp.service"
 import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
+import { CreatePayUOrderDto } from "./dtos/create-payu-order.dto"
 import { GetOrderDto } from "./dtos/get-order-dto"
+import { UpdateOrderStatusDto } from "./dtos/update-order-status.dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
 import { prettifyShippingMethod } from "./utils/prettifyShippingMethod"
 
@@ -71,14 +78,61 @@ export class OrdersService {
 
 		@InjectRepository(Tiendas) private readonly tiendas: Repository<Tiendas>,
 
+		@InjectRepository(TiendaPayuInfo) private readonly tiendaPayuInfo: Repository<TiendaPayuInfo>,
+
 		private readonly datasource: DataSource,
 
 		private readonly logger: Logger,
 
 		private readonly mailsService: MailsService,
 
-		private readonly whatsappService: WhatsappService
+		private readonly whatsappService: WhatsappService,
+
+		private eventEmitter: EventEmitter2
 	) {}
+
+	async cratePayUOrder(data: CreatePayUOrderDto) {
+		const { cartId, storeId, total } = data
+
+		const cart = await this.carritosRepository.findOne({ where: { id: cartId, tienda: storeId } })
+
+		if (!cart) throw new BadRequestException("Cart not found")
+
+		const store = await this.tiendasInfoRepository.findOne({ where: { tiendaInfo: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		const storePayUInfo = await this.tiendaPayuInfo.findOne({ where: { tiendaId: storeId } })
+
+		if (!storePayUInfo) throw new BadRequestException("Store PayU info not found")
+
+		const { apiKey, merchantId, accountId } = storePayUInfo
+
+		const signature = crypto
+			.createHash("md5")
+			.update(`${apiKey}~${merchantId}~${cartId}~${total}~COP`)
+			.digest("hex")
+
+		return {
+			merchantId,
+			accountId,
+			signature
+		}
+	}
+
+	async updateOrderStatus(updateOrderStatusDto: UpdateOrderStatusDto) {
+		const { orderId, userId, status, method } = updateOrderStatusDto
+
+		const order = await this.carritosRepository.findOne({ where: { id: orderId, usuario: userId } })
+
+		if (!order) throw new NotFoundException("Order not found")
+
+		order.estado = status
+		order.metodoPago = method
+		order.updatedAt = new Date()
+
+		await this.carritosRepository.save(order)
+	}
 
 	async getOrder(getOrderDto: GetOrderDto) {
 		const { orderId, storeId, userId } = getOrderDto
@@ -271,7 +325,9 @@ export class OrdersService {
 				const clientEmailData: OrderEmailDto = {
 					...(await this.formatDataForEmail(createOrderDto, cart, true))
 				}
-				notificationsTasks.push(this.sendOrderEmail(emailCliente, tienda, clientEmailData))
+				notificationsTasks.push(
+					this.sendOrderEmail(emailCliente, tienda, clientEmailData, "¡Tu pedido fue recibido!")
+				)
 			}
 
 			if (datosTienda?.email_tienda) {
@@ -279,22 +335,22 @@ export class OrdersService {
 				const storeEmailData: OrderEmailDto = {
 					...(await this.formatDataForEmail(createOrderDto, cart, false))
 				}
-				notificationsTasks.push(this.sendOrderEmail(emailTienda, tienda, storeEmailData))
+				notificationsTasks.push(
+					this.sendOrderEmail(emailTienda, tienda, storeEmailData, "¡Nueva venta en tu tienda!")
+				)
 			}
 
 			if (datosTienda?.telefono) {
 				const whatsappStoreMessage = `🔔Nueva venta en tu tienda\n¡Hola, ${datosTienda.nombre}! 🌟 Acabas de recibir un nuevo pedido con el número de orden *#${cart.id}* por un total de *$${cart.total}* 🛍️. ¡Revísalo pronto! 💪🏼🥳.\nPuedes ingresar a tu panel de control para ver todos los detalles de la venta 🔍.\n💜 Enviado por Komercia.`
-				notificationsTasks.push(
-					this.whatsappService.sendWhatsappMessage(datosTienda.telefono, whatsappStoreMessage)
-				)
-			}
 
-			notificationsTasks.push(
-				this.whatsappService.sendMessageToGroup(
-					JSON.stringify(createOrderDto),
-					"Testing Stores Created"
-				)
-			)
+				this.eventEmitter.emit(Events.ORDER_CREATED, {
+					name: datosTienda.nombre,
+					cartId: cart.id.toString(),
+					total: cart.total,
+					to: datosTienda.telefono,
+					message: whatsappStoreMessage
+				})
+			}
 
 			try {
 				await Promise.allSettled(notificationsTasks)
@@ -330,12 +386,18 @@ export class OrdersService {
 		}
 	}
 
-	private async sendOrderEmail(email: string, storeId: number, data: OrderEmailDto) {
+	private async sendOrderEmail(
+		email: string,
+		storeId: number,
+		data: OrderEmailDto,
+		subject: string
+	) {
 		return await this.mailsService.sendCustomEmail({
 			to: email,
 			storeId,
 			templateId: "d-31bcbff48b1841f29782d02a9904a177",
-			dynamicTemplateData: data
+			dynamicTemplateData: data,
+			subject
 		})
 	}
 

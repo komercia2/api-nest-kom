@@ -14,6 +14,27 @@ export class MySQLStoreAnalyticsService {
 		private readonly storeAnalyticsRepository: Repository<StoreAnalytics>
 	) {}
 
+	async saveClickedPayCart(ids: [{ productId: number; units: number }], storeId: number) {
+		const containsNaN = ids.some(({ productId, units }) => isNaN(productId) || isNaN(units))
+
+		if (containsNaN) return
+
+		const storeAnalytics = ids.map(({ productId, units }) => {
+			const analytic = new StoreAnalytics()
+
+			analytic.id = UuidUtil.uuid
+			analytic.storeId = +storeId
+			analytic.productId = +productId
+			analytic.units = +units
+			analytic.event = StoreAnalyticsEvent.ADDED_PRODUCT_TO_CART
+			analytic.occurredAt = new Date()
+
+			return analytic
+		})
+
+		await this.storeAnalyticsRepository.save(storeAnalytics)
+	}
+
 	async countDevices(storeId: number) {
 		const query = this.storeAnalyticsRepository
 			.createQueryBuilder("storeAnalytics")

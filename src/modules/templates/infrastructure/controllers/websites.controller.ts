@@ -199,6 +199,7 @@ export class WebsitesController {
 				statusCode: HttpStatus.OK
 			})
 		} catch (error) {
+			console.log(error)
 			return handlerHttpResponse(res, {
 				message: "Error getting website",
 				success: false,

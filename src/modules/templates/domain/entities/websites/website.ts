@@ -9,6 +9,7 @@ export interface WebSiteEntityProps {
 	subdomain: string | null
 	templateNumber: number
 	templateId?: string | null
+	demoId?: number | string
 	domain: string | null
 	isMain: boolean
 	active: boolean
@@ -41,7 +42,7 @@ export class WebSiteEntity {
 	constructor(props: WebSiteEntityProps) {
 		this._id = props._id
 		this.storeId = props.storeId
-		this.subdomain = props.subdomain ? this.validateAndClean(props.subdomain) : null
+		this.subdomain = props.subdomain ? props.subdomain : null
 		this.templateNumber = props.templateNumber
 		this.templateId = props.templateId
 		this.domain = props.domain ?? null

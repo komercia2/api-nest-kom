@@ -17,7 +17,9 @@ import {
 	Tiendas,
 	TiendasInfo,
 	TiendaSuscripcionStripe,
-	Users
+	TiendasUsuarios,
+	Users,
+	UsersInfo
 } from "src/entities"
 import { DataSource, In, Repository } from "typeorm"
 import { QueryDeepPartialEntity } from "typeorm/query-builder/QueryPartialEntity"
@@ -26,6 +28,7 @@ import { validate as isValidUUID } from "uuid"
 import { PasswordUtil } from "../auth/utils/password.util"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import {
+	ChangePasswordDto,
 	FilterSuscriptionDto,
 	GetFilteredStoresDto,
 	GetStoreAdminsDto,
@@ -39,6 +42,7 @@ import { EditSusctiptionCouponDto } from "./dtos/edit-suscription-coupon.dto"
 import { EditUserDto } from "./dtos/editUserDto"
 import { FilterLogsDto } from "./dtos/filter-logs.dto"
 import { FilterUsersDto } from "./dtos/filter-users.dto"
+import { GetFilteredReferralsDto } from "./dtos/get-filtered-referrals.dto"
 import { UnlinkStoreAdminDto } from "./dtos/unlink-store-admin.dto"
 import { UpdateStorePlanDto } from "./dtos/update-store-plan.dto"
 import { CouponsType } from "./enums/coupons"
@@ -94,9 +98,131 @@ export class SuperService {
 		private readonly multipleSubscriptionCouponToStoreRepository: Repository<MultipleSubscriptionCouponToStore>,
 
 		@InjectRepository(LogTiendas)
-		private readonly logTiendasRepository: Repository<LogTiendas>
+		private readonly logTiendasRepository: Repository<LogTiendas>,
+
+		@InjectRepository(TiendasUsuarios)
+		private readonly tiendasUsuariosRepository: Repository<TiendasUsuarios>,
+
+		@InjectRepository(UsersInfo)
+		private readonly usersInfoRepository: Repository<UsersInfo>
 	) {}
 
+	async getStoresReferralByExpert(expertId: string) {
+		const stores = await this.tiendasInfoRepository.find({
+			where: { expert: expertId },
+			relations: { tiendaInfo2: true },
+			select: { tiendaInfo2: { nombre: true } }
+		})
+
+		const normaliedStores = stores.map((store) => {
+			return { id: store?.tiendaInfo, name: store.tiendaInfo2?.nombre }
+		})
+
+		return normaliedStores
+	}
+
+	async getReferrals(paginatationDto: PaginationDto, filters: GetFilteredReferralsDto) {
+		const { page, limit } = paginatationDto
+
+		const { name, email, identification } = filters
+
+		const expertsIDs = await this.tiendasInfoRepository
+			.createQueryBuilder("storeInfo")
+			.where("storeInfo.expert IS NOT NULL")
+			.select(["storeInfo.expert"])
+			.distinct(true)
+			.getMany()
+
+		const cleanedExperts = expertsIDs
+			.map((expert) => expert?.expert)
+			.filter((expert): expert is string => Boolean(expert))
+			.filter((expert) => !isNaN(+expert))
+			.map((expert) => +expert)
+
+		const expertsMapOcurrences = cleanedExperts.reduce((acc, expert) => {
+			acc[expert] = (acc[expert] || 0) + 1
+			return acc
+		}, {} as Record<string, number>)
+
+		const expertsListQuery = this.usersRepository
+			.createQueryBuilder("users")
+			.where("users.id IN (:...experts)", { experts: cleanedExperts })
+			.select(["users.id", "users.nombre", "users.email", "users.identificacion"])
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (name) expertsListQuery.andWhere("users.nombre LIKE :name", { name: `%${name}%` })
+
+		if (email) expertsListQuery.andWhere("users.email LIKE :email", { email: `%${email}%` })
+
+		if (identification) {
+			expertsListQuery.andWhere("users.identificacion LIKE :identification", {
+				identification: `%${identification}%`
+			})
+		}
+
+		const [expertsList, count] = await Promise.all([
+			expertsListQuery.getMany(),
+			this.usersRepository.count({ where: { id: In(cleanedExperts) } })
+		])
+
+		const expertsListWithOccurrences = expertsList.map((expert) => {
+			const referrals = expertsMapOcurrences[expert.id] || 0
+			return { ...expert, referrals }
+		})
+
+		return {
+			data: expertsListWithOccurrences,
+			pagination: {
+				total: Math.ceil(count / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(count / limit)
+			}
+		}
+	}
+
+	async removeUserAdmin(userId: number, storeId: number) {
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		await this.tiendasUsuariosRepository.delete({ tiendasId: storeId, usersId: userId })
+
+		return { message: "User unlinked from store" }
+	}
+
+	async addUserAdmin(userId: number, storeId: number) {
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+
+		if (!store) throw new BadRequestException("Store not found")
+
+		const storeUser = new TiendasUsuarios()
+		storeUser.tiendas = store
+		storeUser.users = user
+
+		await this.tiendasUsuariosRepository.save(storeUser)
+
+		return { message: "User linked to store" }
+	}
+
+	async getStoreUsers(userId: number) {
+		const stores = await this.tiendasUsuariosRepository.find({
+			where: { usersId: userId },
+			relations: { tiendas: true }
+		})
+
+		return stores
+	}
 	async removeEntity(storeId: number, entityId: number) {
 		const entity = await this.entidadesTiendasRepository.findOne({
 			where: { tiendaId: storeId, entidadId: entityId }
@@ -306,11 +432,20 @@ export class SuperService {
 
 		if (!store) throw new BadRequestException("Store not found")
 
+		const usersWithStore = await this.usersRepository.find({ where: { tienda: storeId } })
+
+		if (usersWithStore.length > 0) {
+			await this.usersRepository.update(
+				usersWithStore.map((user) => user.id),
+				{ tienda: 0 }
+			)
+		}
+
 		const queryRunner = this.datasource.createQueryRunner()
 		await queryRunner.connect()
 		await queryRunner.startTransaction()
 		try {
-			await this.usersRepository.delete({ tienda: storeId })
+			await this.entidadesTiendasRepository.delete({ tiendaId: storeId })
 			await this.storeRepository.delete(storeId)
 
 			await queryRunner.commitTransaction()
@@ -325,9 +460,11 @@ export class SuperService {
 	}
 
 	async editUser(edituserDto: EditUserDto) {
-		const { userId, newPassword, email, name } = edituserDto
+		const { userId, newPassword, email, name, phone } = edituserDto
 
-		const user = await this.usersRepository.findOne({ where: { id: userId } })
+		const user = await this.usersRepository.findOne({
+			where: { id: userId }
+		})
 
 		if (!user) throw new BadRequestException("User not found")
 
@@ -345,7 +482,23 @@ export class SuperService {
 		}
 
 		await this.usersRepository.update({ id: userId }, { ...params })
+		await this.usersInfoRepository.update({ idUser: userId }, { telefono: phone })
 		return { message: "User updated" }
+	}
+
+	async changePassword(changePasswordDto: ChangePasswordDto) {
+		const { userId, newPassword } = changePasswordDto
+
+		const user = await this.usersRepository.findOne({ where: { id: userId } })
+
+		if (!user) throw new BadRequestException("User not found")
+
+		const bcryptHash = PasswordUtil.hash(newPassword)
+		const hashedPassword = PasswordUtil.toLaravelHash(bcryptHash)
+
+		await this.usersRepository.update({ id: userId }, { password: hashedPassword })
+
+		return { message: "Password changed" }
 	}
 
 	async updateStore(updateStoreDto: UpdateStoreDto) {
@@ -563,8 +716,8 @@ export class SuperService {
 				"usersInfo.telefono"
 			])
 			.orderBy("users.createdAt", "DESC")
-			.innerJoin("users.tienda2", "tienda")
-			.innerJoin("users.usersInfo", "usersInfo")
+			.leftJoin("users.tienda2", "tienda")
+			.leftJoin("users.usersInfo", "usersInfo")
 			.skip((page - 1) * limit)
 			.take(limit)
 
@@ -835,8 +988,11 @@ export class SuperService {
 			country,
 			city,
 			expired,
+			withSuscriptionCoupon,
 			withoutExpire,
-			toExpire
+			toExpire,
+			phone,
+			refferal
 		} = filter
 
 		const queryBuilder = this.storeRepository
@@ -861,7 +1017,8 @@ export class SuperService {
 				"entidadesTiendas.id",
 				"entidadesTiendas.entidadId",
 				"users.nombre",
-				"users.email"
+				"users.email",
+				"tiendasInfo.expert"
 			])
 			.innerJoin("store.tiendasInfo", "tiendasInfo")
 			.leftJoin("store.users", "users")
@@ -870,6 +1027,11 @@ export class SuperService {
 			.leftJoin("store.categoria2", "categoria2")
 			.leftJoin("store.entidadesTiendas", "entidadesTiendas")
 			.leftJoinAndMapMany("store.tareasTiendas", "store.tareasTiendas", "tasks")
+			.leftJoinAndSelect("store.subscriptionsCoupons", "subscriptionsCoupons")
+			.leftJoinAndSelect(
+				"store.multipleSubscriptionCouponsToStore",
+				"multipleSubscriptionCouponsToStore"
+			)
 			.loadRelationCountAndMap("store.productos", "store.productos")
 			.loadRelationCountAndMap("store.carritos", "store.carritos")
 			.orderBy("store.createdAt", date)
@@ -915,7 +1077,12 @@ export class SuperService {
 		}
 
 		if (expired) {
-			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: new Date() })
+			const currentDate = new Date()
+			const date45DaysAgo = new Date(currentDate.setDate(currentDate.getDate() - 45))
+			queryBuilder.andWhere("store.fechaExpiracion BETWEEN :date AND :currentDate", {
+				date: date45DaysAgo,
+				currentDate: new Date()
+			})
 		}
 
 		if (withoutExpire) {
@@ -928,10 +1095,22 @@ export class SuperService {
 
 		if (toExpire) {
 			const currentDate = new Date()
-			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 15))
+			const targetDate = new Date(currentDate.setDate(currentDate.getDate() + 30))
 
-			queryBuilder.andWhere("store.fechaExpiracion <= :date", { date: targetDate })
+			queryBuilder.andWhere("store.fechaExpiracion BETWEEN :date AND :currentDate", {
+				date: new Date(),
+				currentDate: targetDate
+			})
 		}
+
+		if (withSuscriptionCoupon) {
+			queryBuilder.andWhere("subscriptionsCoupons.id IS NOT NULL")
+			queryBuilder.orWhere("multipleSubscriptionCouponsToStore.id IS NOT NULL")
+		}
+
+		if (phone) queryBuilder.andWhere("tiendasInfo.telefono LIKE :phone", { phone: `%${phone}%` })
+
+		if (refferal) queryBuilder.andWhere("tiendasInfo.expert IS NOT NULL")
 
 		const [stores, total] = await queryBuilder.getManyAndCount()
 
