@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Geolocalizacion, Productos, Tiendas } from "src/entities"
+import { BotInfo, Geolocalizacion, MedioPagos, Productos, Tiendas } from "src/entities"
 import { Repository } from "typeorm"
 
 @Injectable()
@@ -9,7 +9,9 @@ export class ChatbotsService {
 		@InjectRepository(Tiendas) private readonly storeRepository: Repository<Tiendas>,
 		@InjectRepository(Productos) private readonly productPrository: Repository<Productos>,
 		@InjectRepository(Geolocalizacion)
-		private readonly geolocalizacionRepository: Repository<Geolocalizacion>
+		private readonly geolocalizacionRepository: Repository<Geolocalizacion>,
+		@InjectRepository(MedioPagos) private readonly paymentMethodsRepository: Repository<MedioPagos>,
+		@InjectRepository(BotInfo) private readonly botInfoRepository: Repository<BotInfo>
 	) {}
 
 	async getProductsDetailed(storeID: number) {
@@ -34,6 +36,8 @@ export class ChatbotsService {
 				"productos.fotoCloudinary",
 				"productos.precio",
 				"productos.slug",
+				"productos.conVariante",
+				"productos.envioGratis",
 				"productosInfo.descripcionCorta",
 				"productosInfo.inventario",
 				"productosInfo.marca",
@@ -60,15 +64,14 @@ export class ChatbotsService {
 				name: product.nombre,
 				price: product.precio,
 				image: product.fotoCloudinary,
+				withVariants: product.conVariante,
 				shortDescription: product.productosInfo.descripcionCorta,
 				inventory: product.productosInfo.inventario,
 				brand: product.productosInfo.marca,
 				weight: product.productosInfo.peso,
 				warranty: product.productosInfo.garantia,
+				freeShipping: product.envioGratis,
 				sku: product.slug,
-				variantsType: product.productosVariantes
-					.flatMap(({ variantes }) => JSON.parse(variantes || "[]"))
-					.flat(1),
 				combinations: product.productosVariantes
 					.map(({ productosVariantesCombinaciones }) =>
 						productosVariantesCombinaciones.map(({ combinaciones }) =>
@@ -100,6 +103,8 @@ export class ChatbotsService {
 				"productos.id",
 				"productos.nombre",
 				"productos.fotoCloudinary",
+				"productos.conVariante",
+				"productos.envioGratis",
 				"productos.precio",
 				"productos.slug",
 				"productosInfo.descripcionCorta",
@@ -130,6 +135,8 @@ export class ChatbotsService {
 			price: product.precio,
 			image: product.fotoCloudinary,
 			shortDescription: product.productosInfo.descripcionCorta,
+			withVariants: product.conVariante,
+			freeShipping: product.envioGratis,
 			inventory: product.productosInfo.inventario,
 			brand: product.productosInfo.marca,
 			weight: product.productosInfo.peso,
@@ -171,6 +178,27 @@ export class ChatbotsService {
 		}))
 	}
 
+	async getPaymentMethods(storeId: number) {
+		const paymentMethods = await this.paymentMethodsRepository.find({
+			where: { idMedios: storeId }
+		})
+		{
+			const parsedPaymentMethods = paymentMethods.map(
+				({ idMedios, idMedios2, createdAt, updatedAt, ...rest }) => ({
+					...rest
+				})
+			)
+
+			return parsedPaymentMethods
+		}
+	}
+
+	async getBotInfo(storeId: number) {
+		const botInfo = await this.botInfoRepository.findOne({ where: { storeId } })
+
+		return botInfo
+	}
+
 	async getProducts(storeId: number) {
 		const queryBuilder = this.productPrository
 			.createQueryBuilder("productos")
@@ -204,10 +232,11 @@ export class ChatbotsService {
 				"tiendasInfo.dominio"
 			])
 
-		const [storeInfo, products, geolocations] = await Promise.all([
+		const [storeInfo, geolocations, paymentMethods, botInfo] = await Promise.all([
 			queryBuilder.getOne(),
-			this.getProducts(storeId),
-			this.getGeolocations(storeId)
+			this.getGeolocations(storeId),
+			this.getPaymentMethods(storeId),
+			this.getBotInfo(storeId)
 		])
 
 		if (!storeInfo) return null
@@ -221,8 +250,9 @@ export class ChatbotsService {
 			categories: storeInfo.categoriaProductos.map(
 				(categoria) => categoria.nombreCategoriaProducto
 			),
-			products,
-			geolocations: geolocations.map(({ schedule, address }) => ({ schedule, address }))
+			geolocations: geolocations.map(({ schedule, address }) => ({ schedule, address })),
+			paymentMethods,
+			botInfo: botInfo?.info || null
 		}
 	}
 }
