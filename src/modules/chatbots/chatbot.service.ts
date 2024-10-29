@@ -50,7 +50,13 @@ export class ChatbotsService {
 
 		const products = await queryBuilder.getMany()
 
-		return products.map((product) => {
+		const produtcsToRemoveIDs = products
+			.filter((product) => product?.productosInfo?.inventario === 0 && !product?.conVariante)
+			.map((product) => product.id)
+
+		const filteredProducts = products.filter((product) => !produtcsToRemoveIDs.includes(product.id))
+
+		return filteredProducts.map((product) => {
 			return {
 				id: product.id,
 				name: product.nombre,
@@ -105,7 +111,13 @@ export class ChatbotsService {
 
 		const products = await queryBuilder.getMany()
 
-		return products.map((product) => {
+		const produtcsToRemoveIDs = products
+			.filter((product) => product?.productosInfo?.inventario === 0 && !product?.conVariante)
+			.map((product) => product.id)
+
+		const filteredProducts = products.filter((product) => !produtcsToRemoveIDs.includes(product.id))
+
+		return filteredProducts.map((product) => {
 			let productUrl = ""
 
 			if (product.tienda2?.subdominio && !product.tienda2?.tiendasInfo?.dominio) {
@@ -262,10 +274,17 @@ export class ChatbotsService {
 			.andWhere("productos.activo = 1")
 			.andWhere("productos.deletedAt IS NULL")
 			.select(["productos.id", "productos.nombre", "productos.fotoCloudinary"])
+			.innerJoinAndSelect("productos.productosInfo", "productosInfo")
 
 		const products = await queryBuilder.getMany()
 
-		return products.map((product) => ({
+		const produtcsToRemoveIDs = products
+			.filter((product) => product?.productosInfo?.inventario === 0 && !product?.conVariante)
+			.map((product) => product.id)
+
+		const filteredProducts = products.filter((product) => !produtcsToRemoveIDs.includes(product.id))
+
+		return filteredProducts.map((product) => ({
 			id: product.id,
 			name: product.nombre,
 			image: product.fotoCloudinary
