@@ -1,6 +1,6 @@
 import { Injectable } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Geolocalizacion, Productos, Tiendas } from "src/entities"
+import { BotInfo, Geolocalizacion, MedioPagos, Productos, Tiendas } from "src/entities"
 import { Repository } from "typeorm"
 
 @Injectable()
@@ -9,8 +9,135 @@ export class ChatbotsService {
 		@InjectRepository(Tiendas) private readonly storeRepository: Repository<Tiendas>,
 		@InjectRepository(Productos) private readonly productPrository: Repository<Productos>,
 		@InjectRepository(Geolocalizacion)
-		private readonly geolocalizacionRepository: Repository<Geolocalizacion>
+		private readonly geolocalizacionRepository: Repository<Geolocalizacion>,
+		@InjectRepository(MedioPagos) private readonly paymentMethodsRepository: Repository<MedioPagos>,
+		@InjectRepository(BotInfo) private readonly botInfoRepository: Repository<BotInfo>
 	) {}
+
+	async getProductsDetailedByIDs(storeID: number, ids: number[]) {
+		const queryBuilder = this.productPrository
+			.createQueryBuilder("productos")
+			.where("productos.tienda = :storeID", { storeID })
+			.andWhere("productos.activo = 1")
+			.andWhere("productos.deletedAt IS NULL")
+			.andWhere("productos.id IN (:...ids)", { ids })
+			.innerJoinAndSelect("productos.productosInfo", "productosInfo")
+			.leftJoinAndSelect("productos.productosVariantes", "productosVariantes")
+			.leftJoinAndSelect(
+				"productosVariantes.productosVariantesCombinaciones",
+				"productosVariantesCombinaciones"
+			)
+			.innerJoin("productos.tienda2", "tiendas")
+			.innerJoin("tiendas.tiendasInfo", "tiendasInfo")
+			.select([
+				"tiendas.subdominio",
+				"tiendasInfo.dominio",
+				"productos.id",
+				"productos.nombre",
+				"productos.fotoCloudinary",
+				"productos.precio",
+				"productos.slug",
+				"productos.conVariante",
+				"productos.envioGratis",
+				"productosInfo.descripcionCorta",
+				"productosInfo.inventario",
+				"productosInfo.marca",
+				"productosInfo.peso",
+				"productosInfo.garantia",
+				"productosVariantes.variantes",
+				"productosVariantesCombinaciones.combinaciones"
+			])
+
+		const products = await queryBuilder.getMany()
+
+		return products.map((product) => {
+			return {
+				id: product.id,
+				name: product.nombre,
+				price: product.precio,
+				withVariants: product.conVariante,
+				weight: product.productosInfo.peso,
+				warranty: product.productosInfo.garantia,
+				freeShipping: product.envioGratis,
+				combinations: product.productosVariantes
+					.map(({ productosVariantesCombinaciones }) =>
+						productosVariantesCombinaciones.map(({ combinaciones }) =>
+							JSON.parse(combinaciones || "[]")
+						)
+					)
+					.flat(2)
+			}
+		})
+	}
+
+	async getProductsDetailed(storeID: number) {
+		const queryBuilder = this.productPrository
+			.createQueryBuilder("productos")
+			.where("productos.tienda = :storeID", { storeID })
+			.andWhere("productos.activo = 1")
+			.andWhere("productos.deletedAt IS NULL")
+			.innerJoinAndSelect("productos.productosInfo", "productosInfo")
+			.leftJoinAndSelect("productos.productosVariantes", "productosVariantes")
+			.leftJoinAndSelect(
+				"productosVariantes.productosVariantesCombinaciones",
+				"productosVariantesCombinaciones"
+			)
+			.innerJoin("productos.tienda2", "tiendas")
+			.innerJoin("tiendas.tiendasInfo", "tiendasInfo")
+			.select([
+				"tiendas.subdominio",
+				"tiendasInfo.dominio",
+				"productos.id",
+				"productos.nombre",
+				"productos.fotoCloudinary",
+				"productos.precio",
+				"productos.slug",
+				"productos.conVariante",
+				"productos.envioGratis",
+				"productosInfo.descripcionCorta",
+				"productosInfo.inventario",
+				"productosInfo.marca",
+				"productosInfo.peso",
+				"productosInfo.garantia",
+				"productosVariantes.variantes",
+				"productosVariantesCombinaciones.combinaciones"
+			])
+
+		const products = await queryBuilder.getMany()
+
+		return products.map((product) => {
+			let productUrl = ""
+
+			if (product.tienda2?.subdominio && !product.tienda2?.tiendasInfo?.dominio) {
+				productUrl = `https://${product.tienda2.subdominio}.komercia.store/productos/${product.slug}`
+			} else if (product.tienda2?.tiendasInfo?.dominio) {
+				productUrl = `${product.tienda2.tiendasInfo.dominio}/productos/${product.slug}`
+			}
+
+			return {
+				id: product.id,
+				url: productUrl,
+				name: product.nombre,
+				price: product.precio,
+				image: product.fotoCloudinary,
+				withVariants: product.conVariante,
+				shortDescription: product.productosInfo.descripcionCorta,
+				inventory: product.productosInfo.inventario,
+				brand: product.productosInfo.marca,
+				weight: product.productosInfo.peso,
+				warranty: product.productosInfo.garantia,
+				freeShipping: product.envioGratis,
+				sku: product.slug,
+				combinations: product.productosVariantes
+					.map(({ productosVariantesCombinaciones }) =>
+						productosVariantesCombinaciones.map(({ combinaciones }) =>
+							JSON.parse(combinaciones || "[]")
+						)
+					)
+					.flat(2)
+			}
+		})
+	}
 
 	async getProductInfo(productId: number) {
 		const queryBuilder = this.productPrository
@@ -32,6 +159,8 @@ export class ChatbotsService {
 				"productos.id",
 				"productos.nombre",
 				"productos.fotoCloudinary",
+				"productos.conVariante",
+				"productos.envioGratis",
 				"productos.precio",
 				"productos.slug",
 				"productosInfo.descripcionCorta",
@@ -62,6 +191,8 @@ export class ChatbotsService {
 			price: product.precio,
 			image: product.fotoCloudinary,
 			shortDescription: product.productosInfo.descripcionCorta,
+			withVariants: product.conVariante,
+			freeShipping: product.envioGratis,
 			inventory: product.productosInfo.inventario,
 			brand: product.productosInfo.marca,
 			weight: product.productosInfo.peso,
@@ -103,6 +234,27 @@ export class ChatbotsService {
 		}))
 	}
 
+	async getPaymentMethods(storeId: number) {
+		const paymentMethods = await this.paymentMethodsRepository.find({
+			where: { idMedios: storeId }
+		})
+		{
+			const parsedPaymentMethods = paymentMethods.map(
+				({ idMedios, idMedios2, createdAt, updatedAt, ...rest }) => ({
+					...rest
+				})
+			)
+
+			return parsedPaymentMethods
+		}
+	}
+
+	async getBotInfo(storeId: number) {
+		const botInfo = await this.botInfoRepository.findOne({ where: { storeId } })
+
+		return botInfo
+	}
+
 	async getProducts(storeId: number) {
 		const queryBuilder = this.productPrository
 			.createQueryBuilder("productos")
@@ -136,10 +288,11 @@ export class ChatbotsService {
 				"tiendasInfo.dominio"
 			])
 
-		const [storeInfo, products, geolocations] = await Promise.all([
+		const [storeInfo, geolocations, paymentMethods, botInfo] = await Promise.all([
 			queryBuilder.getOne(),
-			this.getProducts(storeId),
-			this.getGeolocations(storeId)
+			this.getGeolocations(storeId),
+			this.getPaymentMethods(storeId),
+			this.getBotInfo(storeId)
 		])
 
 		if (!storeInfo) return null
@@ -153,8 +306,9 @@ export class ChatbotsService {
 			categories: storeInfo.categoriaProductos.map(
 				(categoria) => categoria.nombreCategoriaProducto
 			),
-			products,
-			geolocations: geolocations.map(({ schedule, address }) => ({ schedule, address }))
+			geolocations: geolocations.map(({ schedule, address }) => ({ schedule, address })),
+			paymentMethods,
+			botInfo: botInfo?.info || null
 		}
 	}
 }

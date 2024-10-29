@@ -11,6 +11,7 @@ import {
 
 import { ApisConexiones } from "./ApisConexiones"
 import { Banners } from "./Banners"
+import { BotInfo } from "./BotInfo"
 import { Carritos } from "./Carritos"
 import { CarritosWhatsapp } from "./CarritosWhatsapp"
 import { CategoriaProductos } from "./CategoriaProductos"
@@ -158,6 +159,9 @@ export class Tiendas {
 
 	@Column("tinyint", { name: "notified_as_discount", nullable: true, default: () => "'0'" })
 	notifiedAsDiscount: boolean | null
+
+	@Column("tinyint", { name: "notified_as_60_days_expired", nullable: true, default: () => "'0'" })
+	notifiedAs60DaysExpired: boolean | null
 
 	@OneToMany(() => ApisConexiones, (apisConexiones) => apisConexiones.tienda)
 	apisConexiones: ApisConexiones[]
@@ -436,4 +440,7 @@ export class Tiendas {
 		(multipleSubscriptionCouponToStore) => multipleSubscriptionCouponToStore.store
 	)
 	multipleSubscriptionCouponsToStore: MultipleSubscriptionCouponToStore[]
+
+	@OneToOne(() => BotInfo, (botInfo) => botInfo.store)
+	botInfo: BotInfo
 }
