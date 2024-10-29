@@ -14,6 +14,62 @@ export class ChatbotsService {
 		@InjectRepository(BotInfo) private readonly botInfoRepository: Repository<BotInfo>
 	) {}
 
+	async getProductsDetailedByIDs(storeID: number, ids: number[]) {
+		const queryBuilder = this.productPrository
+			.createQueryBuilder("productos")
+			.where("productos.tienda = :storeID", { storeID })
+			.andWhere("productos.activo = 1")
+			.andWhere("productos.deletedAt IS NULL")
+			.andWhere("productos.id IN (:...ids)", { ids })
+			.innerJoinAndSelect("productos.productosInfo", "productosInfo")
+			.leftJoinAndSelect("productos.productosVariantes", "productosVariantes")
+			.leftJoinAndSelect(
+				"productosVariantes.productosVariantesCombinaciones",
+				"productosVariantesCombinaciones"
+			)
+			.innerJoin("productos.tienda2", "tiendas")
+			.innerJoin("tiendas.tiendasInfo", "tiendasInfo")
+			.select([
+				"tiendas.subdominio",
+				"tiendasInfo.dominio",
+				"productos.id",
+				"productos.nombre",
+				"productos.fotoCloudinary",
+				"productos.precio",
+				"productos.slug",
+				"productos.conVariante",
+				"productos.envioGratis",
+				"productosInfo.descripcionCorta",
+				"productosInfo.inventario",
+				"productosInfo.marca",
+				"productosInfo.peso",
+				"productosInfo.garantia",
+				"productosVariantes.variantes",
+				"productosVariantesCombinaciones.combinaciones"
+			])
+
+		const products = await queryBuilder.getMany()
+
+		return products.map((product) => {
+			return {
+				id: product.id,
+				name: product.nombre,
+				price: product.precio,
+				withVariants: product.conVariante,
+				weight: product.productosInfo.peso,
+				warranty: product.productosInfo.garantia,
+				freeShipping: product.envioGratis,
+				combinations: product.productosVariantes
+					.map(({ productosVariantesCombinaciones }) =>
+						productosVariantesCombinaciones.map(({ combinaciones }) =>
+							JSON.parse(combinaciones || "[]")
+						)
+					)
+					.flat(2)
+			}
+		})
+	}
+
 	async getProductsDetailed(storeID: number) {
 		const queryBuilder = this.productPrository
 			.createQueryBuilder("productos")
