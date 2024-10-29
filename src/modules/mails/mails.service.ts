@@ -29,7 +29,7 @@ export class MailsService {
 		try {
 			await this.mailService.send({
 				to: to,
-				from: this.sendgridFrom as string,
+				from: "no-reply@komercia.co",
 				templateId
 			})
 			this.logger.log(`Email sent successfully to ${to.length} recipients`)
