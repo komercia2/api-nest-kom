@@ -36,19 +36,24 @@ export class MySQLStoreAnalyticsService {
 	}
 
 	async countDevices(storeId: number) {
+		const event = "VISITED_PAGE"
+
 		const query = this.storeAnalyticsRepository
 			.createQueryBuilder("storeAnalytics")
 			.where("storeAnalytics.storeId = :storeId", { storeId })
+			.andWhere("storeAnalytics.event = :event", { event })
 			.groupBy("storeAnalytics.device")
 			.select("storeAnalytics.device", "key")
 			.addSelect("COUNT(storeAnalytics.device)", "value")
 
 		const result = await query.getRawMany()
 
-		const defaultValues = Object.values(Devices).reduce((acc, device) => {
-			acc[device] = 0
-			return acc
-		}, {} as Record<Devices, number>)
+		const defaultValues: Record<Devices, number> = {
+			[Devices.DESKTOP]: 0,
+			[Devices.MOBILE]: 0,
+			[Devices.TABLET]: 0,
+			[Devices.OTHER]: 0
+		}
 
 		const mergedResult = result.reduce((acc, curr) => {
 			acc[curr.key] = Number(curr.value)
