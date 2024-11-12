@@ -143,12 +143,14 @@ export class JobsService {
 
 	async findStores60DaysExpired() {
 		const date60DaysBefore = this.getDateNDaysBeforeFromNow(60)
+		const date30DaysBefore = this.getDateNDaysBeforeFromNow(30)
 		const currentDate = new Date().toISOString()
 
 		return await this.tiendasRepository
 			.createQueryBuilder("store")
 			.andWhere("DATE(store.createdAt) = DATE(:date60DaysBefore)", { date60DaysBefore })
 			.andWhere("store.fechaExpiracion <= DATE(:currentDate)", { currentDate })
+			.andWhere("store.fechaExpiracion > DATE(:date30DaysBefore)", { date30DaysBefore })
 			.innerJoin("store.tiendasInfo", "storeInfo")
 			.select(["store.id", "store.nombre", "storeInfo.emailTienda", "store.fechaExpiracion"])
 			.getMany()
