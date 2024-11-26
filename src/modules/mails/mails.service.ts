@@ -78,10 +78,10 @@ export class MailsService {
 	}
 
 	async saveMessageSent(createMailDto: CreateMailDto): Promise<void> {
-		const { to, dynamicTemplateData, storeId, userId } = createMailDto
+		const { dynamicTemplateData, storeId, userId } = createMailDto
 
 		const mensajeContacto = this.mensajesContactoRepository.create({
-			email: to,
+			email: dynamicTemplateData.clientEmail,
 			mensaje: dynamicTemplateData.messsage,
 			nombre: dynamicTemplateData.clientName,
 			telefono: dynamicTemplateData.clientPhoneNumber,
