@@ -16,6 +16,7 @@ import { PaymentsModule } from "src/modules/payments/payments.module"
 import { ProductModule } from "src/modules/products/products.module"
 import { SalesModule } from "src/modules/sales/sales.module"
 import { StoresModule } from "src/modules/stores/stores.module"
+import { SubscribersModule } from "src/modules/subscribers/subscribers.module"
 import { SuperModule } from "src/modules/super/super.module"
 import { UsersModule } from "src/modules/users/users.module"
 import { WhatsappModule } from "src/modules/whatsapp/whatsapp.module"
@@ -103,6 +104,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/chatbots`,
 		module: ChatbotsModule
+	},
+	{
+		path: `${apiVersions.v1}/subscribers`,
+		module: SubscribersModule
 	}
 ]
 
