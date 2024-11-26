@@ -64,7 +64,7 @@ export class MailsService {
 		try {
 			await this.mailService.send({
 				to: to,
-				from: this.sendgridFrom as string,
+				from: dynamicTemplateData.clientEmail as string,
 				templateId,
 				dynamicTemplateData
 			})
