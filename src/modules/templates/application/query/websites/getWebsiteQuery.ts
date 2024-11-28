@@ -9,12 +9,26 @@ export class GetWebsiteQuery {
 		private readonly websiteRepository: IWebSitesRepository
 	) {}
 
+	private readonly validTemplates = [15]
+
+	// async execute(criteria: string, isDomain: boolean) {
+	// 	const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria, isDomain)
+	// 	if (!templateId) {
+	// 		const mySQLData = await this.websiteRepository.findMySQLTemplateByCriteria(criteria, isDomain)
+	// 		if (mySQLData) return mySQLData
+	// 	}
+	// 	return await this.websiteRepository.getWebSite(templateId, criteria)
+	// }
+
 	async execute(criteria: string, isDomain: boolean) {
+		const mySQLData = await this.websiteRepository.findMySQLTemplateByCriteria(criteria, isDomain)
+
+		if (mySQLData && !this.validTemplates.includes(mySQLData.template)) return mySQLData
+
 		const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria, isDomain)
-		if (!templateId) {
-			const mySQLData = await this.websiteRepository.findMySQLTemplateByCriteria(criteria, isDomain)
-			if (mySQLData) return mySQLData
-		}
+
+		if (!templateId) return mySQLData
+
 		return await this.websiteRepository.getWebSite(templateId, criteria)
 	}
 }
