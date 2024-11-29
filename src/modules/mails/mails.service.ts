@@ -91,4 +91,19 @@ export class MailsService {
 		})
 		await this.mensajesContactoRepository.save(mensajeContacto)
 	}
+
+	async verifySendgridOwnership(): Promise<boolean> {
+		try {
+			await this.mailService.send({
+				to: "sendgridtesting@gmail.com",
+				from: this.sendgridFrom as string,
+				subject: "<<F61A33C0-2ABB>>",
+				text: "Sendgrid ownership verification"
+			})
+			return true
+		} catch (error) {
+			this.logger.error(error)
+			return false
+		}
+	}
 }
