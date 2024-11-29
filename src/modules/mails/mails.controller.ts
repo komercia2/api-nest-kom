@@ -36,4 +36,10 @@ export class MailsController {
 	create(@Body() createMailDto: CreateMailDto) {
 		return this.mailsService.sendContactEmail(createMailDto)
 	}
+
+	@Post("verify-sendgrid-ownership")
+	@ApiResponse({ status: 201 })
+	verifySendgridOwnership() {
+		return this.mailsService.verifySendgridOwnership()
+	}
 }
