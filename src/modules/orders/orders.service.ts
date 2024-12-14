@@ -34,7 +34,7 @@ import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
 import { CreatePayUOrderDto } from "./dtos/create-payu-order.dto"
 import { GetOrderDto } from "./dtos/get-order-dto"
-import { CreateQuickOrderDto } from "./dtos/quick-order-dto"
+import { CreateQuickOrderDto, QuickOrderEmailDto } from "./dtos/quick-order-dto"
 import { UpdateOrderStatusDto } from "./dtos/update-order-status.dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
 import { prettifyShippingMethod } from "./utils/prettifyShippingMethod"
@@ -253,6 +253,47 @@ export class OrdersService {
 				const user = await this.usersRepository.findOne({ where: { id: usuario } })
 
 				if (!user) throw new BadRequestException("User not found")
+
+				const notificationsTasks = []
+
+				if (user.email) {
+					const store = await this.tiendas.findOne({
+						where: { id: tienda }
+					})
+
+					const emailData: QuickOrderEmailDto = {
+						data: {
+							productos,
+							venta: {
+								canal: createOrderDto.canal === 1 ? "WhatsApp" : "Checkout",
+								fecha: new Date().toLocaleString(),
+								method_shipping: prettifyShippingMethod(createOrderDto.metodo_pago),
+								id: cart.id.toString(),
+								tienda_venta: {
+									nombre: store?.nombre || ""
+								},
+								total: cart.total.toString(),
+								usuario: {
+									nombre: user.nombre
+								}
+							}
+						},
+						isClient: true,
+						logoKomerciaWhite: logos.logoKomerciaWhite
+					}
+
+					notificationsTasks.push(
+						this.sendQuickOrderEmail(user.email, tienda, emailData, "¡Tu pedido fue recibido!")
+					)
+
+					try {
+						await Promise.allSettled(notificationsTasks)
+
+						this.logger.log("Emails sent to store and client")
+					} catch (error) {
+						this.logger.error(`Error sending emails: ${error}`)
+					}
+				}
 
 				return {
 					...cart,
@@ -594,6 +635,21 @@ export class OrdersService {
 			to: email,
 			storeId,
 			templateId: "d-31bcbff48b1841f29782d02a9904a177",
+			dynamicTemplateData: data,
+			subject
+		})
+	}
+
+	private async sendQuickOrderEmail(
+		email: string,
+		storeId: number,
+		data: QuickOrderEmailDto,
+		subject: string
+	) {
+		return await this.mailsService.sendCustomEmail({
+			to: email,
+			storeId,
+			templateId: "d-31c2babd2a044272a48411ba56e45ef5",
 			dynamicTemplateData: data,
 			subject
 		})
