@@ -27,3 +27,38 @@ export interface Product {
 	inventario: number
 	combinacion?: string
 }
+
+/**
+ * Email
+ */
+
+interface Order {
+	id: string
+	fecha: string
+	canal: string
+	total: string
+	method_shipping: string
+	tienda_venta: {
+		nombre: string
+	}
+	usuario?: {
+		nombre: string
+	}
+}
+
+interface Producto {
+	nombre: string
+	cantidad: number
+	precio: number
+	foto_cloudinary: string
+	combinacion?: string
+}
+
+export interface QuickOrderEmailDto {
+	isClient: boolean
+	logoKomerciaWhite: string
+	data: {
+		venta: Order
+		productos: Producto[]
+	}
+}
