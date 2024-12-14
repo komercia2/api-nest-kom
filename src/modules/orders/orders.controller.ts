@@ -5,6 +5,7 @@ import { CheckoutJwtGuard } from "@shared/infrastructure/guards"
 import { CreateOrderDto } from "./dtos/create-order-dto"
 import { CreatePayUOrderDto } from "./dtos/create-payu-order.dto"
 import { GetOrderDto } from "./dtos/get-order-dto"
+import { CreateQuickOrderDto } from "./dtos/quick-order-dto"
 import { UpdateOrderStatusDto } from "./dtos/update-order-status.dto"
 import { OrdersService } from "./orders.service"
 
@@ -12,6 +13,11 @@ import { OrdersService } from "./orders.service"
 @Controller()
 export class OrdersController {
 	constructor(private readonly ordersService: OrdersService) {}
+
+	@Post("create-quick-order")
+	async createQuickOrder(@Body() createQuickOrderDto: CreateQuickOrderDto) {
+		return this.ordersService.createQuickOrder(createQuickOrderDto)
+	}
 
 	@UseGuards(CheckoutJwtGuard)
 	@Post("create-payu-order")

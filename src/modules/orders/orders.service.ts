@@ -34,6 +34,7 @@ import logos from "./constants/logos"
 import { CreateOrderDto } from "./dtos/create-order-dto"
 import { CreatePayUOrderDto } from "./dtos/create-payu-order.dto"
 import { GetOrderDto } from "./dtos/get-order-dto"
+import { CreateQuickOrderDto } from "./dtos/quick-order-dto"
 import { UpdateOrderStatusDto } from "./dtos/update-order-status.dto"
 import { OrderEmailDto } from "./interfaces/send-order-mail.interface"
 import { prettifyShippingMethod } from "./utils/prettifyShippingMethod"
@@ -90,6 +91,191 @@ export class OrdersService {
 
 		private eventEmitter: EventEmitter2
 	) {}
+
+	async createQuickOrder(createOrderDto: CreateQuickOrderDto) {
+		const queryRunner = this.datasource.createQueryRunner()
+
+		this.logger.log("QueryRunner created")
+
+		await queryRunner.connect()
+
+		this.logger.log("QueryRunner connected")
+
+		await queryRunner.startTransaction()
+
+		this.logger.log("Transaction started")
+
+		const { productos, tienda, usuario, comentario } = createOrderDto
+
+		try {
+			const cart = new Carritos()
+
+			cart.tipo = createOrderDto.tipo
+			cart.tienda = createOrderDto.tienda
+			cart.usuario = createOrderDto.usuario
+			cart.resellerId = null
+			cart.fecha = new Date().toISOString()
+			cart.total = createOrderDto.total
+			cart.costoEnvio = createOrderDto.costo_envio
+			if (createOrderDto.tipo === true) {
+				cart.estado = "8"
+			} else if (createOrderDto.metodo_pago === "6" && createOrderDto.canal === 4) {
+				cart.estado = "1"
+			} else {
+				cart.estado = "0"
+			}
+			cart.canal = createOrderDto.canal.toString()
+			cart.direccionEntrega = JSON.stringify(createOrderDto.direccion_entrega)
+			cart.takeout = createOrderDto.takeout
+			cart.estadoEntrega = createOrderDto.estado_entrega
+			cart.ip = createOrderDto.ip
+			cart.comentario = createOrderDto.comentario
+			cart.cupon = createOrderDto.cupon
+			cart.descuento = createOrderDto.descuento
+			cart.createdAt = new Date()
+
+			await queryRunner.manager.save(cart)
+
+			this.logger.log(`Cart ${cart.id} created`)
+
+			if (productos.length === 0) {
+				throw new BadRequestException("Products not found")
+			}
+
+			if (createOrderDto.productos) {
+				await Promise.all(
+					productos.map(async (producto) => {
+						const { id, nombre } = producto
+
+						const product = await this.productosRepository.findOne({ where: { id, tienda } })
+
+						if (!product) throw new BadRequestException("Product not found")
+
+						if (product.conVariante) {
+							const variant = await this.productosVariantesRepository.findOne({
+								where: { idProducto: id }
+							})
+
+							if (!variant) throw new BadRequestException("Product variants not found")
+
+							const combinations = await this.productosVariantesCombinacionesRepository.findOne({
+								where: { idProductosVariantes: variant.id }
+							})
+
+							if (!combinations) throw new BadRequestException("Product combinations not found")
+							if (!combinations.combinaciones) {
+								throw new BadRequestException("Product combinations not found")
+							}
+
+							const decodedCombinations: Combination[] = JSON.parse(combinations.combinaciones)
+
+							decodedCombinations.forEach((c) => {
+								const strProductCombinacion = JSON.stringify(producto.combinacion)
+								const strCurrentCombination = JSON.stringify(c.combinacion)
+
+								if (
+									strCurrentCombination === strProductCombinacion &&
+									+c.precio === +producto.precio
+								) {
+									producto.precio = c.precio
+									producto.combinacion = c.combinacion
+
+									if (producto.cantidad > c.unidades) {
+										throw new BadRequestException(`Product ${nombre} has not enough stock`)
+									}
+
+									c.unidades -= producto.cantidad
+								}
+							})
+							combinations.combinaciones = JSON.stringify(decodedCombinations)
+							await queryRunner.manager.save(combinations)
+						} else {
+							const productInfo = await this.productosInfoRepository.findOne({
+								where: { id }
+							})
+
+							if (!productInfo) throw new BadRequestException("Product info not found")
+
+							let { inventario } = productInfo
+
+							if (!inventario) throw new BadRequestException("Product inventory not found")
+
+							if (producto.cantidad > inventario) {
+								throw new BadRequestException(`Product ${nombre} has not enough stock`)
+							}
+
+							inventario -= producto.cantidad
+							productInfo.inventario = inventario
+							await queryRunner.manager.save(productInfo)
+						}
+
+						const productCart: QueryDeepPartialEntity<ProductosCarritos> = {
+							carrito: cart.id,
+							producto: id,
+							unidades: producto.cantidad
+						}
+						// productCart.carrito = cart.id
+						// productCart.producto = id
+						// productCart.unidades = producto.cantidad
+
+						if (producto.combinacion) {
+							productCart.variantes = JSON.stringify(producto.combinacion)
+						}
+
+						if ("precio" in product && producto.precio != 0 && producto.precio !== null) {
+							productCart.precioProducto = producto.precio
+						} else {
+							productCart.precioProducto = 0
+						}
+						await queryRunner.manager.insert(ProductosCarritos, productCart)
+					})
+				)
+
+				this.logger.log("Stock verified")
+
+				if (createOrderDto.comentario) {
+					const message = await this.createOrderMessage(comentario, cart.id, usuario)
+					await queryRunner.manager.save(message)
+					this.logger.log("Message created")
+				}
+				try {
+					await this.isClientRegistered(usuario, tienda, CLIENT_ASSIGNATION_METHOD.ORDER)
+				} catch (error) {
+					this.logger.error(`Error registering client: ${error}`)
+				}
+
+				this.logger.log("Client registered")
+
+				await queryRunner.commitTransaction()
+
+				this.logger.log("Transaction commited")
+
+				return cart
+			}
+		} catch (error) {
+			console.log(error)
+			await queryRunner.rollbackTransaction()
+			this.logger.error(`Transaction rolled back: ${error}`)
+			if (error instanceof BadRequestException) {
+				throw error
+			}
+
+			if (error instanceof ConflictException) {
+				throw error
+			}
+
+			if (error instanceof InternalServerErrorException) {
+				throw error
+			}
+
+			if (error instanceof Error) {
+				throw new InternalServerErrorException("Internal server error")
+			}
+		} finally {
+			await queryRunner.release()
+			this.logger.log("QueryRunner released")
+		}
+	}
 
 	async cratePayUOrder(data: CreatePayUOrderDto) {
 		const { cartId, storeId, total } = data
