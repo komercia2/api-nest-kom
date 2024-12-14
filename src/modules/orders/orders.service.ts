@@ -250,7 +250,19 @@ export class OrdersService {
 
 				this.logger.log("Transaction commited")
 
-				return cart
+				const user = await this.usersRepository.findOne({ where: { id: usuario } })
+
+				if (!user) throw new BadRequestException("User not found")
+
+				return {
+					...cart,
+					usuario: {
+						id: user.id,
+						nombre: user.nombre,
+						foto: user.foto,
+						email: user.email
+					}
+				}
 			}
 		} catch (error) {
 			console.log(error)
