@@ -22,6 +22,7 @@ import {
 } from "src/entities"
 import { DataSource, Repository } from "typeorm"
 
+import { ClodinaryService } from "../clodinary/clodinary.service"
 import { SuperLoginDto } from "./dtos"
 import { CreateStoreDto } from "./dtos/create-store.dto"
 import { PasswordUtil } from "./utils/password.util"
@@ -38,7 +39,8 @@ export class AuthService {
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
 		@InjectRepository(UsersInfo) private readonly usersInfoRepository: Repository<UsersInfo>,
 		private readonly datasource: DataSource,
-		private readonly logger: Logger
+		private readonly logger: Logger,
+		private readonly cloudinaryService: ClodinaryService
 	) {}
 
 	async createStore(dto: CreateStoreDto) {
@@ -264,6 +266,8 @@ export class AuthService {
 			const user = await this.usersRepository.findOne({ where: { email: dto.email } })
 
 			if (!user) throw new NotFoundException("User not found. Failure on user creation")
+
+			await this.cloudinaryService.migrateStoresLogo(store.id)
 
 			return {
 				id: store.id,
