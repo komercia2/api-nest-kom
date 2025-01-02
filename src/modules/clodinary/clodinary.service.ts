@@ -19,7 +19,7 @@ export class ClodinaryService {
 		})
 	}
 
-	async migrateStoresLogo(storeID: number) {
+	async migrateNewStoreLogo(storeID: number) {
 		const store = await this.tiendasRepository.findOne({ where: { id: storeID } })
 
 		if (!store) {
@@ -37,7 +37,10 @@ export class ClodinaryService {
 		this.logger.log(`Migrating logo for store with ID ${id} identified as ${logo}`)
 
 		try {
-			const { secure_url } = await this.upload(`https://api2.komercia.co/logos/${logo}`, "logos")
+			const { secure_url } = await this.upload(
+				`https://api2.komercia.co/logos/logo_nuevas_tiendas.png`,
+				"logos"
+			)
 			await this.tiendasRepository.update(id, { cloudinaryLogo: secure_url, logoMigrated: true })
 		} catch (error) {
 			this.logger.error(`Error migrating logo for store with ID ${id}: ${error}`)

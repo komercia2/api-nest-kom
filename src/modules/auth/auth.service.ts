@@ -267,7 +267,7 @@ export class AuthService {
 
 			if (!user) throw new NotFoundException("User not found. Failure on user creation")
 
-			await this.cloudinaryService.migrateStoresLogo(store.id)
+			await this.cloudinaryService.migrateNewStoreLogo(store.id)
 
 			return {
 				id: store.id,
