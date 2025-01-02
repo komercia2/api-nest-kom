@@ -70,6 +70,7 @@ import {
 	GetStoreWhatsAppCheckoutQuery
 } from "./application/query"
 import { GetStoreIntegrationsQuery } from "./application/query/get-store-integrations-query"
+import { GetStoreLogoQuery } from "./application/query/logos/get-store-logo-query"
 import { StoresApplicationInjectionTokens } from "./application/stores-application-injection-tokens"
 import {
 	PrivateStoreAnalyticsController,
@@ -94,6 +95,7 @@ import {
 import { PublicStoreAnalyticsController } from "./infrastructure/controllers/public/public-store-analytics-controller"
 import { PublicStoreCustomerAccessCodeController } from "./infrastructure/controllers/public/public-store-cutomer-access-code-controller"
 import { PublicStoreInfoController } from "./infrastructure/controllers/public/public-store-info-controller"
+import { PublicStoreLogoController } from "./infrastructure/controllers/public/public-store-logo-controller"
 import {
 	MySQLStoreAnalyticsRepository,
 	MySQLStoreBannerRepository,
@@ -111,6 +113,7 @@ import {
 } from "./infrastructure/repositories"
 import { MySQLStoreCustomerAccessCodeRepository } from "./infrastructure/repositories/mysq-store-customer-repository"
 import { MySQLStoreProductCategoryRepository } from "./infrastructure/repositories/mysq-store-product-category-repository"
+import { MySQLStoreLogoRespository } from "./infrastructure/repositories/mysql-store-logos-repository"
 import { MySQLStoreShippingMeansRepository } from "./infrastructure/repositories/mysql-store-shipping-means-repository"
 import { MysqlStoreProductSubcategoryRepository } from "./infrastructure/repositories/mysql-store-subcategory-repository"
 import {
@@ -131,6 +134,7 @@ import {
 	MysqlStoreProductSubcategoryService,
 	MySQLStoreWhatsappCheckoutService
 } from "./infrastructure/services"
+import { MySQLStoreLogoService } from "./infrastructure/services/mysql-store-logo-service"
 import { MysqlStoreShippingMeansService } from "./infrastructure/services/mysql-store-shipping-means-service"
 import { StoresInfrastructureInjectionTokens } from "./infrastructure/store-infrastructure-injection-tokens"
 
@@ -202,6 +206,10 @@ const application = [
 	{
 		provide: StoresApplicationInjectionTokens.IStroePaymentMethodsRepository,
 		useClass: MySQLStorePaymentMethodsRepository
+	},
+	{
+		provide: StoresApplicationInjectionTokens.IStoreLogoRepository,
+		useClass: MySQLStoreLogoRespository
 	}
 ]
 
@@ -319,6 +327,10 @@ const infrastructure = [
 		useClass: GetStoreShippingMeansQuery
 	},
 	{
+		provide: StoresInfrastructureInjectionTokens.GetStoreLogoQuery,
+		useClass: GetStoreLogoQuery
+	},
+	{
 		provide: StoresInfrastructureInjectionTokens.SaveClickedPayCartCommand,
 		useClass: SaveClickedPayCartCommand
 	},
@@ -389,6 +401,10 @@ const infrastructure = [
 	{
 		provide: StoresInfrastructureInjectionTokens.MysqlStoreIntegrationsService,
 		useClass: MySqlStoreIntegrationsService
+	},
+	{
+		provide: StoresInfrastructureInjectionTokens.MySQLStoreLogoService,
+		useClass: MySQLStoreLogoService
 	}
 ]
 
@@ -449,7 +465,8 @@ const infrastructure = [
 		PrivateStoreAnalyticsController,
 		PublicStorePaymentMethodsController,
 		PrivateStorePaymentGatewaysController,
-		PrivateStoreIntegrationsController
+		PrivateStoreIntegrationsController,
+		PublicStoreLogoController
 	],
 	providers: [...application, ...infrastructure]
 })
@@ -474,7 +491,8 @@ export class StoresModule implements NestModule {
 				PublicStoreHeadquartersController,
 				PublicShippingMeansController,
 				PublicStorePaymentMethodsController,
-				PrivateStoreIntegrationsController
+				PrivateStoreIntegrationsController,
+				PublicStoreLogoController
 			)
 			.apply(LaravelAuthMiddleware)
 			.exclude({

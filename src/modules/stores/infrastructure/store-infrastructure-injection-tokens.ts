@@ -19,6 +19,7 @@ export enum StoresInfrastructureInjectionTokens {
 	MySQLStoreAnalyticsService = "MySQLStoreAnalyticsService",
 	MySQLStorePaymentMethodsService = "MySQLStorePaymentMethodsService",
 	MysqlStoreIntegrationsService = "MysqlStoreIntegrationsService",
+	MySQLStoreLogoService = "MySQLStoreLogoService",
 
 	/**
 	 * Use cases (queries)
@@ -46,6 +47,7 @@ export enum StoresInfrastructureInjectionTokens {
 	CountAllDevicesQuery = "CountAllDevicesQuery",
 	GetPaymentMethodsQueryWithoutAuth = "GetPaymentMethodsQueryWithoutAuth",
 	FindPaymentMethodWithCredentialsQuery = "FindPaymentMethodWithCredentialsQuery",
+	GetStoreLogoQuery = "GetStoreLogoQuery",
 
 	/**
 	 * Use cases (commands)

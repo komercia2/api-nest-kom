@@ -163,6 +163,12 @@ export class Tiendas {
 	@Column("tinyint", { name: "notified_as_60_days_expired", nullable: true, default: () => "'0'" })
 	notifiedAs60DaysExpired: boolean | null
 
+	@Column("tinyint", { name: "logo_migrated", nullable: true, width: 1, default: () => "'0'" })
+	logoMigrated: boolean | null
+
+	@Column("text", { name: "cloudinary_logo", nullable: true })
+	cloudinaryLogo: string | null
+
 	@OneToMany(() => ApisConexiones, (apisConexiones) => apisConexiones.tienda)
 	apisConexiones: ApisConexiones[]
 
