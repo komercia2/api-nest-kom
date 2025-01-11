@@ -23,6 +23,11 @@ export class GetWebsiteQuery {
 	async execute(criteria: string, isDomain: boolean) {
 		const mySQLData = await this.websiteRepository.findMySQLTemplateByCriteria(criteria, isDomain)
 
+		if (!mySQLData) {
+			const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria, isDomain)
+			return await this.websiteRepository.getWebSite(templateId, criteria)
+		}
+
 		if (mySQLData && !this.validTemplates.includes(mySQLData.template)) return mySQLData
 
 		const templateId = await this.websiteRepository.findTemplateIdByCriteria(criteria, isDomain)
