@@ -1,0 +1,43 @@
+import { Injectable } from "@nestjs/common"
+import { InjectRepository } from "@nestjs/typeorm"
+import { Productos } from "src/entities"
+import { Like, Repository } from "typeorm"
+
+import { GetProductsDtos } from "./dtos/get-productos.dtos"
+
+@Injectable()
+export class PanelService {
+	constructor(@InjectRepository(Productos) private productosRepository: Repository<Productos>) {}
+
+	async getProductos(storeID: number, getProductsDtos: GetProductsDtos) {
+		const { name, page, limit, categoryID, freeShipping, withVariants, favorite } = getProductsDtos
+
+		const query = this.productosRepository
+			.createQueryBuilder("productos")
+			.where("productos.tienda = :storeID", { storeID })
+			.andWhere("productos.activo = 1")
+			.andWhere("productos.deletedAt IS NULL")
+			.orderBy("productos.createdAt", "DESC")
+			.skip((page - 1) * limit)
+			.take(limit)
+
+		if (name) query.where({ nombre: Like(`%${name}%`) })
+		if (categoryID) query.andWhere("productos.categoriaProducto = :categoryID", { categoryID })
+		if (freeShipping) query.andWhere("productos.envioGratis = :freeShipping", { freeShipping })
+		if (withVariants) query.andWhere("productos.conVariante = :withVariants", { withVariants })
+		if (favorite) query.andWhere("productos.favorito = :favorite", { favorite })
+
+		const [products, total] = await query.getManyAndCount()
+
+		return {
+			data: products,
+			pagination: {
+				total: Math.ceil(total / limit),
+				page: +page,
+				limit: +limit,
+				hasPrev: page > 1,
+				hasNext: page < Math.ceil(total / limit)
+			}
+		}
+	}
+}

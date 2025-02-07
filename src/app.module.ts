@@ -36,6 +36,7 @@ import { SuperModule } from "./modules/super/super.module"
 import { TwilioModule } from "./modules/twilio/twilio.module"
 import { UsersModule } from "./modules/users/users.module"
 import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
+import { PanelModule } from './modules/panel/panel.module';
 
 @Module({
 	imports: [
@@ -86,7 +87,8 @@ import { WhatsappModule } from "./modules/whatsapp/whatsapp.module"
 		AnalyticsModule,
 		TwilioModule,
 		SubscribersModule,
-		CloudinaryModule
+		CloudinaryModule,
+		PanelModule
 	],
 	providers: [ConfigModule],
 	controllers: [AppController]
