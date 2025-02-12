@@ -84,6 +84,9 @@ export class ProductosInfo {
 	@Column("varchar", { name: "descripcion_corta", nullable: true, length: 255 })
 	descripcionCorta: string | null
 
+	@Column("varchar", { name: "descripcion_corta_auxiliar", nullable: true, length: 255 })
+	descripcionCortaAuxiliar: string | null
+
 	@Column("int", { name: "promocion_valor", nullable: true })
 	promocionValor: number | null
 
