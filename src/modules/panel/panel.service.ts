@@ -12,6 +12,14 @@ export class PanelService {
 		@InjectRepository(ProductosInfo) private productosInfoRepository: Repository<ProductosInfo>
 	) {}
 
+	async getShortAuxDescription(productID: number) {
+		const product = await this.productosInfoRepository.findOne({ where: { id: productID } })
+
+		if (!product) throw new NotFoundException("Producto no encontrado")
+
+		return { shortAuxDescription: product.descripcionCortaAuxiliar }
+	}
+
 	async updateShortAuxDescription(productID: number, shortAuxDescription: string) {
 		const product = await this.productosInfoRepository.findOne({ where: { id: productID } })
 

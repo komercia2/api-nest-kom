@@ -7,6 +7,11 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Get("get-short-aux-description/:productID")
+	getShortAuxDescription(@Param("productID") productID: number) {
+		return this.panelService.getShortAuxDescription(productID)
+	}
+
 	@Put("update-short-aux-description/:productID")
 	updateShortAuxDescription(
 		@Param("productID") productID: number,
