@@ -1,13 +1,31 @@
-import { Injectable } from "@nestjs/common"
+import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Productos } from "src/entities"
+import { Productos, ProductosInfo } from "src/entities"
 import { Like, Repository } from "typeorm"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 
 @Injectable()
 export class PanelService {
-	constructor(@InjectRepository(Productos) private productosRepository: Repository<Productos>) {}
+	constructor(
+		@InjectRepository(Productos) private productosRepository: Repository<Productos>,
+		@InjectRepository(ProductosInfo) private productosInfoRepository: Repository<ProductosInfo>
+	) {}
+
+	async updateShortAuxDescription(productID: number, shortAuxDescription: string) {
+		const product = await this.productosInfoRepository.findOne({ where: { id: productID } })
+
+		if (!product) throw new NotFoundException("Producto no encontrado")
+		if (shortAuxDescription.length > 150) {
+			throw new BadRequestException(
+				"La descripción auxiliar corta no puede tener más de 150 caracteres"
+			)
+		}
+
+		product.descripcionCortaAuxiliar = shortAuxDescription
+
+		await this.productosInfoRepository.save(product)
+	}
 
 	async getProductos(storeID: number, getProductsDtos: GetProductsDtos) {
 		const { name, page, limit, categoryID, freeShipping, withVariants, favorite } = getProductsDtos
