@@ -7,6 +7,11 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Put("delete-product-delivery-status/:cartID")
+	deleteProductDeliveryStatus(@Param("cartID") cartID: number) {
+		return this.panelService.deleteProductDeliveryStatus(cartID)
+	}
+
 	@Put("update-delivery-status/:deliveryStatusID/:cartID")
 	updateDeliveryStatus(
 		@Param("deliveryStatusID") deliveryStatusID: number,
