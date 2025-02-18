@@ -14,6 +14,16 @@ export class PanelService {
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>
 	) {}
 
+	async deleteProductDeliveryStatus(cartID: number) {
+		const cart = await this.carritosRepository.findOne({ where: { id: cartID } })
+
+		if (!cart) throw new NotFoundException("Carrito no encontrado")
+
+		cart.deliveryStatusId = null
+
+		await this.carritosRepository.save(cart)
+	}
+
 	async updateDeliveryStatus(deliveryStatusID: number, cartID: number) {
 		const cart = await this.carritosRepository.findOne({ where: { id: cartID } })
 
