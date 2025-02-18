@@ -1,6 +1,6 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Productos, ProductosInfo } from "src/entities"
+import { Carritos, DeliveryStatus, Productos, ProductosInfo } from "src/entities"
 import { Like, Repository } from "typeorm"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
@@ -9,8 +9,31 @@ import { GetProductsDtos } from "./dtos/get-productos.dtos"
 export class PanelService {
 	constructor(
 		@InjectRepository(Productos) private productosRepository: Repository<Productos>,
-		@InjectRepository(ProductosInfo) private productosInfoRepository: Repository<ProductosInfo>
+		@InjectRepository(ProductosInfo) private productosInfoRepository: Repository<ProductosInfo>,
+		@InjectRepository(DeliveryStatus) private deliveryStatus: Repository<DeliveryStatus>,
+		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>
 	) {}
+
+	async updateDeliveryStatus(deliveryStatusID: number, cartID: number) {
+		const cart = await this.carritosRepository.findOne({ where: { id: cartID } })
+
+		if (!cart) throw new NotFoundException("Carrito no encontrado")
+
+		const deliveryStatus = await this.deliveryStatus.findOne({
+			where: { id: deliveryStatusID.toString() }
+		})
+
+		if (!deliveryStatus) throw new NotFoundException("Estado de entrega no encontrado")
+
+		cart.deliveryStatus = deliveryStatus
+		cart.deliveryStatusId = deliveryStatusID.toString()
+
+		await this.carritosRepository.save(cart)
+	}
+
+	async getDeliveryStatus() {
+		return this.deliveryStatus.find()
+	}
 
 	async getShortAuxDescription(productID: number) {
 		const product = await this.productosInfoRepository.findOne({ where: { id: productID } })
