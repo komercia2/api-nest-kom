@@ -7,6 +7,19 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Put("update-delivery-status/:deliveryStatusID/:cartID")
+	updateDeliveryStatus(
+		@Param("deliveryStatusID") deliveryStatusID: number,
+		@Param("cartID") cartID: number
+	) {
+		return this.panelService.updateDeliveryStatus(deliveryStatusID, cartID)
+	}
+
+	@Get("get-delivery-status")
+	getDeliveryStatus() {
+		return this.panelService.getDeliveryStatus()
+	}
+
 	@Get("get-short-aux-description/:productID")
 	getShortAuxDescription(@Param("productID") productID: number) {
 		return this.panelService.getShortAuxDescription(productID)
