@@ -1,4 +1,5 @@
-import { Body, Controller, Get, Param, Put, Query } from "@nestjs/common"
+import { Body, Controller, Get, Param, Put, Query, Res } from "@nestjs/common"
+import { Response } from "express"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { PanelService } from "./panel.service"
@@ -6,6 +7,16 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Get("export-clients/:storeID")
+	async export(@Res() res: Response, @Param("storeID") id: string) {
+		const { data, filename } = await this.panelService.exportClients(+id)
+
+		res.attachment(filename)
+		res.send(data)
+
+		return res
+	}
 
 	@Put("delete-product-delivery-status/:cartID")
 	deleteProductDeliveryStatus(@Param("cartID") cartID: number) {
