@@ -1,8 +1,10 @@
 import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
-import { Carritos, DeliveryStatus, Productos, ProductosInfo } from "src/entities"
+import { Parser } from "json2csv"
+import { Carritos, Clientes, DeliveryStatus, Productos, ProductosInfo } from "src/entities"
 import { Like, Repository } from "typeorm"
 
+import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 
 @Injectable()
@@ -11,8 +13,66 @@ export class PanelService {
 		@InjectRepository(Productos) private productosRepository: Repository<Productos>,
 		@InjectRepository(ProductosInfo) private productosInfoRepository: Repository<ProductosInfo>,
 		@InjectRepository(DeliveryStatus) private deliveryStatus: Repository<DeliveryStatus>,
-		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>
+		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
+		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>
 	) {}
+
+	async exportClients(storeID: number) {
+		const clients = await this.clientesRepository
+			.createQueryBuilder("clientes")
+			.where("clientes.tienda = :storeID", { storeID })
+			.innerJoin("clientes.user", "users")
+			.innerJoin("users.ciudad2", "ciudades")
+			.innerJoin("users.usersInfo", "usersInfo")
+			.leftJoin("users.carritos2", "carritos")
+			.orderBy("clientes.createdAt", "DESC")
+			.groupBy("clientes.id")
+			.select([
+				"users.nombre as nombre",
+				"users.tipoIdentificacion as tipo_identificacion",
+				"users.identificacion as identificacion",
+				"users.email as email",
+				"ciudades.nombreCiu as ciudad",
+				"usersInfo.telefono as telefono",
+				"CAST(COUNT(carritos.id) as UNSIGNED) as cantidad_compras",
+				"SUM(carritos.total) as compras_completadas",
+				"MAX(carritos.createdAt) as ultima_compra",
+				"COUNT(carritos.cupon) > 0 as usuario_uso_cupon",
+				"MAX(carritos.metodoPago) as metodo_pago_preferido"
+			])
+			.where("carritos.estado = 1")
+			.getRawMany()
+
+		// Parse dates
+		const parsedClients = clients.map((client) => {
+			client.ultima_compra = new Date(client.ultima_compra).toISOString().split("T")[0]
+			client.usuario_uso_cupon = client.usuario_uso_cupon === "1" ? "SI" : "NO"
+			client.metodo_pago_preferido = prettifyShippingMethod(client.metodo_pago_preferido)
+			return client
+		})
+
+		const fields = [
+			"nombre",
+			"tipo_identificacion",
+			"identificacion",
+			"email",
+			"ciudad",
+			"telefono",
+			"cantidad_compras",
+			"compras_completadas",
+			"ultima_compra",
+			"usuario_uso_cupon",
+			"metodo_pago_preferido"
+		]
+
+		// Generate CSV
+		const csv = new Parser({ fields }).parse(parsedClients)
+
+		return {
+			data: csv,
+			filename: `clientes-${new Date().toISOString().split("T")[0]}.csv`
+		}
+	}
 
 	async deleteProductDeliveryStatus(cartID: number) {
 		const cart = await this.carritosRepository.findOne({ where: { id: cartID } })
