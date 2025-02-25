@@ -47,7 +47,7 @@ export class PanelService {
 		const parsedClients = clients.map((client) => {
 			client.ultima_compra = new Date(client.ultima_compra).toISOString().split("T")[0]
 			client.usuario_uso_cupon = client.usuario_uso_cupon === "1" ? "SI" : "NO"
-			client.telefono = client?.telefono?.replace(/\D/g, "")
+			client.telefono = `"${client?.telefono?.replace(/\D/g, "")}"`
 			client.compras_completadas = new Intl.NumberFormat("es-ES", {
 				style: "currency",
 				currency: currency
