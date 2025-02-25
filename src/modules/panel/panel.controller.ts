@@ -9,8 +9,12 @@ export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
 	@Get("export-clients/:storeID")
-	async export(@Res() res: Response, @Param("storeID") id: string) {
-		const { data, filename } = await this.panelService.exportClients(+id)
+	async export(
+		@Res() res: Response,
+		@Param("storeID") id: string,
+		@Query("currency") currency = "COP"
+	) {
+		const { data, filename } = await this.panelService.exportClients(+id, currency)
 
 		res.attachment(filename)
 		res.send(data)
