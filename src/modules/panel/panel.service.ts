@@ -47,6 +47,12 @@ export class PanelService {
 		const parsedClients = clients.map((client) => {
 			client.ultima_compra = new Date(client.ultima_compra).toISOString().split("T")[0]
 			client.usuario_uso_cupon = client.usuario_uso_cupon === "1" ? "SI" : "NO"
+			client.telefono = client.telefono ? `'${client.telefono}` : ""
+			client.compras_completadas = new Intl.NumberFormat("en-US", {
+				style: "decimal",
+				minimumFractionDigits: 2,
+				maximumFractionDigits: 2
+			}).format(client.compras_completadas)
 			client.metodo_pago_preferido = prettifyShippingMethod(client.metodo_pago_preferido)
 			return client
 		})
