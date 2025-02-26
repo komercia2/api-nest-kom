@@ -16,18 +16,16 @@ export class PanelService {
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>
 	) {}
-
-	async exportClients(storeID: number, currency = "COP") {
-		const clients = await this.clientesRepository
+	async exportClients(storeID: number, currency = "COP", clientIDs?: Array<string>) {
+		const query = this.clientesRepository
 			.createQueryBuilder("clientes")
-			.where("clientes.tienda = :storeID", { storeID })
 			.innerJoin("clientes.user", "users")
 			.innerJoin("users.ciudad2", "ciudades")
 			.innerJoin("users.usersInfo", "usersInfo")
-			.leftJoin("users.carritos2", "carritos")
-			.orderBy("clientes.createdAt", "DESC")
-			.groupBy("clientes.id")
+			.leftJoin("users.carritos2", "carritos", "carritos.estado = 1") // Mover condición al JOIN
+			.where("clientes.tienda = :storeID", { storeID })
 			.select([
+				"users.id as id",
 				"users.nombre as nombre",
 				"users.tipoIdentificacion as tipo_identificacion",
 				"users.identificacion as identificacion",
@@ -40,14 +38,23 @@ export class PanelService {
 				"COUNT(carritos.cupon) > 0 as usuario_uso_cupon",
 				"MAX(carritos.metodoPago) as metodo_pago_preferido"
 			])
-			.where("carritos.estado = 1")
-			.getRawMany()
+			.groupBy(
+				"users.id, users.nombre, users.tipoIdentificacion, users.identificacion, users.email, ciudades.nombreCiu, usersInfo.telefono"
+			)
 
-		// Parse dates
+		// Filtrar por IDs si existen
+		if (clientIDs && clientIDs?.length > 0) {
+			const parsedClientIDs = clientIDs.map((id) => parseInt(id))
+			query.andWhere("users.id IN (:...clientIDs)", { clientIDs: parsedClientIDs })
+		}
+
+		const clients = await query.getRawMany()
+
+		// Parseo de fechas y formato de moneda
 		const parsedClients = clients.map((client) => {
 			client.ultima_compra = new Date(client.ultima_compra).toISOString().split("T")[0]
 			client.usuario_uso_cupon = client.usuario_uso_cupon === "1" ? "SI" : "NO"
-			client.telefono = `"${client?.telefono?.replace(/\D/g, "")}"`
+			client.telefono = client.telefono ? client.telefono : "N/A"
 			client.compras_completadas = new Intl.NumberFormat("es-ES", {
 				style: "currency",
 				currency: currency
@@ -70,7 +77,7 @@ export class PanelService {
 			"metodo_pago_preferido"
 		]
 
-		// Generate CSV
+		// Generar CSV
 		const csv = new Parser({ fields }).parse(parsedClients)
 
 		return {
