@@ -12,9 +12,10 @@ export class PanelController {
 	async export(
 		@Res() res: Response,
 		@Param("storeID") id: string,
-		@Query("currency") currency = "COP"
+		@Query("currency") currency = "COP",
+		@Query("clientIDs") clientIDs?: Array<string>
 	) {
-		const { data, filename } = await this.panelService.exportClients(+id, currency)
+		const { data, filename } = await this.panelService.exportClients(+id, currency, clientIDs)
 
 		res.attachment(filename)
 		res.send(data)
