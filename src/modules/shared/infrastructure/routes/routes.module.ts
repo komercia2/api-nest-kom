@@ -5,6 +5,7 @@ import { AppModule } from "src/app.module"
 import { AiSuggetionsModule } from "src/modules/ai-suggetions/ai-suggetions.module"
 import { AuthModule } from "src/modules/auth/auth.module"
 import { ChatbotsModule } from "src/modules/chatbots/chatbots.module"
+import { CloudinaryModule } from "src/modules/clodinary/cloudinary.module"
 import { CommonModule } from "src/modules/common/common.module"
 import { CouponsModule } from "src/modules/coupons/coupons.module"
 import { HooksModule } from "src/modules/hooks/hooks.module"
@@ -113,6 +114,10 @@ const routes: RouteTree[] = [
 	{
 		path: `${apiVersions.v1}/panel`,
 		module: PanelModule
+	},
+	{
+		path: `${apiVersions.v1}/cloudinary`,
+		module: CloudinaryModule
 	}
 ]
 
