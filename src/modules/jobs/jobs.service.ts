@@ -5,6 +5,7 @@ import { Logger } from "nestjs-pino"
 import { Tiendas } from "src/entities"
 import { Repository } from "typeorm"
 
+import { ClodinaryService } from "../clodinary/clodinary.service"
 import { MailsService } from "../mails/mails.service"
 
 const MEMBERSHIP_IS_ABOUT_TO_EXPIRE_SENDGRID_TEMPLATE_ID = "d-497493aec9b449cc82576a448600d859"
@@ -17,8 +18,35 @@ export class JobsService {
 	constructor(
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
 		private readonly logger: Logger,
-		private readonly mailsService: MailsService
+		private readonly mailsService: MailsService,
+		private readonly cloudinaryService: ClodinaryService
 	) {}
+
+	// @Cron(CronExpression.EVERY_MINUTE)
+	// async handleMigrateLogo() {
+	// 	this.logger.log("[handleMigrateLogo] Running")
+
+	// 	const stores = await this.findStoresWithoutExpire()
+
+	// 	if (stores.length === 0) {
+	// 		this.logger.warn("No stores found")
+	// 		return
+	// 	}
+
+	// 	this.logger.log(`Found ${stores.length} stores`)
+
+	// 	const promises = stores.map(async (store) => {
+	// 		try {
+	// 			await this.cloudinaryService.syncStoreLogo(store.id)
+	// 		} catch (error) {
+	// 			this.logger.error(`Failed to migrate logo for store with ID ${store.id}: ${error}`)
+	// 		}
+	// 	})
+
+	// 	await Promise.all(promises)
+
+	// 	this.logger.log("[handleMigrateLogo] Finished")
+	// }
 
 	@Cron(CronExpression.EVERY_DAY_AT_5PM)
 	async handleMembershipDiscount() {
@@ -193,6 +221,18 @@ export class JobsService {
 			.andWhere("store.notifiedAsAboutToExpire = :sent", { sent: false })
 			.innerJoin("store.tiendasInfo", "storeInfo")
 			.select(["store.id", "store.nombre", "storeInfo.emailTienda", "store.fechaExpiracion"])
+			.getMany()
+	}
+
+	async findStoresWithoutExpire() {
+		const date30DaysBefore = this.getDateNDaysBeforeFromNow(30)
+		const currentDate = new Date().toISOString()
+
+		return await this.tiendasRepository
+			.createQueryBuilder("store")
+			.andWhere("store.fechaExpiracion >= DATE(:currentDate)", { currentDate })
+			.innerJoin("store.tiendasInfo", "storeInfo")
+			.select(["store.id", "store.fechaExpiracion", "store.logo"])
 			.getMany()
 	}
 
