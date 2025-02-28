@@ -491,8 +491,8 @@ export class StoresModule implements NestModule {
 				PublicStoreHeadquartersController,
 				PublicShippingMeansController,
 				PublicStorePaymentMethodsController,
-				PrivateStoreIntegrationsController,
-				PublicStoreLogoController
+				PrivateStoreIntegrationsController
+				// PublicStoreLogoController
 			)
 			.apply(LaravelAuthMiddleware)
 			.exclude({
