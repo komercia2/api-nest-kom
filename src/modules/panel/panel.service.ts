@@ -16,13 +16,16 @@ export class PanelService {
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>
 	) {}
-	async exportClients(storeID: number, currency = "COP", clientIDs?: Array<string>) {
+	async exportClients(storeID: number, clientIDs?: Array<string>) {
 		const query = this.clientesRepository
 			.createQueryBuilder("clientes")
 			.innerJoin("clientes.user", "users")
 			.innerJoin("users.ciudad2", "ciudades")
 			.innerJoin("users.usersInfo", "usersInfo")
-			.leftJoin("users.carritos2", "carritos", "carritos.estado = 1") // Mover condición al JOIN
+			.leftJoin("users.carritos2", "carritos", "carritos.estado = 1")
+			.innerJoin("users.ciudad2", "ciudad2")
+			.innerJoin("ciudad2.departamento", "departamentos")
+			.innerJoin("departamentos.paises", "paises")
 			.where("clientes.tienda = :storeID", { storeID })
 			.select([
 				"users.id as id",
@@ -36,7 +39,8 @@ export class PanelService {
 				"SUM(carritos.total) as compras_completadas",
 				"MAX(carritos.createdAt) as ultima_compra",
 				"COUNT(carritos.cupon) > 0 as usuario_uso_cupon",
-				"MAX(carritos.metodoPago) as metodo_pago_preferido"
+				"MAX(carritos.metodoPago) as metodo_pago_preferido",
+				"paises.codigo as codigo_pais"
 			])
 			.groupBy(
 				"users.id, users.nombre, users.tipoIdentificacion, users.identificacion, users.email, ciudades.nombreCiu, usersInfo.telefono"
@@ -57,7 +61,7 @@ export class PanelService {
 			client.telefono = client.telefono ? client.telefono : "N/A"
 			client.compras_completadas = new Intl.NumberFormat("es-ES", {
 				style: "currency",
-				currency: currency
+				currency: this.mapCountrieCurrency(client.codigo_pais)
 			}).format(client.compras_completadas)
 			client.metodo_pago_preferido = prettifyShippingMethod(client.metodo_pago_preferido)
 			return client
@@ -84,6 +88,18 @@ export class PanelService {
 			data: csv,
 			filename: `clientes-${new Date().toISOString().split("T")[0]}.csv`
 		}
+	}
+
+	mapCountrieCurrency(countrieCode: string) {
+		if (countrieCode.toLowerCase() === "co") return "COP"
+		if (countrieCode.toLowerCase() === "internacional") return "USD"
+		if (countrieCode.toLowerCase() === "mx") return "MXN"
+		if (countrieCode.toLowerCase() === "ar") return "ARS"
+		if (countrieCode.toLowerCase() === "cl") return "CLP"
+		if (countrieCode.toLowerCase() === "pr") return "USD"
+		if (countrieCode.toLowerCase() === "pe") return "PEN"
+		if (countrieCode.toLowerCase() === "pan") return "USD"
+		return "COP"
 	}
 
 	async deleteProductDeliveryStatus(cartID: number) {
