@@ -16,6 +16,88 @@ export class PanelService {
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>
 	) {}
+
+	async exportSales(storeID: number, cartIDs?: Array<string>) {
+		const query = this.carritosRepository
+			.createQueryBuilder("carritos")
+			.innerJoin("carritos.usuario2", "users")
+			.innerJoin("users.ciudad2", "ciudades")
+			.innerJoin("users.usersInfo", "usersInfo")
+			.innerJoin("users.ciudad2", "ciudad2")
+			.innerJoin("ciudad2.departamento", "departamentos")
+			.innerJoin("departamentos.paises", "paises")
+			.where("carritos.tienda = :storeID", { storeID })
+			.select([
+				"carritos.id as id",
+				"users.nombre as nombre",
+				"users.tipoIdentificacion as tipo_identificacion",
+				"users.identificacion as identificacion",
+				"users.email as email",
+				"ciudades.nombreCiu as ciudad",
+				"usersInfo.telefono as telefono",
+				"carritos.total as total",
+				"carritos.createdAt as fecha_compra",
+				"carritos.metodoPago as metodo_pago",
+				"carritos.cupon as cupon",
+				"carritos.estado as estado",
+				"paises.codigo as codigo_pais",
+				"carritos.estadoEntrega as estado_entrega"
+			])
+			.orderBy("carritos.createdAt", "DESC")
+
+		// Filtrar por IDs si existen
+		if (cartIDs && cartIDs?.length > 0) {
+			const parsedCartIDs = cartIDs.map((id) => parseInt(id))
+			query.andWhere("carritos.id IN (:...cartIDs)", { cartIDs: parsedCartIDs })
+		}
+
+		const sales = await query.getRawMany()
+
+		// Parseo de fechas y formato de moneda
+		const parsedSales = sales.map((sale) => {
+			sale.fecha_compra = new Date(sale.fecha_compra).toISOString().split("T")[0]
+			sale.telefono = sale.telefono ? sale.telefono : "N/A"
+			sale.total = new Intl.NumberFormat("es-ES", {
+				style: "currency",
+				currency: this.mapCountrieCurrency(sale.codigo_pais)
+			}).format(sale.total)
+			sale.metodo_pago = prettifyShippingMethod(sale.metodo_pago)
+			sale.estado = this.mapCartState(sale.estado)
+			sale.cupon =
+				sale.cupon === "null" ||
+				sale.cupon === "" ||
+				sale.cupon === "undefined" ||
+				sale.cupon === null ||
+				sale.cupon === undefined
+					? "N/A"
+					: sale.cupon
+			sale.estado_entrega = this.mapDeliveryStatus(sale.estado_entrega)
+			return sale
+		})
+
+		const fields = [
+			"nombre",
+			"tipo_identificacion",
+			"identificacion",
+			"email",
+			"ciudad",
+			"telefono",
+			"total",
+			"fecha_compra",
+			"metodo_pago",
+			"cupon",
+			"estado",
+			"estado_entrega"
+		]
+
+		const csv = new Parser({ fields }).parse(parsedSales)
+
+		return {
+			data: csv,
+			filename: `ventas-${new Date().toISOString().split("T")[0]}.csv`
+		}
+	}
+
 	async exportClients(storeID: number, clientIDs?: Array<string>) {
 		const query = this.clientesRepository
 			.createQueryBuilder("clientes")
@@ -88,6 +170,25 @@ export class PanelService {
 			data: csv,
 			filename: `clientes-${new Date().toISOString().split("T")[0]}.csv`
 		}
+	}
+
+	mapDeliveryStatus(state: string) {
+		if (state === "1") return "Pendiente"
+		if (state === "2") return "En Empaque"
+		if (state === "3") return "En Tránsito"
+		if (state === "4") return "Devuelto"
+		if (state === "5") return "Entregado"
+		if (state === "6") return "Cancelado"
+		return "Pendiente"
+	}
+
+	mapCartState(state: string) {
+		if (state === "0") return "Sin Pagar"
+		if (state === "1") return "Pagado"
+		if (state === "3") return "Cancelada"
+		if (state === "4") return "Despachada"
+		if (state === "6") return "Entregada"
+		return "Rechazada"
 	}
 
 	mapCountrieCurrency(countrieCode: string) {
