@@ -8,6 +8,20 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Get("export-sales/:storeID")
+	async exportSales(
+		@Res() res: Response,
+		@Param("storeID") id: string,
+		@Query("cartIDs") cartIDs?: Array<string>
+	) {
+		const { data, filename } = await this.panelService.exportSales(+id, cartIDs)
+
+		res.attachment(filename)
+		res.send(data)
+
+		return res
+	}
+
 	@Get("export-clients/:storeID")
 	async export(
 		@Res() res: Response,
