@@ -56,7 +56,7 @@ export class PanelService {
 		// Parseo de fechas y formato de moneda
 		const parsedSales = sales.map((sale) => {
 			sale.fecha_compra = new Date(sale.fecha_compra).toISOString().split("T")[0]
-			sale.telefono = sale.telefono ? sale.telefono : "N/A"
+			sale.telefono = sale.telefono ? this.removeCountryCode(sale.telefono) : "N/A"
 			sale.total = new Intl.NumberFormat("es-ES", {
 				style: "currency",
 				currency: this.mapCountrieCurrency(sale.codigo_pais)
@@ -140,7 +140,8 @@ export class PanelService {
 		const parsedClients = clients.map((client) => {
 			client.ultima_compra = new Date(client.ultima_compra).toISOString().split("T")[0]
 			client.usuario_uso_cupon = client.usuario_uso_cupon === "1" ? "SI" : "NO"
-			client.telefono = client.telefono ? client.telefono : "N/A"
+			client.telefono = client.telefono ? this.removeCountryCode(client.telefono) : "N/A"
+			client.identificacion = ` ${client.identificacion}`
 			client.compras_completadas = new Intl.NumberFormat("es-ES", {
 				style: "currency",
 				currency: this.mapCountrieCurrency(client.codigo_pais)
@@ -201,6 +202,17 @@ export class PanelService {
 		if (countrieCode.toLowerCase() === "pe") return "PEN"
 		if (countrieCode.toLowerCase() === "pan") return "USD"
 		return "COP"
+	}
+
+	removeCountryCode(phone: string) {
+		if (phone.startsWith("+57")) return phone.substring(3)
+		if (phone.startsWith("+52")) return phone.substring(3)
+		if (phone.startsWith("+54")) return phone.substring(3)
+		if (phone.startsWith("+56")) return phone.substring(3)
+		if (phone.startsWith("+1")) return phone.substring(2)
+		if (phone.startsWith("+51")) return phone.substring(3)
+		if (phone.startsWith("+507")) return phone.substring(4)
+		return phone
 	}
 
 	async deleteProductDeliveryStatus(cartID: number) {
