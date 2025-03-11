@@ -56,7 +56,7 @@ export class PanelService {
 		// Parseo de fechas y formato de moneda
 		const parsedSales = sales.map((sale) => {
 			sale.fecha_compra = new Date(sale.fecha_compra).toISOString().split("T")[0]
-			sale.telefono = sale.telefono ? sale.telefono : "N/A"
+			sale.telefono = sale.telefono ? this.removeCountryCode(sale.telefono) : "N/A"
 			sale.total = new Intl.NumberFormat("es-ES", {
 				style: "currency",
 				currency: this.mapCountrieCurrency(sale.codigo_pais)
