@@ -45,3 +45,4 @@ ngrok.exe
 # Whatsapp webjs
 session.json/
 .wwebjs_cache/
+.qodo
