@@ -7,6 +7,7 @@ import {
 import { ConfigService } from "@nestjs/config"
 import { JwtService } from "@nestjs/jwt"
 import { InjectRepository } from "@nestjs/typeorm"
+import axios from "axios"
 import { Logger } from "nestjs-pino"
 import {
 	EntidadesTiendas,
@@ -267,7 +268,16 @@ export class AuthService {
 
 			if (!user) throw new NotFoundException("User not found. Failure on user creation")
 
-			await this.cloudinaryService.migrateNewStoreLogo(store.id)
+			await Promise.all([
+				this.cloudinaryService.migrateNewStoreLogo(store.id),
+				axios.post("https://api-whatsapp-production-76cf.up.railway.app/notify-store-created", {
+					storeName: dto.nombre_tienda,
+					storeEmail: dto.email,
+					storeId: store.id,
+					clientFullName: dto.nombre,
+					countryId: dto.pais
+				})
+			])
 
 			return {
 				id: store.id,
