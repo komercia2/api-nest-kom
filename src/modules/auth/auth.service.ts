@@ -275,7 +275,7 @@ export class AuthService {
 					storeEmail: dto.email,
 					storeId: store.id,
 					clientFullName: dto.nombre,
-					countryId: dto.pais
+					countryId: dto?.pais ?? 1
 				})
 			])
 
