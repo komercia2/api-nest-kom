@@ -277,6 +277,11 @@ export class PanelService {
 			.where("productos.tienda = :storeID", { storeID })
 			.andWhere("productos.activo = 1")
 			.andWhere("productos.deletedAt IS NULL")
+			.leftJoinAndSelect("productos.categoriaProducto2", "categoria")
+			.leftJoinAndSelect("productos.subcategoria2", "subcategoria")
+			.leftJoinAndSelect("productos.productosDropshippings", "dropshipping")
+			.leftJoin("productos.productosInfo", "productosInfo")
+			.addSelect("productosInfo.tipoServicio")
 			.orderBy("productos.createdAt", "DESC")
 			.skip((page - 1) * limit)
 			.take(limit)
@@ -289,8 +294,66 @@ export class PanelService {
 
 		const [products, total] = await query.getManyAndCount()
 
+		const mappedProducts = products.map((product) => {
+			return {
+				id: product.id,
+				tienda: product.tienda,
+				nombre: product.nombre,
+				categoria_producto: {
+					id: product.categoriaProducto,
+					nombre_categoria_producto: product.categoriaProducto2.nombreCategoriaProducto,
+					tienda: product.categoriaProducto2.tienda,
+					descripcion: product.categoriaProducto2.descripcion,
+					foto_banner: product.categoriaProducto2.fotoBanner,
+					orden: product.categoriaProducto2.orden,
+					foto_icono: product.categoriaProducto2.fotoIcono,
+					id_cloudinary: product.categoriaProducto2.idCloudinary,
+					imagen_cloudinary: product.categoriaProducto2.imagenCloudinary
+				},
+				subcategoria: product.subcategoria,
+				precio: product.precio,
+				foto: product.foto,
+				activo: product.activo,
+				disponibilidad: product.disponibilidad,
+				foto_cloudinary: product.fotoCloudinary,
+				slug: product.slug,
+				deleted_at: product.deletedAt,
+				id_cloudinary: product.idCloudinary,
+				envio_gratis: product.envioGratis,
+				con_variante: product.conVariante,
+				valor_compra: product.valorCompra,
+				created_at: product.createdAt,
+				updated_at: product.updatedAt,
+				tag: product.tag,
+				favorito: product.favorito,
+				orden: product.orden,
+				ml_published: product.mlPublished,
+				id_siigo: product.idSiigo,
+				marca: product.productosInfo.marca,
+				promocion_valor: product.productosInfo.promocionValor,
+				tag_promocion: product.productosInfo.tagPromocion,
+				etiquetas: product.productosInfo.etiquetas,
+				bodega: product.productosInfo.bodega,
+				alto: product.productosInfo.alto,
+				ancho: product.productosInfo.ancho,
+				largo: product.productosInfo.largo,
+				dealer_whatsapp: product.productosInfo.dealerWhatsapp,
+				condicion: product.productosInfo.condicion,
+				dropshipping: product.productosDropshippings.map((dropshipping) => {
+					return {
+						id: dropshipping.id,
+						comision: dropshipping.comision,
+						productos_id: dropshipping.productosId,
+						created_at: dropshipping.createdAt,
+						updated_at: dropshipping.updatedAt,
+						estado: dropshipping.estado
+					}
+				})
+			}
+		})
+
 		return {
-			data: products,
+			data: mappedProducts,
 			pagination: {
 				total: Math.ceil(total / limit),
 				page: +page,
