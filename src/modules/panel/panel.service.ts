@@ -75,21 +75,23 @@ export class PanelService {
 				this.productosRepository.save(product)
 			])
 
-			await Promise.all(
-				combinaciones.map(async (combination) => {
-					const { id: combinationID, combinaciones: combinationValue } = combination
+			if (combinaciones && combinaciones.length > 0) {
+				await Promise.all(
+					combinaciones.map(async (combination) => {
+						const { id: combinationID, combinaciones: combinationValue } = combination
 
-					const combinationEntity = await this.combinacionesRepository.findOne({
-						where: { id: combinationID }
+						const combinationEntity = await this.combinacionesRepository.findOne({
+							where: { id: combinationID }
+						})
+
+						if (!combinationEntity) throw new NotFoundException("Combination not found")
+
+						combinationEntity.combinaciones = combinationValue
+
+						await this.combinacionesRepository.save(combinationEntity)
 					})
-
-					if (!combinationEntity) throw new NotFoundException("Combination not found")
-
-					combinationEntity.combinaciones = combinationValue
-
-					await this.combinacionesRepository.save(combinationEntity)
-				})
-			)
+				)
+			}
 
 			await queryRunner.commitTransaction()
 
