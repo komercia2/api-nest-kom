@@ -2,11 +2,17 @@ import { Body, Controller, Get, Param, Put, Query, Res } from "@nestjs/common"
 import { Response } from "express"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
+import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { PanelService } from "./panel.service"
 
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Put("update-product-pricing")
+	updateProductPricing(@Body() updateProductPricingDto: UpdateProductPricingDto) {
+		return this.panelService.updateProductPricing(updateProductPricingDto)
+	}
 
 	@Get("export-sales/:storeID")
 	async exportSales(
