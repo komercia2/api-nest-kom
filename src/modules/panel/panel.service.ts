@@ -1,11 +1,27 @@
-import { BadRequestException, Injectable, NotFoundException } from "@nestjs/common"
+import {
+	BadRequestException,
+	Injectable,
+	InternalServerErrorException,
+	NotFoundException
+} from "@nestjs/common"
 import { InjectRepository } from "@nestjs/typeorm"
 import { Parser } from "json2csv"
-import { Carritos, Clientes, DeliveryStatus, Productos, ProductosInfo } from "src/entities"
-import { Like, Repository } from "typeorm"
+import { Logger } from "nestjs-pino"
+import {
+	Carritos,
+	Clientes,
+	DeliveryStatus,
+	Productos,
+	ProductosInfo,
+	ProductosVariantes,
+	ProductosVariantesCombinaciones
+} from "src/entities"
+import { DataSource, In, Like, Repository } from "typeorm"
 
 import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
+import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IProductCombination } from "./interfaces/products"
 
 @Injectable()
 export class PanelService {
@@ -14,8 +30,78 @@ export class PanelService {
 		@InjectRepository(ProductosInfo) private productosInfoRepository: Repository<ProductosInfo>,
 		@InjectRepository(DeliveryStatus) private deliveryStatus: Repository<DeliveryStatus>,
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
-		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>
+		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>,
+		@InjectRepository(ProductosVariantesCombinaciones)
+		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
+		private readonly datasource: DataSource,
+		private readonly logger: Logger
 	) {}
+
+	async updateProductPricing(dto: UpdateProductPricingDto) {
+		const { id, unidades, precio, combinaciones, storeID } = dto
+
+		if (precio < 0) throw new BadRequestException("Price cannot be negative")
+		if (unidades < 0) throw new BadRequestException("Units cannot be negative")
+
+		const product = await this.productosRepository.findOne({
+			where: { id, tienda: storeID },
+			relations: [
+				"productosInfo",
+				"productosVariantes",
+				"productosVariantes.productosVariantesCombinaciones"
+			]
+		})
+
+		if (!product) throw new NotFoundException("Product not found")
+
+		product.precio = precio
+		product.productosInfo.inventario = unidades
+
+		const queryRunner = this.datasource.createQueryRunner()
+
+		this.logger.log("QueryRunner created")
+
+		await queryRunner.connect()
+
+		this.logger.log("QueryRunner connected")
+
+		await queryRunner.startTransaction()
+
+		this.logger.log("Transaction started")
+
+		try {
+			await Promise.all([
+				this.productosInfoRepository.save(product.productosInfo),
+				this.productosRepository.save(product)
+			])
+
+			await Promise.all(
+				combinaciones.map(async (combination) => {
+					const { id: combinationID, combinaciones: combinationValue } = combination
+
+					const combinationEntity = await this.combinacionesRepository.findOne({
+						where: { id: combinationID }
+					})
+
+					if (!combinationEntity) throw new NotFoundException("Combination not found")
+
+					combinationEntity.combinaciones = combinationValue
+
+					await this.combinacionesRepository.save(combinationEntity)
+				})
+			)
+
+			await queryRunner.commitTransaction()
+
+			this.logger.log("Product pricing updated successfully", "updateProductPricing")
+		} catch (error) {
+			await queryRunner.rollbackTransaction()
+
+			this.logger.error("Error updating product pricing", error, "updateProductPricing")
+
+			throw new InternalServerErrorException("Error updating product pricing")
+		}
+	}
 
 	async exportSales(storeID: number, cartIDs?: Array<string>) {
 		const query = this.carritosRepository
