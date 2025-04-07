@@ -39,6 +39,30 @@ export class PanelService {
 		private readonly logger: Logger
 	) {}
 
+	async deleteGeolocation(storeID: number, geolocationID: number) {
+		const geolocation = await this.geoLocationRepository.findOne({
+			where: { id: geolocationID, tienda: +storeID }
+		})
+		if (!geolocation) throw new NotFoundException("Geolocation not found")
+		await this.geoLocationRepository.delete({ id: geolocationID, tienda: +storeID })
+	}
+
+	async createGeolocation(storeID: number, geolocationData: IGeolocation) {
+		const geolocation = this.geoLocationRepository.create({
+			nombreSede: geolocationData.nombre_sede,
+			direccion: geolocationData.direccion,
+			latitud: geolocationData.latitud,
+			longitud: geolocationData.longitud,
+			ciudad: geolocationData.ciudad,
+			horario: geolocationData.horario,
+			fotoTienda: geolocationData.foto_tienda,
+			telefono: geolocationData.telefono,
+			createdAt: new Date(),
+			tienda: storeID
+		})
+		await this.geoLocationRepository.save(geolocation)
+	}
+
 	async editGeolocation(
 		storeID: number,
 		geolocationID: number,
@@ -65,7 +89,8 @@ export class PanelService {
 
 	async getGeolocations(storeID: number) {
 		const sites = await this.geoLocationRepository.find({
-			where: { tienda: storeID }
+			where: { tienda: storeID },
+			order: { createdAt: "DESC" }
 		})
 
 		return sites.map((site) => mapGeolocation(site))

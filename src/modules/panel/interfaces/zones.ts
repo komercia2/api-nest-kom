@@ -5,7 +5,7 @@ export interface IGeolocation {
 	direccion: string
 	latitud: number
 	longitud: number
-	ciudad: number | null
+	ciudad: number
 	horario: string | null
 	foto_tienda: string | null
 	telefono: string | null

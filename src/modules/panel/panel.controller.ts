@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Put, Query, Res } from "@nestjs/common"
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common"
 import { Response } from "express"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
@@ -9,6 +9,19 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Post("create-geolocation/:storeID")
+	createGeolocation(@Param("storeID") storeID: number, @Body() geolocation: IGeolocation) {
+		return this.panelService.createGeolocation(storeID, geolocation)
+	}
+
+	@Delete("delete-geolocation/:storeID/:geolocationID")
+	deleteGeolocation(
+		@Param("storeID") storeID: number,
+		@Param("geolocationID") geolocationID: number
+	) {
+		return this.panelService.deleteGeolocation(storeID, geolocationID)
+	}
 
 	@Put("geolocation/:storeID/:geolocationID")
 	editGeolocation(
