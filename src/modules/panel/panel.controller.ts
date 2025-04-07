@@ -3,12 +3,23 @@ import { Response } from "express"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IPolicy } from "./interfaces/policies"
 import { IGeolocation } from "./interfaces/zones"
 import { PanelService } from "./panel.service"
 
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Put("update-policies/:storeID")
+	editPolicies(@Body() policies: Partial<IPolicy>, @Param("storeID") storeID: number) {
+		return this.panelService.editPolicies(storeID, policies)
+	}
+
+	@Get("get-policies/:storeID")
+	getPolicies(@Param("storeID") storeID: number) {
+		return this.panelService.getPolicies(storeID)
+	}
 
 	@Post("create-geolocation/:storeID")
 	createGeolocation(@Param("storeID") storeID: number, @Body() geolocation: IGeolocation) {

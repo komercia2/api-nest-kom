@@ -12,6 +12,7 @@ import {
 	Clientes,
 	DeliveryStatus,
 	Geolocalizacion,
+	Politicas,
 	Productos,
 	ProductosInfo,
 	ProductosVariantesCombinaciones
@@ -23,6 +24,7 @@ import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { IGeolocation } from "./interfaces/zones"
 import { mapGeolocation } from "./mappings/geolocation.mapper"
+import { mapPolicy } from "./mappings/policie.mapper"
 
 @Injectable()
 export class PanelService {
@@ -33,11 +35,38 @@ export class PanelService {
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>,
 		@InjectRepository(Geolocalizacion) private geoLocationRepository: Repository<Geolocalizacion>,
+		@InjectRepository(Politicas) private politicasRepository: Repository<Politicas>,
 		@InjectRepository(ProductosVariantesCombinaciones)
 		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async editPolicies(storeID: number, policiesData: Partial<Politicas>) {
+		const policies = await this.politicasRepository.findOne({
+			where: { idTienda: storeID }
+		})
+		if (!policies) throw new NotFoundException("Policies not found")
+		policies.envios = policiesData?.envios ?? policies.envios
+		policies.pagos = policiesData?.pagos ?? policies.pagos
+		policies.datos = policiesData?.datos ?? policies.datos
+		policies.garantia = policiesData?.garantia ?? policies.garantia
+		policies.devolucion = policiesData?.devolucion ?? policies.devolucion
+		policies.cambio = policiesData?.cambio ?? policies.cambio
+		policies.updatedAt = new Date()
+
+		await this.politicasRepository.save(policies)
+	}
+
+	async getPolicies(storeID: number) {
+		const policie = await this.politicasRepository.findOne({
+			where: { idTienda: storeID }
+		})
+
+		if (!policie) throw new NotFoundException("Policies not found")
+
+		return mapPolicy(policie)
+	}
 
 	async deleteGeolocation(storeID: number, geolocationID: number) {
 		const geolocation = await this.geoLocationRepository.findOne({
