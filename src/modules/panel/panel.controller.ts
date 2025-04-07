@@ -1,13 +1,63 @@
-import { Body, Controller, Get, Param, Put, Query, Res } from "@nestjs/common"
+import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common"
 import { Response } from "express"
+import { Redes } from "src/entities"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IPolicy } from "./interfaces/policies"
+import { IGeolocation } from "./interfaces/zones"
 import { PanelService } from "./panel.service"
 
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Put("update-networks/:storeID")
+	editNetworks(@Body() networks: Partial<Redes>, @Param("storeID") storeID: number) {
+		return this.panelService.editNetworks(storeID, networks)
+	}
+
+	@Get("get-networks/:storeID")
+	getNetworks(@Param("storeID") storeID: number) {
+		return this.panelService.getNetworks(storeID)
+	}
+
+	@Put("update-policies/:storeID")
+	editPolicies(@Body() policies: Partial<IPolicy>, @Param("storeID") storeID: number) {
+		return this.panelService.editPolicies(storeID, policies)
+	}
+
+	@Get("get-policies/:storeID")
+	getPolicies(@Param("storeID") storeID: number) {
+		return this.panelService.getPolicies(storeID)
+	}
+
+	@Post("create-geolocation/:storeID")
+	createGeolocation(@Param("storeID") storeID: number, @Body() geolocation: IGeolocation) {
+		return this.panelService.createGeolocation(storeID, geolocation)
+	}
+
+	@Delete("delete-geolocation/:storeID/:geolocationID")
+	deleteGeolocation(
+		@Param("storeID") storeID: number,
+		@Param("geolocationID") geolocationID: number
+	) {
+		return this.panelService.deleteGeolocation(storeID, geolocationID)
+	}
+
+	@Put("geolocation/:storeID/:geolocationID")
+	editGeolocation(
+		@Param("storeID") storeID: number,
+		@Param("geolocationID") geolocationID: number,
+		@Body() geolocation: Partial<IGeolocation>
+	) {
+		return this.panelService.editGeolocation(storeID, geolocationID, geolocation)
+	}
+
+	@Get("get-geolocations/:storeID")
+	getGeolocations(@Param("storeID") storeID: number) {
+		return this.panelService.getGeolocations(storeID)
+	}
 
 	@Put("update-product-pricing")
 	updateProductPricing(@Body() updateProductPricingDto: UpdateProductPricingDto) {

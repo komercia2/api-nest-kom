@@ -2,6 +2,7 @@ import {
 	ConflictException,
 	Injectable,
 	NotFoundException,
+	Res,
 	UnauthorizedException
 } from "@nestjs/common"
 import { ConfigService } from "@nestjs/config"
@@ -26,6 +27,7 @@ import { DataSource, Repository } from "typeorm"
 import { ClodinaryService } from "../clodinary/clodinary.service"
 import { SuperLoginDto } from "./dtos"
 import { CreateStoreDto } from "./dtos/create-store.dto"
+import { PanelLoginDto } from "./dtos/panel-login.dto"
 import { PasswordUtil } from "./utils/password.util"
 
 @Injectable()
@@ -43,6 +45,24 @@ export class AuthService {
 		private readonly logger: Logger,
 		private readonly cloudinaryService: ClodinaryService
 	) {}
+
+	async loginToPanel(panelLoginDto: PanelLoginDto) {
+		const { email, password } = panelLoginDto
+
+		const user = await this.usersRepository.findOne({ where: { email, activo: true } })
+
+		if (!user) throw new UnauthorizedException("Invalid email or password")
+
+		const isPasswordValid = await PasswordUtil.compare(password, user.password)
+
+		if (!isPasswordValid) throw new UnauthorizedException("Invalid email or password")
+
+		const payload = { id: user.id, email: user.email }
+
+		return {
+			accessToken: this.signToken(payload, this.configService.get<string>("PANEL_JWT_SECRET"))
+		}
+	}
 
 	async createStore(dto: CreateStoreDto) {
 		const queryRunner = this.datasource.createQueryRunner()
@@ -437,10 +457,8 @@ export class AuthService {
 	}
 
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	signToken = (payload: any) => {
-		return this.jwtService.sign(payload, {
-			secret: this.configService.get<string>("SUPER_JWT_SECRET")
-		})
+	signToken = (payload: any, secret = this.configService.get<string>("SUPER_JWT_SECRET")) => {
+		return this.jwtService.sign(payload, { secret })
 	}
 
 	async findUserByEmail(email: string) {
