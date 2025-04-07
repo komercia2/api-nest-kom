@@ -14,16 +14,14 @@ import {
 	Geolocalizacion,
 	Productos,
 	ProductosInfo,
-	ProductosVariantes,
-	ProductosVariantesCombinaciones,
-	Zonas
+	ProductosVariantesCombinaciones
 } from "src/entities"
-import { DataSource, In, Like, Repository } from "typeorm"
+import { DataSource, Like, Repository } from "typeorm"
 
 import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
-import { IProductCombination } from "./interfaces/products"
+import { IGeolocation } from "./interfaces/zones"
 import { mapGeolocation } from "./mappings/geolocation.mapper"
 
 @Injectable()
@@ -40,6 +38,30 @@ export class PanelService {
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async editGeolocation(
+		storeID: number,
+		geolocationID: number,
+		geolocationData: Partial<IGeolocation>
+	) {
+		const geolocation = await this.geoLocationRepository.findOne({
+			where: { id: geolocationID, tienda: +storeID }
+		})
+
+		if (!geolocation) throw new NotFoundException("Geolocation not found")
+
+		geolocation.nombreSede = geolocationData?.nombre_sede ?? geolocation.nombreSede
+		geolocation.direccion = geolocationData?.direccion ?? geolocation.direccion
+		geolocation.latitud = geolocationData?.latitud ?? geolocation.latitud
+		geolocation.longitud = geolocationData?.longitud ?? geolocation.longitud
+		geolocation.ciudad = geolocationData?.ciudad ?? geolocation.ciudad
+		geolocation.horario = geolocationData?.horario ?? geolocation.horario
+		geolocation.fotoTienda = geolocationData?.foto_tienda ?? geolocation.fotoTienda
+		geolocation.telefono = geolocationData?.telefono ?? geolocation.telefono
+		geolocation.updatedAt = new Date()
+
+		await this.geoLocationRepository.save(geolocation)
+	}
 
 	async getGeolocations(storeID: number) {
 		const sites = await this.geoLocationRepository.find({
