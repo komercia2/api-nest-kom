@@ -5,6 +5,7 @@ import { SwaggerModule } from "@nestjs/swagger"
 import { getSwaggerConfig } from "@shared/infrastructure/docs"
 import { json, urlencoded } from "body-parser"
 import * as compression from "compression"
+import * as cookieParser from "cookie-parser"
 import { Logger } from "nestjs-pino"
 
 import { AppModule } from "./app.module"
@@ -35,6 +36,7 @@ async function bootstrap() {
 
 	app.useGlobalPipes(new ValidationPipe())
 	app.useLogger(app.get(Logger))
+	app.use(cookieParser())
 	app.use(compression())
 
 	await app.listen(configService.get<number>("PORT") || 3000)

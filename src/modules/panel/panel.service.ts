@@ -11,17 +11,21 @@ import {
 	Carritos,
 	Clientes,
 	DeliveryStatus,
+	Geolocalizacion,
+	Politicas,
 	Productos,
 	ProductosInfo,
-	ProductosVariantes,
-	ProductosVariantesCombinaciones
+	ProductosVariantesCombinaciones,
+	Redes
 } from "src/entities"
-import { DataSource, In, Like, Repository } from "typeorm"
+import { DataSource, Like, Repository } from "typeorm"
 
 import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
-import { IProductCombination } from "./interfaces/products"
+import { IGeolocation } from "./interfaces/zones"
+import { mapGeolocation } from "./mappings/geolocation.mapper"
+import { mapPolicy } from "./mappings/policie.mapper"
 
 @Injectable()
 export class PanelService {
@@ -31,11 +35,124 @@ export class PanelService {
 		@InjectRepository(DeliveryStatus) private deliveryStatus: Repository<DeliveryStatus>,
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>,
+		@InjectRepository(Geolocalizacion) private geoLocationRepository: Repository<Geolocalizacion>,
+		@InjectRepository(Politicas) private politicasRepository: Repository<Politicas>,
+		@InjectRepository(Redes) private redesRepository: Repository<Redes>,
 		@InjectRepository(ProductosVariantesCombinaciones)
 		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async editNetworks(storeID: number, redesData: Partial<Redes>) {
+		const redes = await this.redesRepository.findOne({
+			where: { id: storeID }
+		})
+
+		if (!redes) throw new NotFoundException("Networks not found")
+
+		redes.facebook = redesData?.facebook ?? redes.facebook
+		redes.instagram = redesData?.instagram ?? redes.instagram
+		redes.twitter = redesData?.twitter ?? redes.twitter
+		redes.youtube = redesData?.youtube ?? redes.youtube
+		redes.whatsapp = redesData?.whatsapp ?? redes.whatsapp
+		redes.tiktok = redesData?.tiktok ?? redes.tiktok
+
+		await this.redesRepository.save(redes)
+	}
+
+	async getNetworks(storeID: number) {
+		const networks = await this.redesRepository.findOne({
+			where: { id: storeID }
+		})
+
+		if (!networks) throw new NotFoundException("Networks not found")
+
+		return networks
+	}
+
+	async editPolicies(storeID: number, policiesData: Partial<Politicas>) {
+		const policies = await this.politicasRepository.findOne({
+			where: { idTienda: storeID }
+		})
+		if (!policies) throw new NotFoundException("Policies not found")
+		policies.envios = policiesData?.envios ?? policies.envios
+		policies.pagos = policiesData?.pagos ?? policies.pagos
+		policies.datos = policiesData?.datos ?? policies.datos
+		policies.garantia = policiesData?.garantia ?? policies.garantia
+		policies.devolucion = policiesData?.devolucion ?? policies.devolucion
+		policies.cambio = policiesData?.cambio ?? policies.cambio
+		policies.updatedAt = new Date()
+
+		await this.politicasRepository.save(policies)
+	}
+
+	async getPolicies(storeID: number) {
+		const policie = await this.politicasRepository.findOne({
+			where: { idTienda: storeID }
+		})
+
+		if (!policie) throw new NotFoundException("Policies not found")
+
+		return mapPolicy(policie)
+	}
+
+	async deleteGeolocation(storeID: number, geolocationID: number) {
+		const geolocation = await this.geoLocationRepository.findOne({
+			where: { id: geolocationID, tienda: +storeID }
+		})
+		if (!geolocation) throw new NotFoundException("Geolocation not found")
+		await this.geoLocationRepository.delete({ id: geolocationID, tienda: +storeID })
+	}
+
+	async createGeolocation(storeID: number, geolocationData: IGeolocation) {
+		const geolocation = this.geoLocationRepository.create({
+			nombreSede: geolocationData.nombre_sede,
+			direccion: geolocationData.direccion,
+			latitud: geolocationData.latitud,
+			longitud: geolocationData.longitud,
+			ciudad: geolocationData.ciudad,
+			horario: geolocationData.horario,
+			fotoTienda: geolocationData.foto_tienda,
+			telefono: geolocationData.telefono,
+			createdAt: new Date(),
+			tienda: storeID
+		})
+		await this.geoLocationRepository.save(geolocation)
+	}
+
+	async editGeolocation(
+		storeID: number,
+		geolocationID: number,
+		geolocationData: Partial<IGeolocation>
+	) {
+		const geolocation = await this.geoLocationRepository.findOne({
+			where: { id: geolocationID, tienda: +storeID }
+		})
+
+		if (!geolocation) throw new NotFoundException("Geolocation not found")
+
+		geolocation.nombreSede = geolocationData?.nombre_sede ?? geolocation.nombreSede
+		geolocation.direccion = geolocationData?.direccion ?? geolocation.direccion
+		geolocation.latitud = geolocationData?.latitud ?? geolocation.latitud
+		geolocation.longitud = geolocationData?.longitud ?? geolocation.longitud
+		geolocation.ciudad = geolocationData?.ciudad ?? geolocation.ciudad
+		geolocation.horario = geolocationData?.horario ?? geolocation.horario
+		geolocation.fotoTienda = geolocationData?.foto_tienda ?? geolocation.fotoTienda
+		geolocation.telefono = geolocationData?.telefono ?? geolocation.telefono
+		geolocation.updatedAt = new Date()
+
+		await this.geoLocationRepository.save(geolocation)
+	}
+
+	async getGeolocations(storeID: number) {
+		const sites = await this.geoLocationRepository.find({
+			where: { tienda: storeID },
+			order: { createdAt: "DESC" }
+		})
+
+		return sites.map((site) => mapGeolocation(site))
+	}
 
 	async updateProductPricing(dto: UpdateProductPricingDto) {
 		const { id, unidades, precio, combinaciones, storeID } = dto
