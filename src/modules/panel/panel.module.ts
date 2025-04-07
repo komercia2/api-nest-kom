@@ -9,7 +9,8 @@ import {
 	Politicas,
 	Productos,
 	ProductosInfo,
-	ProductosVariantesCombinaciones
+	ProductosVariantesCombinaciones,
+	Redes
 } from "src/entities"
 
 import { PanelController } from "./panel.controller"
@@ -25,7 +26,8 @@ import { PanelService } from "./panel.service"
 			Clientes,
 			ProductosVariantesCombinaciones,
 			Geolocalizacion,
-			Politicas
+			Politicas,
+			Redes
 		])
 	],
 	controllers: [PanelController],

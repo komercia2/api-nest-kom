@@ -15,7 +15,8 @@ import {
 	Politicas,
 	Productos,
 	ProductosInfo,
-	ProductosVariantesCombinaciones
+	ProductosVariantesCombinaciones,
+	Redes
 } from "src/entities"
 import { DataSource, Like, Repository } from "typeorm"
 
@@ -36,11 +37,39 @@ export class PanelService {
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>,
 		@InjectRepository(Geolocalizacion) private geoLocationRepository: Repository<Geolocalizacion>,
 		@InjectRepository(Politicas) private politicasRepository: Repository<Politicas>,
+		@InjectRepository(Redes) private redesRepository: Repository<Redes>,
 		@InjectRepository(ProductosVariantesCombinaciones)
 		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async editNetworks(storeID: number, redesData: Partial<Redes>) {
+		const redes = await this.redesRepository.findOne({
+			where: { id: storeID }
+		})
+
+		if (!redes) throw new NotFoundException("Networks not found")
+
+		redes.facebook = redesData?.facebook ?? redes.facebook
+		redes.instagram = redesData?.instagram ?? redes.instagram
+		redes.twitter = redesData?.twitter ?? redes.twitter
+		redes.youtube = redesData?.youtube ?? redes.youtube
+		redes.whatsapp = redesData?.whatsapp ?? redes.whatsapp
+		redes.tiktok = redesData?.tiktok ?? redes.tiktok
+
+		await this.redesRepository.save(redes)
+	}
+
+	async getNetworks(storeID: number) {
+		const networks = await this.redesRepository.findOne({
+			where: { id: storeID }
+		})
+
+		if (!networks) throw new NotFoundException("Networks not found")
+
+		return networks
+	}
 
 	async editPolicies(storeID: number, policiesData: Partial<Politicas>) {
 		const policies = await this.politicasRepository.findOne({

@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common"
 import { Response } from "express"
+import { Redes } from "src/entities"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
@@ -10,6 +11,16 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Put("update-networks/:storeID")
+	editNetworks(@Body() networks: Partial<Redes>, @Param("storeID") storeID: number) {
+		return this.panelService.editNetworks(storeID, networks)
+	}
+
+	@Get("get-networks/:storeID")
+	getNetworks(@Param("storeID") storeID: number) {
+		return this.panelService.getNetworks(storeID)
+	}
 
 	@Put("update-policies/:storeID")
 	editPolicies(@Body() policies: Partial<IPolicy>, @Param("storeID") storeID: number) {
