@@ -12,6 +12,16 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Put("update-payment-policies/:storeID")
+	editPaymentPolicies(@Body("pagos") pagos: string, @Param("storeID") storeID: number) {
+		return this.panelService.editPaymentPolicies(storeID, pagos)
+	}
+
+	@Get("get-payment-policies/:storeID")
+	getPaymentPolicies(@Param("storeID") storeID: number) {
+		return this.panelService.getPaymentPolcie(storeID)
+	}
+
 	@Put("update-networks/:storeID")
 	editNetworks(@Body() networks: Partial<Redes>, @Param("storeID") storeID: number) {
 		return this.panelService.editNetworks(storeID, networks)

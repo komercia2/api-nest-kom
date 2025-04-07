@@ -44,6 +44,26 @@ export class PanelService {
 		private readonly logger: Logger
 	) {}
 
+	async editPaymentPolicies(storeID: number, pagos: string) {
+		const policies = await this.politicasRepository.findOne({
+			where: { idTienda: +storeID }
+		})
+
+		if (!policies) throw new NotFoundException("Policies not found")
+
+		policies.pagos = pagos
+		policies.updatedAt = new Date()
+
+		await this.politicasRepository.save(policies)
+	}
+
+	async getPaymentPolcie(storeID: number) {
+		return await this.politicasRepository.findOne({
+			where: { idTienda: storeID },
+			select: { pagos: true }
+		})
+	}
+
 	async editNetworks(storeID: number, redesData: Partial<Redes>) {
 		const redes = await this.redesRepository.findOne({
 			where: { id: storeID }
