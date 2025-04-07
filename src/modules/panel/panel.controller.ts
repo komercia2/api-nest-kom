@@ -1,4 +1,5 @@
 import { Body, Controller, Get, Param, Put, Query, Res } from "@nestjs/common"
+import { NodeAuthMiddleware } from "@shared/infrastructure/middlewares/auth/node-auth-middleware"
 import { Response } from "express"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"

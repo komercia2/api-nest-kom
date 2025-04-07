@@ -1,5 +1,6 @@
-import { Module } from "@nestjs/common"
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
+import { NodeAuthMiddleware } from "@shared/infrastructure/middlewares/auth/node-auth-middleware"
 import {
 	Carritos,
 	Clientes,
@@ -26,4 +27,8 @@ import { PanelService } from "./panel.service"
 	controllers: [PanelController],
 	providers: [PanelService]
 })
-export class PanelModule {}
+export class PanelModule implements NestModule {
+	configure(consumer: MiddlewareConsumer) {
+		consumer.apply(NodeAuthMiddleware).forRoutes(PanelController)
+	}
+}
