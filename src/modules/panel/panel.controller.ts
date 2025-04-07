@@ -1,5 +1,4 @@
 import { Body, Controller, Get, Param, Put, Query, Res } from "@nestjs/common"
-import { NodeAuthMiddleware } from "@shared/infrastructure/middlewares/auth/node-auth-middleware"
 import { Response } from "express"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
@@ -9,6 +8,11 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Get("get-geolocations/:storeID")
+	getGeolocations(@Param("storeID") storeID: number) {
+		return this.panelService.getGeolocations(storeID)
+	}
 
 	@Put("update-product-pricing")
 	updateProductPricing(@Body() updateProductPricingDto: UpdateProductPricingDto) {

@@ -5,6 +5,7 @@ import {
 	Carritos,
 	Clientes,
 	DeliveryStatus,
+	Geolocalizacion,
 	Productos,
 	ProductosInfo,
 	ProductosVariantesCombinaciones
@@ -21,7 +22,8 @@ import { PanelService } from "./panel.service"
 			DeliveryStatus,
 			Carritos,
 			Clientes,
-			ProductosVariantesCombinaciones
+			ProductosVariantesCombinaciones,
+			Geolocalizacion
 		])
 	],
 	controllers: [PanelController],

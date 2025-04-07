@@ -11,10 +11,12 @@ import {
 	Carritos,
 	Clientes,
 	DeliveryStatus,
+	Geolocalizacion,
 	Productos,
 	ProductosInfo,
 	ProductosVariantes,
-	ProductosVariantesCombinaciones
+	ProductosVariantesCombinaciones,
+	Zonas
 } from "src/entities"
 import { DataSource, In, Like, Repository } from "typeorm"
 
@@ -22,6 +24,7 @@ import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { IProductCombination } from "./interfaces/products"
+import { mapGeolocation } from "./mappings/geolocation.mapper"
 
 @Injectable()
 export class PanelService {
@@ -31,11 +34,20 @@ export class PanelService {
 		@InjectRepository(DeliveryStatus) private deliveryStatus: Repository<DeliveryStatus>,
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>,
+		@InjectRepository(Geolocalizacion) private geoLocationRepository: Repository<Geolocalizacion>,
 		@InjectRepository(ProductosVariantesCombinaciones)
 		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async getGeolocations(storeID: number) {
+		const sites = await this.geoLocationRepository.find({
+			where: { tienda: storeID }
+		})
+
+		return sites.map((site) => mapGeolocation(site))
+	}
 
 	async updateProductPricing(dto: UpdateProductPricingDto) {
 		const { id, unidades, precio, combinaciones, storeID } = dto

@@ -27,8 +27,6 @@ export class NodeAuthMiddleware implements NestMiddleware {
 				}
 			}
 
-			req.id = decoded["id"]
-
 			next()
 		} catch (err) {
 			throw new UnauthorizedException("Token inválido o expirado")
