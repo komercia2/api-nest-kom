@@ -202,7 +202,10 @@ export class SuperService {
 
 		if (!user) throw new BadRequestException("User not found")
 
-		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+		const store = await this.storeRepository.findOne({
+			where: { id: storeId },
+			relations: { tiendasInfo: true }
+		})
 
 		if (!store) throw new BadRequestException("Store not found")
 
@@ -211,6 +214,12 @@ export class SuperService {
 		storeUser.users = user
 
 		await this.tiendasUsuariosRepository.save(storeUser)
+		await this.logTiendasRepository.save({
+			accion: `Usuario ${user.nombre} vinculado a la tienda ${store.tiendasInfo.emailTienda}`,
+			tiendaId: storeId,
+			usuarioId: userId,
+			createdAt: new Date()
+		})
 
 		return { message: "User linked to store" }
 	}

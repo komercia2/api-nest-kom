@@ -4,13 +4,88 @@ import { Redes } from "src/entities"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IProductCategorie } from "./interfaces/categories"
 import { IPolicy } from "./interfaces/policies"
+import { ICreateProductSubcategorie } from "./interfaces/subcategories"
 import { IGeolocation } from "./interfaces/zones"
 import { PanelService } from "./panel.service"
 
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Put("update-product-state/:storeID")
+	updateProductState(
+		@Param("storeID") storeID: number,
+		@Body("id") id: number,
+		@Body("estado") estado: boolean
+	) {
+		return this.panelService.updateProductState(storeID, id, estado)
+	}
+	@Get("get-product-subcategories/:storeID")
+	@Put("update-product-subcategory/:storeID/:subcategoryID")
+	editProductSubcategory(
+		@Param("storeID") storeID: number,
+		@Param("subcategoryID") subcategoryID: number,
+		@Body() productSubcategory: ICreateProductSubcategorie
+	) {
+		return this.panelService.editProductSubcategory(storeID, subcategoryID, productSubcategory)
+	}
+	@Put("update-product-category/:storeID/:categoryID")
+	editProductCategory(
+		@Param("storeID") storeID: number,
+		@Param("categoryID") categoryID: number,
+		@Body() productCategory: IProductCategorie
+	) {
+		return this.panelService.editProductCategory(storeID, categoryID, productCategory)
+	}
+
+	@Delete("delete-product-subcategory/:storeID/:subcategoryID")
+	deleteProductSubcategory(
+		@Param("storeID") storeID: number,
+		@Param("subcategoryID") subcategoryID: number
+	) {
+		return this.panelService.deleteProductSubcategory(storeID, subcategoryID)
+	}
+
+	@Post("create-product-subcategory/:storeID")
+	createProductSubcategory(
+		@Param("storeID") storeID: number,
+		@Body() productSubcategory: ICreateProductSubcategorie
+	) {
+		return this.panelService.createProductSubcategory(storeID, productSubcategory)
+	}
+
+	@Delete("delete-product-category/:storeID/:categoryID")
+	deleteProductCategory(
+		@Param("storeID") storeID: number,
+		@Param("categoryID") categoryID: number
+	) {
+		return this.panelService.deleteProductCategory(storeID, categoryID)
+	}
+
+	@Post("create-product-category/:storeID")
+	createProductCategory(
+		@Param("storeID") storeID: number,
+		@Body() productCategory: IProductCategorie
+	) {
+		return this.panelService.createProductCategory(storeID, productCategory)
+	}
+
+	@Get("get-categorias-subcategories/:storeID")
+	getCategoriasSubcategories(@Param("storeID") storeID: number) {
+		return this.panelService.getProductCategoriesAndSubcategories(storeID)
+	}
+
+	@Put("update-payment-policies/:storeID")
+	editPaymentPolicies(@Body("pagos") pagos: string, @Param("storeID") storeID: number) {
+		return this.panelService.editPaymentPolicies(storeID, pagos)
+	}
+
+	@Get("get-payment-policies/:storeID")
+	getPaymentPolicies(@Param("storeID") storeID: number) {
+		return this.panelService.getPaymentPolcie(storeID)
+	}
 
 	@Put("update-networks/:storeID")
 	editNetworks(@Body() networks: Partial<Redes>, @Param("storeID") storeID: number) {
