@@ -26,6 +26,7 @@ import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { ICreateProductCategorie } from "./interfaces/categories"
+import { ICreateProductSubcategorie } from "./interfaces/subcategories"
 import { IGeolocation } from "./interfaces/zones"
 import { mapGeolocation } from "./mappings/geolocation.mapper"
 import { mapPolicy } from "./mappings/policie.mapper"
@@ -49,6 +50,75 @@ export class PanelService {
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async editProductSubcategory(
+		storeID: number,
+		subcategoryID: number,
+		dto: ICreateProductSubcategorie
+	) {
+		const subcategory = await this.subcategoriasRepository.findOne({
+			where: { id: subcategoryID, tienda: storeID }
+		})
+
+		if (!subcategory) throw new NotFoundException("Subcategory not found")
+
+		subcategory.nombreSubcategoria = dto.nombre_subcategoria
+		subcategory.categoria = dto.categoria_producto
+		subcategory.idCloudinary = dto.id_cloudinary
+		subcategory.imagenCloudinary = dto.imagen_cloudinary
+
+		await this.subcategoriasRepository.save(subcategory)
+	}
+
+	async editProductCategory(storeID: number, categoryID: number, dto: ICreateProductCategorie) {
+		const category = await this.categoriasRepository.findOne({
+			where: { id: categoryID, tienda: storeID }
+		})
+
+		if (!category) throw new NotFoundException("Category not found")
+
+		category.nombreCategoriaProducto = dto.nombre_categoria_producto
+		category.descripcion = dto.descripcion
+		category.fotoBanner = dto.foto_banner
+		category.orden = dto.orden
+		category.fotoIcono = dto.foto_icono
+		category.idCloudinary = dto.id_cloudinary
+		category.imagenCloudinary = dto.imagen_cloudinary
+
+		await this.categoriasRepository.save(category)
+	}
+
+	async deleteProductSubcategory(storeID: number, subcategoryID: number) {
+		const subcategory = await this.subcategoriasRepository.findOne({
+			where: { id: subcategoryID, tienda: storeID }
+		})
+
+		if (!subcategory) throw new NotFoundException("Subcategory not found")
+
+		await this.subcategoriasRepository.delete({ id: subcategoryID, tienda: storeID })
+	}
+
+	async createProductSubcategory(storeID: number, dto: ICreateProductSubcategorie) {
+		const existingSubcategory = await this.subcategoriasRepository.findOne({
+			where: {
+				nombreSubcategoria: dto.nombre_subcategoria,
+				tienda: storeID,
+				categoria: dto.categoria_producto
+			}
+		})
+
+		if (existingSubcategory) throw new BadRequestException("Subcategory already exists")
+
+		const newSubcategory = this.subcategoriasRepository.create({
+			nombreSubcategoria: dto.nombre_subcategoria,
+			categoria: dto.categoria_producto,
+			tienda: storeID,
+			idCloudinary: dto.id_cloudinary,
+			imagenCloudinary: dto.imagen_cloudinary
+		})
+
+		await this.subcategoriasRepository.save(newSubcategory)
+	}
 
 	async deleteProductCategory(storeID: number, categoryID: number) {
 		const category = await this.categoriasRepository.findOne({
