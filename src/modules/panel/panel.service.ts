@@ -25,6 +25,7 @@ import { DataSource, Like, Repository } from "typeorm"
 import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { ICreateProductCategorie } from "./interfaces/categories"
 import { IGeolocation } from "./interfaces/zones"
 import { mapGeolocation } from "./mappings/geolocation.mapper"
 import { mapPolicy } from "./mappings/policie.mapper"
@@ -48,6 +49,37 @@ export class PanelService {
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async deleteProductCategory(storeID: number, categoryID: number) {
+		const category = await this.categoriasRepository.findOne({
+			where: { id: categoryID, tienda: storeID }
+		})
+
+		if (!category) throw new NotFoundException("Category not found")
+
+		await this.categoriasRepository.delete({ id: categoryID, tienda: storeID })
+	}
+
+	async createProductCategory(storeID: number, dto: ICreateProductCategorie) {
+		const existingCategory = await this.categoriasRepository.findOne({
+			where: { nombreCategoriaProducto: dto.nombre_categoria_producto, tienda: storeID }
+		})
+
+		if (existingCategory) throw new BadRequestException("Category already exists")
+
+		const newCategory = this.categoriasRepository.create({
+			nombreCategoriaProducto: dto.nombre_categoria_producto,
+			tienda: storeID,
+			descripcion: dto.descripcion,
+			fotoBanner: dto.foto_banner,
+			orden: dto.orden,
+			fotoIcono: dto.foto_icono,
+			idCloudinary: dto.id_cloudinary,
+			imagenCloudinary: dto.imagen_cloudinary
+		})
+
+		await this.categoriasRepository.save(newCategory)
+	}
 
 	async getProductCategoriesAndSubcategories(storeId: number) {
 		const categories = await this.categoriasRepository.query(

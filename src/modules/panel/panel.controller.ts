@@ -4,6 +4,7 @@ import { Redes } from "src/entities"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IProductCategorie } from "./interfaces/categories"
 import { IPolicy } from "./interfaces/policies"
 import { IGeolocation } from "./interfaces/zones"
 import { PanelService } from "./panel.service"
@@ -11,6 +12,22 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Delete("delete-product-category/:storeID/:categoryID")
+	deleteProductCategory(
+		@Param("storeID") storeID: number,
+		@Param("categoryID") categoryID: number
+	) {
+		return this.panelService.deleteProductCategory(storeID, categoryID)
+	}
+
+	@Post("create-product-category/:storeID")
+	createProductCategory(
+		@Param("storeID") storeID: number,
+		@Body() productCategory: IProductCategorie
+	) {
+		return this.panelService.createProductCategory(storeID, productCategory)
+	}
 
 	@Get("get-categorias-subcategories/:storeID")
 	getCategoriasSubcategories(@Param("storeID") storeID: number) {
