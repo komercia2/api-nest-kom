@@ -51,6 +51,18 @@ export class PanelService {
 		private readonly logger: Logger
 	) {}
 
+	async updateProductState(storeID: number, id: number, state: boolean) {
+		const product = await this.productosRepository.findOne({
+			where: { id, tienda: storeID }
+		})
+
+		if (!product) throw new NotFoundException("Product not found")
+
+		product.activo = state
+
+		await this.productosRepository.save(product)
+	}
+
 	async editProductSubcategory(
 		storeID: number,
 		subcategoryID: number,

@@ -14,6 +14,15 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Put("update-product-state/:storeID")
+	updateProductState(
+		@Param("storeID") storeID: number,
+		@Body("id") id: number,
+		@Body("estado") estado: boolean
+	) {
+		return this.panelService.updateProductState(storeID, id, estado)
+	}
+	@Get("get-product-subcategories/:storeID")
 	@Put("update-product-subcategory/:storeID/:subcategoryID")
 	editProductSubcategory(
 		@Param("storeID") storeID: number,
