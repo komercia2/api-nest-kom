@@ -377,7 +377,11 @@ export class SuperService {
 		}
 	}
 
-	async updateStoreEntities(storeId: number, updateStoreEntitiesDto: UpdateStoreEntitiesDto) {
+	async updateStoreEntities(
+		storeId: number,
+		updateStoreEntitiesDto: UpdateStoreEntitiesDto,
+		userAdminId: number
+	) {
 		const { entities: incomingEntities } = updateStoreEntitiesDto
 		const queryRunner = this.datasource.createQueryRunner()
 
@@ -414,6 +418,12 @@ export class SuperService {
 				entity.tiendaId = storeId
 				entity.entidadId = entityId
 				return entity
+			})
+			await this.logTiendasRepository.save({
+				accion: `Se agregaron entidades a la tienda`,
+				tiendaId: storeId,
+				usuarioId: userAdminId,
+				createdAt: new Date()
 			})
 
 			await this.entidadesTiendasRepository.save(mappedEntities)
@@ -510,7 +520,7 @@ export class SuperService {
 		return { message: "Password changed" }
 	}
 
-	async updateStore(updateStoreDto: UpdateStoreDto) {
+	async updateStore(updateStoreDto: UpdateStoreDto, userAdminId: number) {
 		const { storeId } = updateStoreDto
 
 		const store = await this.findStoreById(storeId)
@@ -528,8 +538,14 @@ export class SuperService {
 			store.categoria = updateStoreDto.categoryId
 
 			await Promise.all([
-				await this.storeRepository.save(store),
-				await this.tiendasInfoRepository.save(store.tiendasInfo)
+				this.storeRepository.save(store),
+				this.tiendasInfoRepository.save(store.tiendasInfo),
+				this.logTiendasRepository.save({
+					accion: "Información de tienda actualizada",
+					tiendaId: storeId,
+					usuarioId: userAdminId,
+					createdAt: new Date()
+				})
 			])
 
 			return { success: true, message: "Store updated" }
@@ -565,7 +581,7 @@ export class SuperService {
 		return { plan: store.tipo, expirationDate: store.fechaExpiracion }
 	}
 
-	async updateStorePlan(updateStorePlanDto: UpdateStorePlanDto) {
+	async updateStorePlan(updateStorePlanDto: UpdateStorePlanDto, userAdminId: number) {
 		const { storeId, expirationDate, plan } = updateStorePlanDto
 
 		const store = await this.storeRepository.findOne({ where: { id: storeId } })
@@ -575,6 +591,13 @@ export class SuperService {
 		await this.storeRepository.update(storeId, {
 			fechaExpiracion: new Date(expirationDate).toISOString(),
 			tipo: plan
+		})
+
+		await this.logTiendasRepository.save({
+			accion: `Cambio de plan a  ${plan} o fecha de expiración a ${expirationDate}`,
+			tiendaId: storeId,
+			usuarioId: userAdminId,
+			createdAt: new Date()
 		})
 
 		return { message: "Store plan updated" }
@@ -617,7 +640,10 @@ export class SuperService {
 			throw new UnauthorizedException("Invalid key")
 		}
 
-		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+		const store = await this.storeRepository.findOne({
+			where: { id: storeId },
+			relations: { tiendasInfo: true }
+		})
 
 		if (!store) throw new BadRequestException("Store not found")
 

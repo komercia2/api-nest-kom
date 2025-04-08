@@ -9,12 +9,14 @@ import {
 	Post,
 	Put,
 	Query,
+	Req,
 	UseGuards,
 	UsePipes,
 	ValidationPipe
 } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { SuperJwtAuthGuard } from "@shared/infrastructure/guards"
+import { Request } from "express"
 
 import { CouponsService } from "../coupons/coupons.service"
 import { CreateSubscriptionCouponDto } from "../coupons/dtos/create-coupon.dto"
@@ -152,9 +154,11 @@ export class SuperController {
 	@Put("stores/entities/:id")
 	updateStoreEntities(
 		@Param("id") id: number,
+		@Req() req: Request,
 		@Body() updateStoreEntitiesDto: UpdateStoreEntitiesDto
 	) {
-		return this.superService.updateStoreEntities(+id, updateStoreEntitiesDto)
+		const { superUser } = req
+		return this.superService.updateStoreEntities(+id, updateStoreEntitiesDto, +superUser.id)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
@@ -177,8 +181,9 @@ export class SuperController {
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Put("stores")
-	updateStore(@Body() updateStoreDto: UpdateStoreDto) {
-		return this.superService.updateStore(updateStoreDto)
+	updateStore(@Req() req: Request, @Body() updateStoreDto: UpdateStoreDto) {
+		const { superUser } = req
+		return this.superService.updateStore(updateStoreDto, +superUser.id)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
@@ -201,8 +206,9 @@ export class SuperController {
 
 	@UseGuards(SuperJwtAuthGuard)
 	@Put("stores/:storeId/plan")
-	updateStorePlan(@Body() updateStorePlanDto: UpdateStorePlanDto) {
-		return this.superService.updateStorePlan(updateStorePlanDto)
+	updateStorePlan(@Req() req: Request, @Body() updateStorePlanDto: UpdateStorePlanDto) {
+		const { superUser } = req
+		return this.superService.updateStorePlan(updateStorePlanDto, +superUser.id)
 	}
 
 	@UseGuards(SuperJwtAuthGuard)
