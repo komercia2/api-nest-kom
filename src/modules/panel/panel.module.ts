@@ -3,6 +3,7 @@ import { TypeOrmModule } from "@nestjs/typeorm"
 import { NodeAuthMiddleware } from "@shared/infrastructure/middlewares/auth/node-auth-middleware"
 import {
 	Carritos,
+	CategoriaProductos,
 	Clientes,
 	DeliveryStatus,
 	Geolocalizacion,
@@ -10,7 +11,8 @@ import {
 	Productos,
 	ProductosInfo,
 	ProductosVariantesCombinaciones,
-	Redes
+	Redes,
+	Subcategorias
 } from "src/entities"
 
 import { PanelController } from "./panel.controller"
@@ -27,7 +29,9 @@ import { PanelService } from "./panel.service"
 			ProductosVariantesCombinaciones,
 			Geolocalizacion,
 			Politicas,
-			Redes
+			Redes,
+			CategoriaProductos,
+			Subcategorias
 		])
 	],
 	controllers: [PanelController],
@@ -35,6 +39,6 @@ import { PanelService } from "./panel.service"
 })
 export class PanelModule implements NestModule {
 	configure(consumer: MiddlewareConsumer) {
-		consumer.apply(NodeAuthMiddleware).forRoutes(PanelController)
+		// consumer.apply(NodeAuthMiddleware).forRoutes(PanelController)
 	}
 }

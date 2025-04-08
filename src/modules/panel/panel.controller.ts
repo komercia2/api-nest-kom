@@ -12,6 +12,11 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Get("get-categorias-subcategories/:storeID")
+	getCategoriasSubcategories(@Param("storeID") storeID: number) {
+		return this.panelService.getProductCategoriesAndSubcategories(storeID)
+	}
+
 	@Put("update-payment-policies/:storeID")
 	editPaymentPolicies(@Body("pagos") pagos: string, @Param("storeID") storeID: number) {
 		return this.panelService.editPaymentPolicies(storeID, pagos)

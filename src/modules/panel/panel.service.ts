@@ -9,6 +9,7 @@ import { Parser } from "json2csv"
 import { Logger } from "nestjs-pino"
 import {
 	Carritos,
+	CategoriaProductos,
 	Clientes,
 	DeliveryStatus,
 	Geolocalizacion,
@@ -16,7 +17,8 @@ import {
 	Productos,
 	ProductosInfo,
 	ProductosVariantesCombinaciones,
-	Redes
+	Redes,
+	Subcategorias
 } from "src/entities"
 import { DataSource, Like, Repository } from "typeorm"
 
@@ -38,11 +40,71 @@ export class PanelService {
 		@InjectRepository(Geolocalizacion) private geoLocationRepository: Repository<Geolocalizacion>,
 		@InjectRepository(Politicas) private politicasRepository: Repository<Politicas>,
 		@InjectRepository(Redes) private redesRepository: Repository<Redes>,
+		@InjectRepository(CategoriaProductos)
+		private categoriasRepository: Repository<CategoriaProductos>,
+		@InjectRepository(Subcategorias) private subcategoriasRepository: Repository<Subcategorias>,
 		@InjectRepository(ProductosVariantesCombinaciones)
 		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async getProductCategoriesAndSubcategories(storeId: number) {
+		const categories = await this.categoriasRepository.query(
+			`
+			SELECT
+			  cp.id,
+			  cp.nombre_categoria_producto AS nombre_categoria_producto,
+			  cp.tienda,
+			  cp.descripcion,
+			  cp.foto_banner AS foto_banner,
+			  cp.orden,
+			  cp.foto_icono AS foto_icono,
+			  cp.id_cloudinary AS id_cloudinary,
+			  cp.imagen_cloudinary AS imagen_cloudinary,
+			  COUNT(p.id) AS producto_count
+			FROM
+			  komercia_prod.categoria_productos cp
+			LEFT JOIN
+			  komercia_prod.productos p
+			  ON cp.id = p.categoria_producto
+			WHERE
+			  cp.tienda = ?
+			GROUP BY
+			  cp.id
+			ORDER BY
+			  cp.orden DESC
+			`,
+			[storeId]
+		)
+
+		const subcategories = await this.subcategoriasRepository.query(
+			`
+			SELECT
+				s.id,
+				s.nombre_subcategoria AS nombre_subcategoria,
+				s.categoria,
+				s.tienda,
+				s.id_cloudinary AS id_cloudinary,
+				s.imagen_cloudinary AS imagen_cloudinary,
+				COUNT(p.id) AS producto_count
+			FROM
+				komercia_prod.subcategorias s
+			LEFT JOIN
+				komercia_prod.productos p ON s.id = p.subcategoria
+			WHERE
+				s.tienda = ?
+			GROUP BY
+				s.id
+			`,
+			[storeId]
+		)
+
+		return {
+			categories,
+			subcategories
+		}
+	}
 
 	async editPaymentPolicies(storeID: number, pagos: string) {
 		const policies = await this.politicasRepository.findOne({
