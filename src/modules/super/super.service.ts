@@ -583,7 +583,10 @@ export class SuperService {
 	async assignStoreAdmin(assignStoreAdminDto: AssignStoreAdminDto) {
 		const { storeId, adminId } = assignStoreAdminDto
 
-		const store = await this.storeRepository.findOne({ where: { id: storeId } })
+		const store = await this.storeRepository.findOne({
+			where: { id: storeId },
+			relations: { tiendasInfo: true }
+		})
 
 		if (!store) throw new BadRequestException("Store not found")
 
@@ -592,6 +595,13 @@ export class SuperService {
 		if (!admin) throw new BadRequestException("Admin not found")
 
 		await this.usersRepository.update(adminId, { tienda: storeId })
+
+		await this.logTiendasRepository.save({
+			accion: `Nuevo usuario vinculado a la tienda ${store.tiendasInfo.emailTienda}`,
+			tiendaId: storeId,
+			usuarioId: adminId,
+			createdAt: new Date()
+		})
 
 		return { message: "Admin linked to store" }
 	}
@@ -616,6 +626,13 @@ export class SuperService {
 		if (!admin) throw new BadRequestException("Admin not found")
 
 		await this.usersRepository.update(adminId, { tienda: 0 })
+
+		await this.logTiendasRepository.save({
+			accion: `Usuario desvinculado de la tienda ${store.tiendasInfo.emailTienda}`,
+			tiendaId: storeId,
+			usuarioId: adminId,
+			createdAt: new Date()
+		})
 
 		return { message: "Admin unlinked from store" }
 	}
