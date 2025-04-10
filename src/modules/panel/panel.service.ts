@@ -356,65 +356,54 @@ export class PanelService {
 		if (precio < 0) throw new BadRequestException("Price cannot be negative")
 		if (unidades < 0) throw new BadRequestException("Units cannot be negative")
 
-		const product = await this.productosRepository.findOne({
-			where: { id, tienda: storeID },
-			relations: [
-				"productosInfo",
-				"productosVariantes",
-				"productosVariantes.productosVariantesCombinaciones"
-			]
-		})
-
-		if (!product) throw new NotFoundException("Product not found")
-
-		product.precio = precio
-		product.productosInfo.inventario = unidades
-
 		const queryRunner = this.datasource.createQueryRunner()
-
-		this.logger.log("QueryRunner created")
-
 		await queryRunner.connect()
-
-		this.logger.log("QueryRunner connected")
-
 		await queryRunner.startTransaction()
 
-		this.logger.log("Transaction started")
-
 		try {
-			await Promise.all([
-				this.productosInfoRepository.save(product.productosInfo),
-				this.productosRepository.save(product)
-			])
+			const product = await queryRunner.manager.findOne(this.productosRepository.target, {
+				where: { id, tienda: storeID },
+				relations: [
+					"productosInfo",
+					"productosVariantes",
+					"productosVariantes.productosVariantesCombinaciones"
+				]
+			})
+
+			if (!product) throw new NotFoundException("Product not found")
+
+			product.precio = precio
+			product.productosInfo.inventario = unidades
+
+			await queryRunner.manager.save(product.productosInfo)
+			await queryRunner.manager.save(product)
 
 			if (combinaciones && combinaciones.length > 0) {
-				await Promise.all(
-					combinaciones.map(async (combination) => {
-						const { id: combinationID, combinaciones: combinationValue } = combination
+				for (const combination of combinaciones) {
+					const { id: combinationID, combinaciones: combinationValue } = combination
 
-						const combinationEntity = await this.combinacionesRepository.findOne({
+					const combinationEntity = await queryRunner.manager.findOne(
+						this.combinacionesRepository.target,
+						{
 							where: { id: combinationID }
-						})
+						}
+					)
 
-						if (!combinationEntity) throw new NotFoundException("Combination not found")
+					if (!combinationEntity) throw new NotFoundException("Combination not found")
 
-						combinationEntity.combinaciones = combinationValue
-
-						await this.combinacionesRepository.save(combinationEntity)
-					})
-				)
+					combinationEntity.combinaciones = combinationValue
+					await queryRunner.manager.save(combinationEntity)
+				}
 			}
 
 			await queryRunner.commitTransaction()
-
 			this.logger.log("Product pricing updated successfully", "updateProductPricing")
 		} catch (error) {
 			await queryRunner.rollbackTransaction()
-
 			this.logger.error("Error updating product pricing", error, "updateProductPricing")
-
 			throw new InternalServerErrorException("Error updating product pricing")
+		} finally {
+			await queryRunner.release()
 		}
 	}
 
