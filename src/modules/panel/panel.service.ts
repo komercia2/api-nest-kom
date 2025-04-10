@@ -398,6 +398,8 @@ export class PanelService {
 
 			await queryRunner.commitTransaction()
 			this.logger.log("Product pricing updated successfully", "updateProductPricing")
+
+			return { message: "Product pricing updated successfully" }
 		} catch (error) {
 			await queryRunner.rollbackTransaction()
 			this.logger.error("Error updating product pricing", error, "updateProductPricing")
