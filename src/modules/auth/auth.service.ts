@@ -1,6 +1,7 @@
 import {
 	ConflictException,
 	Injectable,
+	InternalServerErrorException,
 	NotFoundException,
 	Res,
 	UnauthorizedException
@@ -19,15 +20,18 @@ import {
 	Tiendas,
 	TiendasInfo,
 	TiendasPages,
+	UserPasswordReset,
 	Users,
 	UsersInfo
 } from "src/entities"
 import { DataSource, Repository } from "typeorm"
 
 import { ClodinaryService } from "../clodinary/clodinary.service"
+import { MailsService } from "../mails/mails.service"
 import { SuperLoginDto } from "./dtos"
 import { CreateStoreDto } from "./dtos/create-store.dto"
 import { PanelLoginDto } from "./dtos/panel-login.dto"
+import { ResetPassworDto, RestorePasswordDto } from "./dtos/reset-password.dto"
 import { PasswordUtil } from "./utils/password.util"
 
 @Injectable()
@@ -41,10 +45,121 @@ export class AuthService {
 		@InjectRepository(Users) private readonly usersRepository: Repository<Users>,
 		@InjectRepository(Tiendas) private readonly tiendasRepository: Repository<Tiendas>,
 		@InjectRepository(UsersInfo) private readonly usersInfoRepository: Repository<UsersInfo>,
+		@InjectRepository(UserPasswordReset)
+		private readonly userPasswordResetRepository: Repository<UserPasswordReset>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger,
-		private readonly cloudinaryService: ClodinaryService
+		private readonly cloudinaryService: ClodinaryService,
+		private readonly mailsService: MailsService
 	) {}
+
+	async restorePassword(dto: RestorePasswordDto) {
+		const isValidToken: { userId: number; email: string } | null = this.jwtService.decode(
+			dto.token.trim()
+		)
+
+		if (!isValidToken) throw new UnauthorizedException("Invalid token or expired")
+
+		const { userId, email } = isValidToken
+
+		const user = await this.usersRepository.findOne({
+			where: { id: userId, email }
+		})
+
+		if (!user) throw new UnauthorizedException("User not found")
+
+		const authFound = await this.userPasswordResetRepository.findOne({
+			where: { token: dto.token }
+		})
+
+		if (!authFound) throw new UnauthorizedException("Invalid token payload")
+		if (!authFound.active) throw new UnauthorizedException("Token alredy used")
+
+		const nodeHash = PasswordUtil.hash(dto.newPassword)
+		const laravelHash = PasswordUtil.toLaravelHash(nodeHash)
+
+		user.password = laravelHash
+		authFound.active = false
+
+		await Promise.all([
+			this.usersRepository.save(user),
+			this.userPasswordResetRepository.save(authFound)
+		])
+
+		return { success: true }
+	}
+
+	async isValidRestorePasswordToken(token: string) {
+		try {
+			if (!token.trim()) throw new UnauthorizedException("Token not found")
+
+			const isValidToken: { userId: number; email: string } | null = this.jwtService.decode(
+				token.trim()
+			)
+
+			if (!isValidToken) throw new UnauthorizedException("Invalid token or expired")
+
+			const { userId, email } = isValidToken
+
+			const user = await this.usersRepository.findOne({
+				where: { id: userId, email }
+			})
+
+			if (!user) throw new UnauthorizedException("User not found")
+
+			const authFound = await this.userPasswordResetRepository.findOne({
+				where: { token }
+			})
+
+			if (!authFound) throw new UnauthorizedException("Invalid token payload")
+			if (!authFound.active) throw new UnauthorizedException("Token alredy used")
+
+			return { success: true, email }
+		} catch (error) {
+			console.log(error)
+			return { success: false }
+		}
+	}
+
+	async sendRestorePasswordEmail(dto: ResetPassworDto): Promise<{
+		success: boolean
+	}> {
+		try {
+			const userExists = await this.userEmailExists(dto.email)
+
+			if (!userExists) throw new UnauthorizedException("User not found")
+
+			const token = this.jwtService.sign(
+				{ userId: userExists.id, email: dto.email },
+				{ expiresIn: "24h", privateKey: this.configService.get<string>("PANEL_JWT_SECRET") }
+			)
+
+			const userPasswordReset = this.userPasswordResetRepository.create({
+				token,
+				active: true,
+				userId: userExists.id
+			})
+
+			await this.userPasswordResetRepository.save(userPasswordReset)
+
+			const data = {
+				nameUser: userExists.nombre,
+				fowardUrl: `https://login.komercia.co/restablecer-contrasena/${token}`
+			}
+
+			await this.mailsService.sendCustomEmail({
+				to: dto.email,
+				storeId: userExists.tienda,
+				templateId: "d-6f868ee2c8554050bc8bf493d69296b1",
+				dynamicTemplateData: data
+			})
+
+			return { success: true }
+		} catch (error) {
+			console.log(error)
+			return { success: false }
+		}
+	}
 
 	async loginToPanel(panelLoginDto: PanelLoginDto) {
 		const { email, password } = panelLoginDto

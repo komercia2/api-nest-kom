@@ -1,15 +1,31 @@
-import { Body, Controller, Post, Res } from "@nestjs/common"
+import { Body, Controller, Param, Post, Res } from "@nestjs/common"
 import { ApiTags } from "@nestjs/swagger"
 import { Response } from "express"
 
 import { AuthService } from "./auth.service"
 import { CreateStoreDto } from "./dtos/create-store.dto"
 import { PanelLoginDto } from "./dtos/panel-login.dto"
+import { ResetPassworDto, RestorePasswordDto } from "./dtos/reset-password.dto"
 
 @ApiTags("Auth")
 @Controller("stores")
 export class StoresAuthController {
 	constructor(private readonly authService: AuthService) {}
+
+	@Post("restore-password")
+	restorePassword(@Body() dto: RestorePasswordDto) {
+		return this.authService.restorePassword(dto)
+	}
+
+	@Post("is-valid-restore-pass-token")
+	isValidRestorePasswordToken(@Body("token") token: string) {
+		return this.authService.isValidRestorePasswordToken(token)
+	}
+
+	@Post("send-restore-password-email")
+	sendRestorePasswordEmail(@Body() dto: ResetPassworDto) {
+		return this.authService.sendRestorePasswordEmail(dto)
+	}
 
 	@Post("login")
 	async loginToPanel(@Res() res: Response, @Body() loginDto: PanelLoginDto) {

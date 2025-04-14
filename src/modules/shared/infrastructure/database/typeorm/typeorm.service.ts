@@ -138,6 +138,7 @@ import {
 	TrespiCredentials,
 	UserAdmins,
 	UserCreditCard,
+	UserPasswordReset,
 	Users,
 	UsersInfo,
 	UsersSubscriptions,
@@ -308,7 +309,8 @@ export class TypeOrmService implements TypeOrmOptionsFactory {
 			WhatsappCheckout,
 			Zonas,
 			ZonasPaths,
-			StoresCouponsPlus
+			StoresCouponsPlus,
+			UserPasswordReset
 		]
 	})
 }
