@@ -5,6 +5,7 @@ import {
 	Carritos,
 	CategoriaProductos,
 	Clientes,
+	Cupones,
 	DeliveryStatus,
 	Geolocalizacion,
 	Politicas,
@@ -12,7 +13,9 @@ import {
 	ProductosInfo,
 	ProductosVariantesCombinaciones,
 	Redes,
-	Subcategorias
+	Subcategorias,
+	TemplateWhatsappSettings,
+	WhatsappCheckout
 } from "src/entities"
 
 import { PanelController } from "./panel.controller"
@@ -31,7 +34,10 @@ import { PanelService } from "./panel.service"
 			Politicas,
 			Redes,
 			CategoriaProductos,
-			Subcategorias
+			Subcategorias,
+			WhatsappCheckout,
+			TemplateWhatsappSettings,
+			Cupones
 		])
 	],
 	controllers: [PanelController],

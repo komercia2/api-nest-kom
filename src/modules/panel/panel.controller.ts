@@ -5,14 +5,63 @@ import { Redes } from "src/entities"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { IProductCategorie } from "./interfaces/categories"
+import { ICoupon } from "./interfaces/coupon"
 import { IPolicy } from "./interfaces/policies"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
+import { IWapiTemplate } from "./interfaces/wapi"
 import { IGeolocation } from "./interfaces/zones"
 import { PanelService } from "./panel.service"
 
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Delete("delete-coupon/:storeID/:couponID")
+	deleteCoupon(@Param("storeID") storeID: number, @Param("couponID") couponID: string) {
+		return this.panelService.deleteCoupon(storeID, couponID)
+	}
+
+	@Put("update-coupon/:storeID/:couponID")
+	updateCoupon(
+		@Param("storeID") storeID: number,
+		@Param("couponID") couponID: string,
+		@Body() data: ICoupon
+	) {
+		return this.panelService.updateCoupon(storeID, couponID, data)
+	}
+
+	@Post("create-coupon/:storeID")
+	createCoupon(@Param("storeID") storeID: number, @Body() data: ICoupon) {
+		return this.panelService.createCoupon(storeID, data)
+	}
+
+	@Get("get-coupons/:storeID")
+	getCoupons(@Param("storeID") storeID: number) {
+		return this.panelService.getCouponList(storeID)
+	}
+
+	@Put("update-whatsapp-dynamic-checkout-settings/:storeID")
+	updateWhatsappCheckoutDynamicSettings(
+		@Param("storeID") storeID: number,
+		@Body("configuration") configuration: string
+	) {
+		return this.panelService.updateWhatsappCheckoutDynamicSettings(storeID, configuration)
+	}
+
+	@Get("get-whatsapp-dynamic-checkout-settings/:storeID")
+	getWhatsappCheckoutDynamicSettings(@Param("storeID") storeID: number) {
+		return this.panelService.getWhatsappCheckoutDynamicSettings(storeID)
+	}
+
+	@Put("update-wapi-settings/:storeID")
+	updateWapiSettings(@Param("storeID") storeID: number, @Body() data: IWapiTemplate) {
+		return this.panelService.updateWapiSettings(storeID, data)
+	}
+
+	@Get("get-wapi-settings/:storeID")
+	getWapiSettings(@Param("storeID") storeID: number) {
+		return this.panelService.getWapiSettings(storeID)
+	}
 
 	@Put("update-product-state/:storeID")
 	updateProductState(
@@ -22,7 +71,7 @@ export class PanelController {
 	) {
 		return this.panelService.updateProductState(storeID, id, estado)
 	}
-	@Get("get-product-subcategories/:storeID")
+
 	@Put("update-product-subcategory/:storeID/:subcategoryID")
 	editProductSubcategory(
 		@Param("storeID") storeID: number,
