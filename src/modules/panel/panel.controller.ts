@@ -6,6 +6,7 @@ import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { IProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
+import { IDiscount } from "./interfaces/discount"
 import { IPolicy } from "./interfaces/policies"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
 import { IWapiTemplate } from "./interfaces/wapi"
@@ -15,6 +16,30 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Delete("delete-discount/:storeID/:couponID")
+	deleteDiscount(@Param("storeID") storeID: number, @Param("discountID") discountID: string) {
+		return this.panelService.deleteDiscount(storeID, discountID)
+	}
+
+	@Put("update-discount/:storeID/:couponID")
+	updateDiscount(
+		@Param("storeID") storeID: number,
+		@Param("discountID") discountID: string,
+		@Body() data: IDiscount
+	) {
+		return this.panelService.updateDiscount(storeID, discountID, data)
+	}
+
+	@Post("create-discount/:storeID")
+	createDiscount(@Param("storeID") storeID: number, @Body() data: IDiscount) {
+		return this.panelService.createDiscount(storeID, data)
+	}
+
+	@Get("get-discounts/:storeID")
+	getDiscountList(@Param("storeID") storeID: number) {
+		return this.panelService.getDiscountList(storeID)
+	}
 
 	@Delete("delete-coupon/:storeID/:couponID")
 	deleteCoupon(@Param("storeID") storeID: number, @Param("couponID") couponID: string) {

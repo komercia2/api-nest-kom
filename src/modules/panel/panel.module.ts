@@ -7,6 +7,7 @@ import {
 	Clientes,
 	Cupones,
 	DeliveryStatus,
+	DescuentoRango,
 	Geolocalizacion,
 	Politicas,
 	Productos,
@@ -37,7 +38,8 @@ import { PanelService } from "./panel.service"
 			Subcategorias,
 			WhatsappCheckout,
 			TemplateWhatsappSettings,
-			Cupones
+			Cupones,
+			DescuentoRango
 		])
 	],
 	controllers: [PanelController],

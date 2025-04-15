@@ -13,6 +13,7 @@ import {
 	Clientes,
 	Cupones,
 	DeliveryStatus,
+	DescuentoRango,
 	Geolocalizacion,
 	Politicas,
 	Productos,
@@ -30,6 +31,7 @@ import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { ICreateProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
+import { IDiscount } from "./interfaces/discount"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
 import { IWapiTemplate } from "./interfaces/wapi"
 import { IGeolocation } from "./interfaces/zones"
@@ -48,6 +50,7 @@ export class PanelService {
 		@InjectRepository(Geolocalizacion) private geoLocationRepository: Repository<Geolocalizacion>,
 		@InjectRepository(Politicas) private politicasRepository: Repository<Politicas>,
 		@InjectRepository(Redes) private redesRepository: Repository<Redes>,
+		@InjectRepository(DescuentoRango) private descuentoRangoRepository: Repository<DescuentoRango>,
 		@InjectRepository(CategoriaProductos)
 		private categoriasRepository: Repository<CategoriaProductos>,
 		@InjectRepository(Subcategorias) private subcategoriasRepository: Repository<Subcategorias>,
@@ -60,6 +63,93 @@ export class PanelService {
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async deleteDiscount(storeID: number, discountID: string): Promise<void> {
+		const discount = await this.descuentoRangoRepository.findOne({
+			where: { id: discountID, tiendasId: storeID }
+		})
+
+		if (!discount) throw new NotFoundException("Discount not found")
+
+		await this.descuentoRangoRepository.remove(discount)
+	}
+
+	async updateDiscount(storeID: number, discountID: string, data: IDiscount) {
+		const discount = await this.descuentoRangoRepository.findOne({
+			where: { id: discountID, tiendasId: storeID }
+		})
+
+		if (!discount) throw new NotFoundException("Discount not found")
+
+		discount.nombre = data.nombre ?? discount.nombre
+		discount.porcentajeDescuento = data.porcentaje_descuento ?? discount.porcentajeDescuento
+		discount.valorDescuento = data.valor_descuento ?? discount.valorDescuento
+		discount.cantidadProductos = data.cantidad_productos ?? discount.cantidadProductos
+		discount.tipo = data.tipo ?? discount.tipo
+		discount.rangosPrecios = data.rangos_precios ?? discount.rangosPrecios
+		discount.opcion = data.opcion ?? discount.opcion
+		discount.estado = data.estado ?? discount.estado
+		discount.updatedAt = new Date()
+
+		const updated = await this.descuentoRangoRepository.save(discount)
+
+		return {
+			id: updated.id,
+			nombre: updated.nombre,
+			porcentaje_descuento: updated.porcentajeDescuento,
+			valor_descuento: updated.valorDescuento,
+			cantidad_productos: updated.cantidadProductos,
+			tiendas_id: updated.tiendasId,
+			created_at: updated.createdAt,
+			updated_at: updated.updatedAt,
+			tipo: !!updated.tipo,
+			rangos_precios: updated.rangosPrecios,
+			opcion: updated.opcion,
+			estado: !!updated.estado
+		}
+	}
+
+	async createDiscount(storeID: number, data: IDiscount) {
+		const newDiscount = this.descuentoRangoRepository.create({
+			nombre: data.nombre,
+			porcentajeDescuento: data.porcentaje_descuento,
+			valorDescuento: data.valor_descuento,
+			cantidadProductos: data.cantidad_productos,
+			tiendasId: storeID,
+			tipo: data.tipo,
+			rangosPrecios: data.rangos_precios,
+			opcion: data.opcion,
+			estado: data.estado,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		})
+
+		return await this.descuentoRangoRepository.save(newDiscount)
+	}
+
+	async getDiscountList(storeID: number) {
+		const discounts = await this.descuentoRangoRepository.find({
+			where: { tiendasId: storeID },
+			order: { createdAt: "DESC" }
+		})
+
+		if (discounts.length === 0) return []
+
+		return discounts.map((discount) => ({
+			id: discount.id,
+			nombre: discount.nombre,
+			porcentaje_descuento: discount.porcentajeDescuento,
+			valor_descuento: discount.valorDescuento,
+			cantidad_productos: discount.cantidadProductos,
+			tiendas_id: discount.tiendasId,
+			created_at: discount.createdAt,
+			updated_at: discount.updatedAt,
+			tipo: discount.tipo,
+			rangos_precios: discount.rangosPrecios,
+			opcion: discount.opcion,
+			estado: discount.estado
+		}))
+	}
 
 	async deleteCoupon(storeID: number, couponID: string): Promise<void> {
 		const coupon = await this.cuponesRepository.findOne({
