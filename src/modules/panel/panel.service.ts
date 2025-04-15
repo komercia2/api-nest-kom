@@ -11,14 +11,18 @@ import {
 	Carritos,
 	CategoriaProductos,
 	Clientes,
+	Cupones,
 	DeliveryStatus,
+	DescuentoRango,
 	Geolocalizacion,
 	Politicas,
 	Productos,
 	ProductosInfo,
 	ProductosVariantesCombinaciones,
 	Redes,
-	Subcategorias
+	Subcategorias,
+	TemplateWhatsappSettings,
+	WhatsappCheckout
 } from "src/entities"
 import { DataSource, Like, Repository } from "typeorm"
 
@@ -26,7 +30,10 @@ import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { ICreateProductCategorie } from "./interfaces/categories"
+import { ICoupon } from "./interfaces/coupon"
+import { IDiscount } from "./interfaces/discount"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
+import { IWapiTemplate } from "./interfaces/wapi"
 import { IGeolocation } from "./interfaces/zones"
 import { mapGeolocation } from "./mappings/geolocation.mapper"
 import { mapPolicy } from "./mappings/policie.mapper"
@@ -38,18 +45,286 @@ export class PanelService {
 		@InjectRepository(ProductosInfo) private productosInfoRepository: Repository<ProductosInfo>,
 		@InjectRepository(DeliveryStatus) private deliveryStatus: Repository<DeliveryStatus>,
 		@InjectRepository(Carritos) private carritosRepository: Repository<Carritos>,
+		@InjectRepository(Cupones) private cuponesRepository: Repository<Cupones>,
 		@InjectRepository(Clientes) private clientesRepository: Repository<Clientes>,
 		@InjectRepository(Geolocalizacion) private geoLocationRepository: Repository<Geolocalizacion>,
 		@InjectRepository(Politicas) private politicasRepository: Repository<Politicas>,
 		@InjectRepository(Redes) private redesRepository: Repository<Redes>,
+		@InjectRepository(DescuentoRango) private descuentoRangoRepository: Repository<DescuentoRango>,
 		@InjectRepository(CategoriaProductos)
 		private categoriasRepository: Repository<CategoriaProductos>,
 		@InjectRepository(Subcategorias) private subcategoriasRepository: Repository<Subcategorias>,
+		@InjectRepository(TemplateWhatsappSettings)
+		private templateWhatsappSettingsRepository: Repository<TemplateWhatsappSettings>,
 		@InjectRepository(ProductosVariantesCombinaciones)
 		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
+		@InjectRepository(WhatsappCheckout)
+		private whatsappCheckoutRepository: Repository<WhatsappCheckout>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async deleteDiscount(storeID: number, discountID: string): Promise<void> {
+		const discount = await this.descuentoRangoRepository.findOne({
+			where: { id: discountID, tiendasId: storeID }
+		})
+
+		if (!discount) throw new NotFoundException("Discount not found")
+
+		await this.descuentoRangoRepository.remove(discount)
+	}
+
+	async updateDiscount(storeID: number, discountID: string, data: IDiscount) {
+		const discount = await this.descuentoRangoRepository.findOne({
+			where: { id: discountID, tiendasId: storeID }
+		})
+
+		if (!discount) throw new NotFoundException("Discount not found")
+
+		discount.nombre = data.nombre ?? discount.nombre
+		discount.porcentajeDescuento = data.porcentaje_descuento ?? discount.porcentajeDescuento
+		discount.valorDescuento = data.valor_descuento ?? discount.valorDescuento
+		discount.cantidadProductos = data.cantidad_productos ?? discount.cantidadProductos
+		discount.tipo = data.tipo ?? discount.tipo
+		discount.rangosPrecios = data.rangos_precios ?? discount.rangosPrecios
+		discount.opcion = data.opcion ?? discount.opcion
+		discount.estado = data.estado ?? discount.estado
+		discount.updatedAt = new Date()
+
+		const updated = await this.descuentoRangoRepository.save(discount)
+
+		return {
+			id: updated.id,
+			nombre: updated.nombre,
+			porcentaje_descuento: updated.porcentajeDescuento,
+			valor_descuento: updated.valorDescuento,
+			cantidad_productos: updated.cantidadProductos,
+			tiendas_id: updated.tiendasId,
+			created_at: updated.createdAt,
+			updated_at: updated.updatedAt,
+			tipo: !!updated.tipo,
+			rangos_precios: updated.rangosPrecios,
+			opcion: updated.opcion,
+			estado: !!updated.estado
+		}
+	}
+
+	async createDiscount(storeID: number, data: IDiscount) {
+		const newDiscount = this.descuentoRangoRepository.create({
+			nombre: data.nombre,
+			porcentajeDescuento: data.porcentaje_descuento,
+			valorDescuento: data.valor_descuento,
+			cantidadProductos: data.cantidad_productos,
+			tiendasId: storeID,
+			tipo: data.tipo,
+			rangosPrecios: data.rangos_precios,
+			opcion: data.opcion,
+			estado: data.estado,
+			createdAt: new Date(),
+			updatedAt: new Date()
+		})
+
+		return await this.descuentoRangoRepository.save(newDiscount)
+	}
+
+	async getDiscountList(storeID: number) {
+		const discounts = await this.descuentoRangoRepository.find({
+			where: { tiendasId: storeID },
+			order: { createdAt: "DESC" }
+		})
+
+		if (discounts.length === 0) return []
+
+		return discounts.map((discount) => ({
+			id: discount.id,
+			nombre: discount.nombre,
+			porcentaje_descuento: discount.porcentajeDescuento,
+			valor_descuento: discount.valorDescuento,
+			cantidad_productos: discount.cantidadProductos,
+			tiendas_id: discount.tiendasId,
+			created_at: discount.createdAt,
+			updated_at: discount.updatedAt,
+			tipo: discount.tipo,
+			rangos_precios: discount.rangosPrecios,
+			opcion: discount.opcion,
+			estado: discount.estado
+		}))
+	}
+
+	async deleteCoupon(storeID: number, couponID: string): Promise<void> {
+		const coupon = await this.cuponesRepository.findOne({
+			where: { id: couponID, tiendasId: storeID }
+		})
+
+		if (!coupon) throw new NotFoundException("Coupon not found")
+
+		await this.cuponesRepository.remove(coupon)
+	}
+
+	async updateCoupon(storeID: number, couponID: string, data: Partial<ICoupon>) {
+		const coupon = await this.cuponesRepository.findOne({
+			where: { id: couponID, tiendasId: storeID }
+		})
+
+		if (!coupon) throw new NotFoundException("Coupon not found")
+
+		coupon.nombre = data.nombre ?? coupon.nombre
+		coupon.codigo = data.codigo ?? coupon.codigo
+		coupon.estado = data.estado ?? coupon.estado
+		coupon.tipo = data.tipo ?? coupon.tipo
+		coupon.porcentajeDescuento = data.porcentaje_descuento ?? coupon.porcentajeDescuento
+		coupon.valorDescuento = data.valor_descuento ?? coupon.valorDescuento
+		coupon.publico = data.publico ?? coupon.publico
+		coupon.updatedAt = new Date()
+
+		const updated = await this.cuponesRepository.save(coupon)
+
+		return {
+			id: updated.id,
+			nombre: updated.nombre,
+			codigo: updated.codigo,
+			estado: updated.estado,
+			tipo: updated.tipo,
+			porcentaje_descuento: updated.porcentajeDescuento,
+			valor_descuento: updated.valorDescuento,
+			tiendas_id: updated.tiendasId,
+			deleted_at: updated.deletedAt,
+			created_at: updated.createdAt,
+			updated_at: updated.updatedAt,
+			publico: updated.publico
+		}
+	}
+
+	async createCoupon(storeID: number, data: ICoupon) {
+		const newCoupon = this.cuponesRepository.create({
+			nombre: data.nombre,
+			codigo: data.codigo,
+			estado: data.estado,
+			tipo: data.tipo,
+			porcentajeDescuento: data.porcentaje_descuento,
+			valorDescuento: data.valor_descuento,
+			createdAt: new Date(),
+			updatedAt: new Date(),
+			tiendasId: storeID,
+			publico: data.publico
+		})
+
+		const saved = await this.cuponesRepository.save(newCoupon)
+
+		return {
+			id: saved.id,
+			nombre: saved.nombre,
+			codigo: saved.codigo,
+			estado: saved.estado,
+			tipo: saved.tipo,
+			porcentaje_descuento: saved.porcentajeDescuento,
+			valor_descuento: saved.valorDescuento,
+			tiendas_id: saved.tiendasId,
+			created_at: saved.createdAt,
+			publico: saved.publico
+		}
+	}
+
+	async getCouponList(storeID: number): Promise<Array<ICoupon>> {
+		const coupons = await this.cuponesRepository.find({
+			where: { tiendasId: storeID },
+			order: { createdAt: "DESC" }
+		})
+
+		if (coupons.length === 0) return []
+
+		return coupons.map((coupon) => ({
+			id: coupon.id,
+			nombre: coupon.nombre,
+			codigo: coupon.codigo,
+			estado: coupon.estado,
+			tipo: coupon.tipo,
+			porcentaje_descuento: coupon.porcentajeDescuento,
+			valor_descuento: coupon.valorDescuento,
+			tiendas_id: coupon.tiendasId,
+			deleted_at: coupon.deletedAt,
+			created_at: coupon.createdAt,
+			updated_at: coupon.updatedAt,
+			publico: coupon.publico
+		}))
+	}
+
+	async updateWhatsappCheckoutDynamicSettings(storeID: number, configuration: string) {
+		const settings = await this.whatsappCheckoutRepository.findOne({
+			where: { tiendasId: storeID }
+		})
+
+		if (!settings) throw new NotFoundException("Whatsapp dynamic checkout settings not found")
+
+		settings.configuration = configuration
+
+		return this.whatsappCheckoutRepository.save(settings)
+	}
+
+	async getWhatsappCheckoutDynamicSettings(storeID: number) {
+		const settings = await this.whatsappCheckoutRepository.findOne({
+			where: { tiendasId: storeID }
+		})
+
+		if (!settings) throw new NotFoundException("Whatsapp dynamic checkout settings not found")
+
+		return {
+			id: settings.id,
+			configuration: settings.configuration,
+			tiendas_id: settings.tiendasId,
+			created_at: settings.createdAt,
+			updated_at: settings.updatedAt
+		}
+	}
+
+	async updateWapiSettings(storeID: number, data: IWapiTemplate) {
+		const settings = await this.templateWhatsappSettingsRepository.findOne({
+			where: { tiendasId: storeID }
+		})
+
+		if (!settings) throw new NotFoundException("Wapi settings not found")
+
+		settings.banner = data.banner
+		settings.descripcion = data.descripcion
+		settings.logoCuadrado = data.logo_cuadrado
+		settings.colorPrimario = data.color_primario
+		settings.colorSecundario = data.color_secundario
+		settings.colorIcon = data.color_icon
+		settings.tema = data.tema
+		settings.pagoOnline = data.pago_online
+		settings.mensajePrincipal = data.mensaje_principal
+		settings.estiloProductos = data.estilo_productos
+		settings.estiloCategorias = data.estilo_categorias
+		settings.watermark = data.watermark
+		settings.stateSubcategorias = data.state_subcategorias
+
+		return this.templateWhatsappSettingsRepository.save(settings)
+	}
+
+	async getWapiSettings(storeID: number): Promise<IWapiTemplate> {
+		const settings = await this.templateWhatsappSettingsRepository.findOne({
+			where: { tiendasId: storeID }
+		})
+
+		if (!settings) throw new NotFoundException("Wapi settings not found")
+
+		return {
+			id: settings.id,
+			banner: settings.banner,
+			descripcion: settings.descripcion,
+			logo_cuadrado: settings.logoCuadrado,
+			color_primario: settings.colorPrimario,
+			color_secundario: settings.colorSecundario,
+			color_icon: settings.colorIcon,
+			tema: settings.tema,
+			pago_online: settings.pagoOnline,
+			mensaje_principal: settings.mensajePrincipal,
+			estilo_productos: settings.estiloProductos,
+			estilo_categorias: settings.estiloCategorias,
+			watermark: settings.watermark,
+			state_subcategorias: settings.stateSubcategorias
+		}
+	}
 
 	async updateProductState(storeID: number, id: number, state: boolean) {
 		const product = await this.productosRepository.findOne({
