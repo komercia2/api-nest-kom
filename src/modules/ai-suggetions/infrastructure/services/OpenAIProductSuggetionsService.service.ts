@@ -1,31 +1,25 @@
 import { Injectable } from "@nestjs/common"
-import { Configuration, OpenAIApi } from "openai"
+import OpenAI from "openai"
 
 @Injectable()
 export class OpenAIProducSuggetionsServices {
-	private configuration: Configuration
-
 	private readonly MODEL = "gpt-4o-mini"
 	private readonly ROLE = "assistant"
 
 	async getProductDescriptionSuggetion(apiKey: string, prompt: string) {
 		try {
-			this.initializeOpenAI(apiKey)
-			const openAI = new OpenAIApi(this.configuration)
+			const openAI = new OpenAI({
+				apiKey: apiKey
+			})
 
-			const chatCompletion = await openAI.createChatCompletion({
+			const chatCompletion = await openAI.chat.completions.create({
 				model: this.MODEL,
 				messages: [{ role: this.ROLE, content: prompt }]
 			})
 
-			return chatCompletion.data.choices[0].message
+			return chatCompletion.choices[0].message
 		} catch (error) {
 			console.log(error)
 		}
-	}
-
-	private initializeOpenAI(apiKey: string) {
-		this.configuration = new Configuration({ apiKey })
-		return this
 	}
 }
