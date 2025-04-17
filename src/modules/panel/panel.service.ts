@@ -12,6 +12,7 @@ import {
 	CategoriaProductos,
 	Clientes,
 	Cupones,
+	CustomerAccessCode,
 	DeliveryStatus,
 	DescuentoRango,
 	DisenoModal,
@@ -32,6 +33,7 @@ import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { ICreateProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
+import { ICustomerAccessCode } from "./interfaces/customer-access-code"
 import { IDiscount } from "./interfaces/discount"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
 import { IWapiTemplate } from "./interfaces/wapi"
@@ -62,9 +64,66 @@ export class PanelService {
 		@InjectRepository(WhatsappCheckout)
 		private whatsappCheckoutRepository: Repository<WhatsappCheckout>,
 		@InjectRepository(DisenoModal) private disenoModalRepository: Repository<DisenoModal>,
+		@InjectRepository(CustomerAccessCode)
+		private customerAccessCode: Repository<CustomerAccessCode>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async deleteCustomerAccessCode(storeID: number, codeID: string): Promise<void> {
+		const accessCode = await this.customerAccessCode.findOne({
+			where: { id: codeID, tiendasId: storeID }
+		})
+
+		if (!accessCode) throw new NotFoundException("Access code not found")
+
+		await this.customerAccessCode.remove(accessCode)
+	}
+
+	async updateCustomerAccessCode(
+		storeID: number,
+		codeID: string,
+		data: Partial<Omit<ICustomerAccessCode, "id" | "tiendasId">>
+	) {
+		const accessCode = await this.customerAccessCode.findOne({
+			where: { id: codeID, tiendasId: storeID }
+		})
+
+		if (!accessCode) throw new NotFoundException("Access code not found")
+
+		Object.assign(accessCode, {
+			userCode: data.user_code ?? accessCode.userCode,
+			userName: data.user_name ?? accessCode.userName,
+			userEmail: data.user_email ?? accessCode.userEmail,
+			accessCode: data.access_code ?? accessCode.accessCode,
+			status: data.status ?? accessCode.status,
+			tiendasId: storeID,
+			updatedAt: new Date()
+		})
+
+		return this.customerAccessCode.save(accessCode)
+	}
+
+	async getCustomerAccessCode(storeID: number): Promise<ICustomerAccessCode[]> {
+		const accessCode = await this.customerAccessCode.find({
+			where: { tiendasId: storeID },
+			order: { createdAt: "DESC" }
+		})
+
+		if (!accessCode) throw new NotFoundException("Access code not found")
+
+		return accessCode.map((code) => ({
+			id: code.id,
+			user_code: code.userCode,
+			user_name: code.userName,
+			user_email: code.userEmail,
+			access_code: code.accessCode,
+			status: code.status,
+			tiendas_id: code.tiendasId,
+			created_at: code.createdAt,
+			updated_at: code.updatedAt
+		}))
+	}
 
 	async updateSecurityModalSettings(
 		storeID: number,

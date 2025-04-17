@@ -6,6 +6,7 @@ import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { IProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
+import { ICustomerAccessCode } from "./interfaces/customer-access-code"
 import { IDiscount } from "./interfaces/discount"
 import { IPolicy } from "./interfaces/policies"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
@@ -16,6 +17,25 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Delete("delete-customer-access-code/:storeID/:codeID")
+	deleteCustomerAccessCode(@Param("storeID") storeID: number, @Param("codeID") codeID: string) {
+		return this.panelService.deleteCustomerAccessCode(storeID, codeID)
+	}
+
+	@Put("update-customer-access-code/:storeID/:codeID")
+	updateCustomerAccessCode(
+		@Param("storeID") storeID: number,
+		@Param("codeID") codeID: string,
+		@Body() data: Partial<Omit<ICustomerAccessCode, "id" | "tiendasId">>
+	) {
+		return this.panelService.updateCustomerAccessCode(storeID, codeID, data)
+	}
+
+	@Get("get-customer-access-code/:storeID")
+	getCustomerAccessCode(@Param("storeID") storeID: number) {
+		return this.panelService.getCustomerAccessCode(storeID)
+	}
 
 	@Put("update-security-modal-settings/:storeID")
 	updateSecurityModalSettings(

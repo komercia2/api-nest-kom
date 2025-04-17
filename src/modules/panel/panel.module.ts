@@ -6,6 +6,7 @@ import {
 	CategoriaProductos,
 	Clientes,
 	Cupones,
+	CustomerAccessCode,
 	DeliveryStatus,
 	DescuentoRango,
 	DisenoModal,
@@ -41,7 +42,8 @@ import { PanelService } from "./panel.service"
 			TemplateWhatsappSettings,
 			Cupones,
 			DisenoModal,
-			DescuentoRango
+			DescuentoRango,
+			CustomerAccessCode
 		])
 	],
 	controllers: [PanelController],
