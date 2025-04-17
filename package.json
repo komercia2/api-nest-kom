@@ -54,7 +54,7 @@
 		"mysql2": "3.5.1",
 		"nest-router": "1.0.9",
 		"nestjs-pino": "3.3.0",
-		"openai": "3.3.0",
+		"openai": "4.95.0",
 		"pino-pretty": "10.0.1",
 		"pusher": "5.2.0",
 		"qrcode-terminal": "^0.12.0",
