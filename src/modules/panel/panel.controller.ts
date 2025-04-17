@@ -5,6 +5,7 @@ import { DisenoModal, Redes } from "src/entities"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IBlog } from "./interfaces/blog"
 import { IProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
 import { ICustomerAccessCode } from "./interfaces/customer-access-code"
@@ -18,6 +19,30 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Delete("delete-blog/:storeID/:blogID")
+	deleteBlog(@Param("storeID") storeID: number, @Param("blogID") blogID: string) {
+		return this.panelService.deleteBlog(storeID, blogID)
+	}
+
+	@Put("update-blog/:storeID/:blogID")
+	updateBlog(
+		@Param("storeID") storeID: number,
+		@Param("blogID") blogID: string,
+		@Body() data: Partial<Omit<IBlog, "id" | "tiendasId">>
+	) {
+		return this.panelService.updateBlog(storeID, blogID, data)
+	}
+
+	@Post("blog/:storeID")
+	createBlog(@Param("storeID") storeID: number, @Body() data: Omit<IBlog, "id" | "tiendasId">) {
+		return this.panelService.createBlog(storeID, data)
+	}
+
+	@Get("blogs/:storeID")
+	TiendaBlogs(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {
+		return this.panelService.getStoreBlogs(storeID, pagination)
+	}
 
 	@Get("contact-messages/:storeID")
 	getContactMessages(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {

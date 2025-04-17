@@ -26,6 +26,7 @@ import {
 	Subcategorias,
 	SuscriptoresTienda,
 	TemplateWhatsappSettings,
+	TiendaBlogs,
 	WhatsappCheckout
 } from "src/entities"
 import { DataSource, Like, Repository } from "typeorm"
@@ -34,6 +35,7 @@ import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IBlog } from "./interfaces/blog"
 import { ICreateProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
 import { ICustomerAccessCode } from "./interfaces/customer-access-code"
@@ -73,9 +75,116 @@ export class PanelService {
 		private customerAccessCode: Repository<CustomerAccessCode>,
 		@InjectRepository(MensajesContacto)
 		private mensajesContactoRepository: Repository<MensajesContacto>,
+		@InjectRepository(TiendaBlogs) private tiendaBlogsRepository: Repository<TiendaBlogs>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async deleteBlog(storeID: number, blogID: string): Promise<void> {
+		const blog = await this.tiendaBlogsRepository.findOne({
+			where: { id: blogID, tiendasId: storeID }
+		})
+
+		if (!blog) throw new NotFoundException("Blog not found")
+
+		await this.tiendaBlogsRepository.remove(blog)
+	}
+
+	async updateBlog(
+		storeID: number,
+		blogID: string,
+		data: Partial<Omit<IBlog, "id" | "tiendasId">>
+	) {
+		const blog = await this.tiendaBlogsRepository.findOne({
+			where: { id: blogID, tiendasId: storeID }
+		})
+
+		if (!blog) throw new NotFoundException("Blog not found")
+
+		Object.assign(blog, {
+			titulo: data.titulo ?? blog.titulo,
+			autor: data.autor ?? blog.autor,
+			contenido: data.contenido ?? blog.contenido,
+			imagenPrincipalUrl: data.imagen_principal_url ?? blog.imagenPrincipalUrl,
+			imagenPrincipalId: data.imagen_principal_id ?? blog.imagenPrincipalId,
+			slug: data.slug ?? blog.slug,
+			resumen: data.resumen ?? blog.resumen,
+			estado: data.estado ?? blog.estado,
+			updatedAt: new Date()
+		})
+
+		await this.tiendaBlogsRepository.save(blog)
+
+		return {
+			id: blog.id,
+			titulo: blog.titulo,
+			autor: blog.autor,
+			imagen_principal_url: blog.imagenPrincipalUrl,
+			imagen_principal_id: blog.imagenPrincipalId,
+			slug: blog.slug,
+			resumen: blog.resumen,
+			estado: blog.estado,
+			created_at: blog.createdAt,
+			updated_at: blog.updatedAt,
+			contenido: blog.contenido
+		}
+	}
+
+	async createBlog(storeID: number, data: Omit<IBlog, "id" | "tiendasId">) {
+		const newBlog = new TiendaBlogs()
+		newBlog.titulo = data.titulo
+		newBlog.autor = data.autor
+		newBlog.contenido = data.contenido
+		newBlog.imagenPrincipalUrl = data.imagen_principal_url
+		newBlog.imagenPrincipalId = data.imagen_principal_id
+		newBlog.tiendasId = storeID
+		newBlog.slug = data.slug
+		newBlog.resumen = data.resumen
+		newBlog.estado = data.estado
+		newBlog.createdAt = new Date()
+		newBlog.updatedAt = new Date()
+
+		return this.tiendaBlogsRepository.save(newBlog)
+	}
+
+	async getStoreBlogs(storeID: number, pagination: PaginationDto) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const [blogs, total] = await this.tiendaBlogsRepository.findAndCount({
+			where: { tiendasId: storeID },
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" }
+		})
+
+		if (blogs.length === 0) return []
+
+		const mappedBlogs: IBlog[] = blogs.map((blog) => ({
+			id: blog.id,
+			titulo: blog.titulo,
+			autor: blog.autor,
+			imagen_principal_url: blog.imagenPrincipalUrl,
+			imagen_principal_id: blog.imagenPrincipalId,
+			slug: blog.slug,
+			resumen: blog.resumen,
+			estado: blog.estado,
+			created_at: blog.createdAt,
+			updated_at: blog.updatedAt,
+			contenido: blog.contenido
+		}))
+
+		return {
+			blog: mappedBlogs,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
 
 	async getContactMessages(storeID: number, pagination: PaginationDto) {
 		const { page, limit } = pagination

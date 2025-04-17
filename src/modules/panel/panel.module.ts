@@ -20,6 +20,7 @@ import {
 	Subcategorias,
 	SuscriptoresTienda,
 	TemplateWhatsappSettings,
+	TiendaBlogs,
 	WhatsappCheckout
 } from "src/entities"
 
@@ -47,7 +48,8 @@ import { PanelService } from "./panel.service"
 			DescuentoRango,
 			CustomerAccessCode,
 			SuscriptoresTienda,
-			MensajesContacto
+			MensajesContacto,
+			TiendaBlogs
 		])
 	],
 	controllers: [PanelController],
