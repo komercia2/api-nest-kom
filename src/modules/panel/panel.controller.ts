@@ -19,6 +19,11 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Get("contact-messages/:storeID")
+	getContactMessages(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {
+		return this.panelService.getContactMessages(storeID, pagination)
+	}
+
 	@Get("get-subscriptions/:storeID")
 	getSubscriptions(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {
 		return this.panelService.getStoreSubscribers(storeID, pagination)

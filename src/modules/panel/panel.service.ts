@@ -17,6 +17,7 @@ import {
 	DescuentoRango,
 	DisenoModal,
 	Geolocalizacion,
+	MensajesContacto,
 	Politicas,
 	Productos,
 	ProductosInfo,
@@ -70,9 +71,45 @@ export class PanelService {
 		private suscriptoresTiendaRepository: Repository<SuscriptoresTienda>,
 		@InjectRepository(CustomerAccessCode)
 		private customerAccessCode: Repository<CustomerAccessCode>,
+		@InjectRepository(MensajesContacto)
+		private mensajesContactoRepository: Repository<MensajesContacto>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async getContactMessages(storeID: number, pagination: PaginationDto) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const [messages, total] = await this.mensajesContactoRepository.findAndCount({
+			where: { tiendaId: storeID },
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" }
+		})
+
+		if (messages.length === 0) return []
+
+		const mappedMessages = messages.map((message) => ({
+			id: message.id,
+			mensaje: message.mensaje,
+			nombre: message.nombre,
+			telefono: message.telefono,
+			email: message.email,
+			created_at: message.createdAt
+		}))
+
+		return {
+			messages: mappedMessages,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
 
 	async getStoreSubscribers(storeID: number, pagination: PaginationDto) {
 		const { page, limit } = pagination

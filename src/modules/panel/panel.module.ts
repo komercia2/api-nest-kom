@@ -11,6 +11,7 @@ import {
 	DescuentoRango,
 	DisenoModal,
 	Geolocalizacion,
+	MensajesContacto,
 	Politicas,
 	Productos,
 	ProductosInfo,
@@ -45,7 +46,8 @@ import { PanelService } from "./panel.service"
 			DisenoModal,
 			DescuentoRango,
 			CustomerAccessCode,
-			SuscriptoresTienda
+			SuscriptoresTienda,
+			MensajesContacto
 		])
 	],
 	controllers: [PanelController],
