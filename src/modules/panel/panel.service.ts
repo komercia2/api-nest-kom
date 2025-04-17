@@ -296,7 +296,8 @@ export class PanelService {
 			nombre: message.nombre,
 			telefono: message.telefono,
 			email: message.email,
-			created_at: message.createdAt
+			created_at: message.createdAt,
+			posible_fraude: message.posibleFraude
 		}))
 
 		return {
