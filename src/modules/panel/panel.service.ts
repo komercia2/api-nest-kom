@@ -27,9 +27,10 @@ import {
 	SuscriptoresTienda,
 	TemplateWhatsappSettings,
 	TiendaBlogs,
+	Users,
 	WhatsappCheckout
 } from "src/entities"
-import { DataSource, Like, Repository } from "typeorm"
+import { DataSource, In, Like, Not, Repository } from "typeorm"
 
 import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
 import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
@@ -76,9 +77,85 @@ export class PanelService {
 		@InjectRepository(MensajesContacto)
 		private mensajesContactoRepository: Repository<MensajesContacto>,
 		@InjectRepository(TiendaBlogs) private tiendaBlogsRepository: Repository<TiendaBlogs>,
+		@InjectRepository(Users) private users: Repository<Users>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async getProfitsPerClient(
+		storeID: number,
+		pagination: PaginationDto,
+		search_by?: string,
+		sort_by = "profits"
+	) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const users = this.carritosRepository
+			.createQueryBuilder("carritos")
+			.leftJoinAndSelect("carritos.usuario2", "usuario2")
+			.select("DISTINCT carritos.usuario")
+			.where("carritos.tienda = :storeID", { storeID })
+			.andWhere("carritos.estado = :estado", { estado: "1" })
+			.andWhere("carritos.usuario IS NOT NULL")
+
+		const users_ids = await users.getRawMany()
+		const users_ids_set = new Set(users_ids.map((user) => user.usuario))
+
+		const [clients, total] = await this.users.findAndCount({
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" },
+			relations: ["carritos2"],
+			where: {
+				id: In(Array.from(users_ids_set)),
+				carritos2: { tienda: storeID },
+				...(search_by && { nombre: Like(`%${search_by}%`) })
+			}
+		})
+
+		const mappedClients = clients.map((client) => {
+			const totalSpent = client.carritos2.reduce((acc, carrito) => {
+				return acc + carrito.total
+			}, 0)
+
+			return {
+				id: client.id,
+				nombre: client.nombre,
+				email: client.email,
+				created_at: client.createdAt,
+				total_profits: totalSpent,
+				total_sales: client.carritos2.length
+			}
+		})
+
+		if (mappedClients.length === 0) return []
+
+		if (sort_by) {
+			switch (sort_by) {
+				case "sales":
+					mappedClients.sort((a, b) => b.total_sales - a.total_sales)
+					break
+				case "profits":
+					mappedClients.sort((a, b) => b.total_profits - a.total_profits)
+					break
+				case "name":
+					mappedClients.sort((a, b) => a.nombre.localeCompare(b.nombre))
+					break
+			}
+		}
+
+		return {
+			clients_profits: mappedClients,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
 
 	async deleteBlog(storeID: number, blogID: string): Promise<void> {
 		const blog = await this.tiendaBlogsRepository.findOne({

@@ -21,6 +21,7 @@ import {
 	SuscriptoresTienda,
 	TemplateWhatsappSettings,
 	TiendaBlogs,
+	Users,
 	WhatsappCheckout
 } from "src/entities"
 
@@ -49,7 +50,8 @@ import { PanelService } from "./panel.service"
 			CustomerAccessCode,
 			SuscriptoresTienda,
 			MensajesContacto,
-			TiendaBlogs
+			TiendaBlogs,
+			Users
 		])
 	],
 	controllers: [PanelController],

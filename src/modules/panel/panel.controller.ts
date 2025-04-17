@@ -20,6 +20,16 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Get("get-profits-per-client/:storeID")
+	getProfitsPerClient(
+		@Param("storeID") storeID: number,
+		@Query() pagination: PaginationDto,
+		@Query("search_by") search_by?: string,
+		@Query("sort_by") sort_by?: string
+	) {
+		return this.panelService.getProfitsPerClient(storeID, pagination, search_by, sort_by)
+	}
+
 	@Delete("delete-blog/:storeID/:blogID")
 	deleteBlog(@Param("storeID") storeID: number, @Param("blogID") blogID: string) {
 		return this.panelService.deleteBlog(storeID, blogID)
