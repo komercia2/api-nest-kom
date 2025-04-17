@@ -33,7 +33,6 @@ import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { ICreateProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
 import { IDiscount } from "./interfaces/discount"
-import { ISecurityModal } from "./interfaces/security-modal"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
 import { IWapiTemplate } from "./interfaces/wapi"
 import { IGeolocation } from "./interfaces/zones"
@@ -67,36 +66,32 @@ export class PanelService {
 		private readonly logger: Logger
 	) {}
 
-	async getSecurityModalSettings(storeID: number): Promise<ISecurityModal> {
+	async updateSecurityModalSettings(
+		storeID: number,
+		data: Partial<Omit<DisenoModal, "tiendasId" | "id">>
+	) {
 		const modal = await this.disenoModalRepository.findOne({
 			where: { tiendasId: storeID }
 		})
 
 		if (!modal) throw new NotFoundException("Security modal not found")
 
-		return {
-			id: modal.id,
-			title: modal.title,
-			description: modal.description,
-			img: modal.img,
-			password: modal.password,
-			color_title: modal.colorTitle,
-			color_description: modal.colorDescription,
-			font_weigh_title: modal.fontWeighTitle,
-			font_size_title: modal.fontSizeTitle,
-			font_weigh_description: modal.fontWeighDescription,
-			font_size_description: modal.fontSizeDescription,
-			width_img: modal.widthImg,
-			color_text_btn: modal.colorTextBtn,
-			color_bg_btn: modal.colorBgBtn,
-			color_border: modal.colorBorder,
-			color_bg_1: modal.colorBg_1,
-			color_bg_2: modal.colorBg_2,
-			state_modal: modal.stateModal,
-			tiendas_id: modal.tiendasId,
-			created_at: modal.createdAt,
-			updated_at: modal.updatedAt
-		}
+		Object.assign(modal, {
+			...data,
+			updatedAt: new Date()
+		})
+
+		return this.disenoModalRepository.save(modal)
+	}
+
+	async getSecurityModalSettings(storeID: number) {
+		const modal = await this.disenoModalRepository.findOne({
+			where: { tiendasId: storeID }
+		})
+
+		if (!modal) throw new NotFoundException("Security modal not found")
+
+		return modal
 	}
 
 	async deleteDiscount(storeID: number, discountID: string): Promise<void> {

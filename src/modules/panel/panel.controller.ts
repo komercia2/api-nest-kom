@@ -1,6 +1,6 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common"
 import { Response } from "express"
-import { Redes } from "src/entities"
+import { DisenoModal, Redes } from "src/entities"
 
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
@@ -16,6 +16,14 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Put("update-security-modal-settings/:storeID")
+	updateSecurityModalSettings(
+		@Param("storeID") storeID: number,
+		@Body() data: Partial<Omit<DisenoModal, "tiendasId" | "id">>
+	) {
+		return this.panelService.updateSecurityModalSettings(storeID, data)
+	}
 
 	@Get("get-security-modal-settings/:storeID")
 	getSecurityModalSettings(@Param("storeID") storeID: number) {
