@@ -2,6 +2,7 @@ import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from "@ne
 import { Response } from "express"
 import { DisenoModal, Redes } from "src/entities"
 
+import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { IProductCategorie } from "./interfaces/categories"
@@ -17,6 +18,11 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Get("get-subscriptions/:storeID")
+	getSubscriptions(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {
+		return this.panelService.getStoreSubscribers(storeID, pagination)
+	}
 
 	@Delete("delete-customer-access-code/:storeID/:codeID")
 	deleteCustomerAccessCode(@Param("storeID") storeID: number, @Param("codeID") codeID: string) {

@@ -1,7 +1,7 @@
 export interface ICustomerAccessCode {
 	id: string
-	user_code: string | null
-	user_name: string | null
+	user_code: string
+	user_name: string
 	user_email: string | null
 	access_code: string
 	status: boolean

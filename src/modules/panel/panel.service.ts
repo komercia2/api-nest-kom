@@ -23,12 +23,14 @@ import {
 	ProductosVariantesCombinaciones,
 	Redes,
 	Subcategorias,
+	SuscriptoresTienda,
 	TemplateWhatsappSettings,
 	WhatsappCheckout
 } from "src/entities"
 import { DataSource, Like, Repository } from "typeorm"
 
 import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
+import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
 import { ICreateProductCategorie } from "./interfaces/categories"
@@ -64,11 +66,67 @@ export class PanelService {
 		@InjectRepository(WhatsappCheckout)
 		private whatsappCheckoutRepository: Repository<WhatsappCheckout>,
 		@InjectRepository(DisenoModal) private disenoModalRepository: Repository<DisenoModal>,
+		@InjectRepository(SuscriptoresTienda)
+		private suscriptoresTiendaRepository: Repository<SuscriptoresTienda>,
 		@InjectRepository(CustomerAccessCode)
 		private customerAccessCode: Repository<CustomerAccessCode>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async getStoreSubscribers(storeID: number, pagination: PaginationDto) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const [subscribers, total] = await this.suscriptoresTiendaRepository.findAndCount({
+			where: { idTienda: storeID },
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" }
+		})
+
+		if (subscribers.length === 0) return []
+
+		const mappedSubscriebrs = subscribers.map((subscriber) => ({
+			id: subscriber.id,
+			email: subscriber.email,
+			created_at: subscriber.createdAt
+		}))
+
+		return {
+			subscribers: mappedSubscriebrs,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
+
+	async createCustomerAccessCode(
+		storeID: number,
+		data: Omit<ICustomerAccessCode, "id" | "tiendasId" | "createdAt" | "updatedAt">
+	) {
+		const existingCode = await this.customerAccessCode.findOne({
+			where: { accessCode: data.access_code, tiendasId: storeID }
+		})
+
+		if (existingCode) throw new BadRequestException("Access code already exists")
+
+		const newAccessCode = new CustomerAccessCode()
+		newAccessCode.userCode = data.user_code
+		newAccessCode.userName = data.user_name
+		newAccessCode.userEmail = data.user_email
+		newAccessCode.accessCode = data.access_code
+		newAccessCode.status = data.status
+		newAccessCode.tiendasId = storeID
+		newAccessCode.createdAt = new Date()
+		newAccessCode.updatedAt = new Date()
+
+		return this.customerAccessCode.save(newAccessCode)
+	}
 
 	async deleteCustomerAccessCode(storeID: number, codeID: string): Promise<void> {
 		const accessCode = await this.customerAccessCode.findOne({
@@ -114,14 +172,14 @@ export class PanelService {
 
 		return accessCode.map((code) => ({
 			id: code.id,
-			user_code: code.userCode,
+			user_code: code.userCode ?? "",
 			user_name: code.userName,
-			user_email: code.userEmail,
+			user_email: code.userEmail ?? "",
 			access_code: code.accessCode,
 			status: code.status,
 			tiendas_id: code.tiendasId,
-			created_at: code.createdAt,
-			updated_at: code.updatedAt
+			created_at: code.createdAt ?? new Date(),
+			updated_at: code.updatedAt ?? new Date()
 		}))
 	}
 

@@ -17,6 +17,7 @@ import {
 	ProductosVariantesCombinaciones,
 	Redes,
 	Subcategorias,
+	SuscriptoresTienda,
 	TemplateWhatsappSettings,
 	WhatsappCheckout
 } from "src/entities"
@@ -43,7 +44,8 @@ import { PanelService } from "./panel.service"
 			Cupones,
 			DisenoModal,
 			DescuentoRango,
-			CustomerAccessCode
+			CustomerAccessCode,
+			SuscriptoresTienda
 		])
 	],
 	controllers: [PanelController],
