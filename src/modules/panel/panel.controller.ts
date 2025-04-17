@@ -1,11 +1,14 @@
 import { Body, Controller, Delete, Get, Param, Post, Put, Query, Res } from "@nestjs/common"
 import { Response } from "express"
-import { Redes } from "src/entities"
+import { DisenoModal, Redes } from "src/entities"
 
+import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IBlog } from "./interfaces/blog"
 import { IProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
+import { ICustomerAccessCode } from "./interfaces/customer-access-code"
 import { IDiscount } from "./interfaces/discount"
 import { IPolicy } from "./interfaces/policies"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
@@ -16,6 +19,87 @@ import { PanelService } from "./panel.service"
 @Controller()
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
+
+	@Get("get-banks-per-country/:countryID")
+	async getBanks(@Param("countryID") countryID: number) {
+		return this.panelService.getBanks(countryID)
+	}
+
+	@Get("get-profits-per-client/:storeID")
+	getProfitsPerClient(
+		@Param("storeID") storeID: number,
+		@Query() pagination: PaginationDto,
+		@Query("search_by") search_by?: string,
+		@Query("sort_by") sort_by?: string
+	) {
+		return this.panelService.getProfitsPerClient(storeID, pagination, search_by, sort_by)
+	}
+
+	@Delete("delete-blog/:storeID/:blogID")
+	deleteBlog(@Param("storeID") storeID: number, @Param("blogID") blogID: string) {
+		return this.panelService.deleteBlog(storeID, blogID)
+	}
+
+	@Put("update-blog/:storeID/:blogID")
+	updateBlog(
+		@Param("storeID") storeID: number,
+		@Param("blogID") blogID: string,
+		@Body() data: Partial<Omit<IBlog, "id" | "tiendasId">>
+	) {
+		return this.panelService.updateBlog(storeID, blogID, data)
+	}
+
+	@Post("blog/:storeID")
+	createBlog(@Param("storeID") storeID: number, @Body() data: Omit<IBlog, "id" | "tiendasId">) {
+		return this.panelService.createBlog(storeID, data)
+	}
+
+	@Get("blogs/:storeID")
+	TiendaBlogs(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {
+		return this.panelService.getStoreBlogs(storeID, pagination)
+	}
+
+	@Get("contact-messages/:storeID")
+	getContactMessages(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {
+		return this.panelService.getContactMessages(storeID, pagination)
+	}
+
+	@Get("get-subscriptions/:storeID")
+	getSubscriptions(@Param("storeID") storeID: number, @Query() pagination: PaginationDto) {
+		return this.panelService.getStoreSubscribers(storeID, pagination)
+	}
+
+	@Delete("delete-customer-access-code/:storeID/:codeID")
+	deleteCustomerAccessCode(@Param("storeID") storeID: number, @Param("codeID") codeID: string) {
+		return this.panelService.deleteCustomerAccessCode(storeID, codeID)
+	}
+
+	@Put("update-customer-access-code/:storeID/:codeID")
+	updateCustomerAccessCode(
+		@Param("storeID") storeID: number,
+		@Param("codeID") codeID: string,
+		@Body() data: Partial<Omit<ICustomerAccessCode, "id" | "tiendasId">>
+	) {
+		return this.panelService.updateCustomerAccessCode(storeID, codeID, data)
+	}
+
+	@Get("get-customer-access-code/:storeID")
+	getCustomerAccessCode(@Param("storeID") storeID: number) {
+		return this.panelService.getCustomerAccessCode(storeID)
+	}
+
+	@Put("update-security-modal-settings/:storeID")
+	updateSecurityModalSettings(
+		@Param("storeID") storeID: number,
+		@Body() data: Partial<Omit<DisenoModal, "tiendasId" | "id">>
+	) {
+		return this.panelService.updateSecurityModalSettings(storeID, data)
+	}
+
+	@Get("get-security-modal-settings/:storeID")
+	getSecurityModalSettings(@Param("storeID") storeID: number) {
+		return this.panelService.getSecurityModalSettings(storeID)
+	}
 
 	@Delete("delete-discount/:storeID/:couponID")
 	deleteDiscount(@Param("storeID") storeID: number, @Param("discountID") discountID: string) {

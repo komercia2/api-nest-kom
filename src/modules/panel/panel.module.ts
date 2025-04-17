@@ -2,20 +2,27 @@ import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { NodeAuthMiddleware } from "@shared/infrastructure/middlewares/auth/node-auth-middleware"
 import {
+	Bancos,
 	Carritos,
 	CategoriaProductos,
 	Clientes,
 	Cupones,
+	CustomerAccessCode,
 	DeliveryStatus,
 	DescuentoRango,
+	DisenoModal,
 	Geolocalizacion,
+	MensajesContacto,
 	Politicas,
 	Productos,
 	ProductosInfo,
 	ProductosVariantesCombinaciones,
 	Redes,
 	Subcategorias,
+	SuscriptoresTienda,
 	TemplateWhatsappSettings,
+	TiendaBlogs,
+	Users,
 	WhatsappCheckout
 } from "src/entities"
 
@@ -39,7 +46,14 @@ import { PanelService } from "./panel.service"
 			WhatsappCheckout,
 			TemplateWhatsappSettings,
 			Cupones,
-			DescuentoRango
+			DisenoModal,
+			DescuentoRango,
+			CustomerAccessCode,
+			SuscriptoresTienda,
+			MensajesContacto,
+			TiendaBlogs,
+			Users,
+			Bancos
 		])
 	],
 	controllers: [PanelController],
