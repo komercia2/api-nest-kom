@@ -17,6 +17,11 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Get("get-security-modal-settings/:storeID")
+	getSecurityModalSettings(@Param("storeID") storeID: number) {
+		return this.panelService.getSecurityModalSettings(storeID)
+	}
+
 	@Delete("delete-discount/:storeID/:couponID")
 	deleteDiscount(@Param("storeID") storeID: number, @Param("discountID") discountID: string) {
 		return this.panelService.deleteDiscount(storeID, discountID)

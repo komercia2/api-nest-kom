@@ -8,6 +8,7 @@ import {
 	Cupones,
 	DeliveryStatus,
 	DescuentoRango,
+	DisenoModal,
 	Geolocalizacion,
 	Politicas,
 	Productos,
@@ -39,6 +40,7 @@ import { PanelService } from "./panel.service"
 			WhatsappCheckout,
 			TemplateWhatsappSettings,
 			Cupones,
+			DisenoModal,
 			DescuentoRango
 		])
 	],
