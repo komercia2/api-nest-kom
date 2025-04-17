@@ -92,6 +92,14 @@ export class MailsService {
 		await this.mensajesContactoRepository.save(mensajeContacto)
 	}
 
+	contactMessageContainsExternalLink(mensaje: string): boolean {
+		const httpRegex = /https?:\/\/[^\s]+/g
+		const httpsRegex = /https?:\/\/[^\s]+/g
+		const linkRegex = /www\.[^\s]+/g
+
+		return httpRegex.test(mensaje) || httpsRegex.test(mensaje) || linkRegex.test(mensaje)
+	}
+
 	async verifySendgridOwnership(): Promise<boolean> {
 		try {
 			await this.mailService.send({

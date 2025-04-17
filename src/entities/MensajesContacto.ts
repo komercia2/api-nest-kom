@@ -27,6 +27,9 @@ export class MensajesContacto {
 	@Column("datetime", { name: "created_at" })
 	createdAt: Date
 
+	@Column("tinyint", { name: "posible_fraude", nullable: true })
+	posibleFraude: number | null
+
 	@Column("datetime", { name: "updated_at" })
 	updatedAt: Date
 }
