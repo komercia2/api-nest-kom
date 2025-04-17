@@ -8,6 +8,7 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Parser } from "json2csv"
 import { Logger } from "nestjs-pino"
 import {
+	Bancos,
 	Carritos,
 	CategoriaProductos,
 	Clientes,
@@ -78,9 +79,21 @@ export class PanelService {
 		private mensajesContactoRepository: Repository<MensajesContacto>,
 		@InjectRepository(TiendaBlogs) private tiendaBlogsRepository: Repository<TiendaBlogs>,
 		@InjectRepository(Users) private users: Repository<Users>,
+		@InjectRepository(Bancos) private bancosRepository: Repository<Bancos>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async getBanks(countryID: number) {
+		const banks = await this.bancosRepository.find({
+			order: { nombre: "DESC" },
+			where: { paisesId: countryID }
+		})
+
+		if (banks.length === 0) return []
+
+		return banks
+	}
 
 	async getProfitsPerClient(
 		storeID: number,

@@ -20,6 +20,11 @@ import { PanelService } from "./panel.service"
 export class PanelController {
 	constructor(private readonly panelService: PanelService) {}
 
+	@Get("get-banks-per-country/:countryID")
+	async getBanks(@Param("countryID") countryID: number) {
+		return this.panelService.getBanks(countryID)
+	}
+
 	@Get("get-profits-per-client/:storeID")
 	getProfitsPerClient(
 		@Param("storeID") storeID: number,

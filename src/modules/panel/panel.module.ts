@@ -2,6 +2,7 @@ import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common"
 import { TypeOrmModule } from "@nestjs/typeorm"
 import { NodeAuthMiddleware } from "@shared/infrastructure/middlewares/auth/node-auth-middleware"
 import {
+	Bancos,
 	Carritos,
 	CategoriaProductos,
 	Clientes,
@@ -51,7 +52,8 @@ import { PanelService } from "./panel.service"
 			SuscriptoresTienda,
 			MensajesContacto,
 			TiendaBlogs,
-			Users
+			Users,
+			Bancos
 		])
 	],
 	controllers: [PanelController],
