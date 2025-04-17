@@ -8,29 +8,39 @@ import { InjectRepository } from "@nestjs/typeorm"
 import { Parser } from "json2csv"
 import { Logger } from "nestjs-pino"
 import {
+	Bancos,
 	Carritos,
 	CategoriaProductos,
 	Clientes,
 	Cupones,
+	CustomerAccessCode,
 	DeliveryStatus,
 	DescuentoRango,
+	DisenoModal,
 	Geolocalizacion,
+	MensajesContacto,
 	Politicas,
 	Productos,
 	ProductosInfo,
 	ProductosVariantesCombinaciones,
 	Redes,
 	Subcategorias,
+	SuscriptoresTienda,
 	TemplateWhatsappSettings,
+	TiendaBlogs,
+	Users,
 	WhatsappCheckout
 } from "src/entities"
-import { DataSource, Like, Repository } from "typeorm"
+import { DataSource, In, Like, Not, Repository } from "typeorm"
 
 import { prettifyShippingMethod } from "../orders/utils/prettifyShippingMethod"
+import { PaginationDto } from "../users/infrastructure/dtos/paginatation.dto"
 import { GetProductsDtos } from "./dtos/get-productos.dtos"
 import { UpdateProductPricingDto } from "./dtos/update-product-pricing"
+import { IBlog } from "./interfaces/blog"
 import { ICreateProductCategorie } from "./interfaces/categories"
 import { ICoupon } from "./interfaces/coupon"
+import { ICustomerAccessCode } from "./interfaces/customer-access-code"
 import { IDiscount } from "./interfaces/discount"
 import { ICreateProductSubcategorie } from "./interfaces/subcategories"
 import { IWapiTemplate } from "./interfaces/wapi"
@@ -60,9 +70,382 @@ export class PanelService {
 		private combinacionesRepository: Repository<ProductosVariantesCombinaciones>,
 		@InjectRepository(WhatsappCheckout)
 		private whatsappCheckoutRepository: Repository<WhatsappCheckout>,
+		@InjectRepository(DisenoModal) private disenoModalRepository: Repository<DisenoModal>,
+		@InjectRepository(SuscriptoresTienda)
+		private suscriptoresTiendaRepository: Repository<SuscriptoresTienda>,
+		@InjectRepository(CustomerAccessCode)
+		private customerAccessCode: Repository<CustomerAccessCode>,
+		@InjectRepository(MensajesContacto)
+		private mensajesContactoRepository: Repository<MensajesContacto>,
+		@InjectRepository(TiendaBlogs) private tiendaBlogsRepository: Repository<TiendaBlogs>,
+		@InjectRepository(Users) private users: Repository<Users>,
+		@InjectRepository(Bancos) private bancosRepository: Repository<Bancos>,
 		private readonly datasource: DataSource,
 		private readonly logger: Logger
 	) {}
+
+	async getBanks(countryID: number) {
+		const banks = await this.bancosRepository.find({
+			order: { nombre: "DESC" },
+			where: { paisesId: countryID }
+		})
+
+		if (banks.length === 0) return []
+
+		return banks
+	}
+
+	async getProfitsPerClient(
+		storeID: number,
+		pagination: PaginationDto,
+		search_by?: string,
+		sort_by = "profits"
+	) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const users = this.carritosRepository
+			.createQueryBuilder("carritos")
+			.leftJoinAndSelect("carritos.usuario2", "usuario2")
+			.select("DISTINCT carritos.usuario")
+			.where("carritos.tienda = :storeID", { storeID })
+			.andWhere("carritos.estado = :estado", { estado: "1" })
+			.andWhere("carritos.usuario IS NOT NULL")
+
+		const users_ids = await users.getRawMany()
+		const users_ids_set = new Set(users_ids.map((user) => user.usuario))
+
+		const [clients, total] = await this.users.findAndCount({
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" },
+			relations: ["carritos2"],
+			where: {
+				id: In(Array.from(users_ids_set)),
+				carritos2: { tienda: storeID },
+				...(search_by && { nombre: Like(`%${search_by}%`) })
+			}
+		})
+
+		const mappedClients = clients.map((client) => {
+			const totalSpent = client.carritos2.reduce((acc, carrito) => {
+				return acc + carrito.total
+			}, 0)
+
+			return {
+				id: client.id,
+				nombre: client.nombre,
+				email: client.email,
+				created_at: client.createdAt,
+				total_profits: totalSpent,
+				total_sales: client.carritos2.length
+			}
+		})
+
+		if (mappedClients.length === 0) return []
+
+		if (sort_by) {
+			switch (sort_by) {
+				case "sales":
+					mappedClients.sort((a, b) => b.total_sales - a.total_sales)
+					break
+				case "profits":
+					mappedClients.sort((a, b) => b.total_profits - a.total_profits)
+					break
+				case "name":
+					mappedClients.sort((a, b) => a.nombre.localeCompare(b.nombre))
+					break
+			}
+		}
+
+		return {
+			clients_profits: mappedClients,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
+
+	async deleteBlog(storeID: number, blogID: string): Promise<void> {
+		const blog = await this.tiendaBlogsRepository.findOne({
+			where: { id: blogID, tiendasId: storeID }
+		})
+
+		if (!blog) throw new NotFoundException("Blog not found")
+
+		await this.tiendaBlogsRepository.remove(blog)
+	}
+
+	async updateBlog(
+		storeID: number,
+		blogID: string,
+		data: Partial<Omit<IBlog, "id" | "tiendasId">>
+	) {
+		const blog = await this.tiendaBlogsRepository.findOne({
+			where: { id: blogID, tiendasId: storeID }
+		})
+
+		if (!blog) throw new NotFoundException("Blog not found")
+
+		Object.assign(blog, {
+			titulo: data.titulo ?? blog.titulo,
+			autor: data.autor ?? blog.autor,
+			contenido: data.contenido ?? blog.contenido,
+			imagenPrincipalUrl: data.imagen_principal_url ?? blog.imagenPrincipalUrl,
+			imagenPrincipalId: data.imagen_principal_id ?? blog.imagenPrincipalId,
+			slug: data.slug ?? blog.slug,
+			resumen: data.resumen ?? blog.resumen,
+			estado: data.estado ?? blog.estado,
+			updatedAt: new Date()
+		})
+
+		await this.tiendaBlogsRepository.save(blog)
+
+		return {
+			id: blog.id,
+			titulo: blog.titulo,
+			autor: blog.autor,
+			imagen_principal_url: blog.imagenPrincipalUrl,
+			imagen_principal_id: blog.imagenPrincipalId,
+			slug: blog.slug,
+			resumen: blog.resumen,
+			estado: blog.estado,
+			created_at: blog.createdAt,
+			updated_at: blog.updatedAt,
+			contenido: blog.contenido
+		}
+	}
+
+	async createBlog(storeID: number, data: Omit<IBlog, "id" | "tiendasId">) {
+		const newBlog = new TiendaBlogs()
+		newBlog.titulo = data.titulo
+		newBlog.autor = data.autor
+		newBlog.contenido = data.contenido
+		newBlog.imagenPrincipalUrl = data.imagen_principal_url
+		newBlog.imagenPrincipalId = data.imagen_principal_id
+		newBlog.tiendasId = storeID
+		newBlog.slug = data.slug
+		newBlog.resumen = data.resumen
+		newBlog.estado = data.estado
+		newBlog.createdAt = new Date()
+		newBlog.updatedAt = new Date()
+
+		return this.tiendaBlogsRepository.save(newBlog)
+	}
+
+	async getStoreBlogs(storeID: number, pagination: PaginationDto) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const [blogs, total] = await this.tiendaBlogsRepository.findAndCount({
+			where: { tiendasId: storeID },
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" }
+		})
+
+		if (blogs.length === 0) return []
+
+		const mappedBlogs: IBlog[] = blogs.map((blog) => ({
+			id: blog.id,
+			titulo: blog.titulo,
+			autor: blog.autor,
+			imagen_principal_url: blog.imagenPrincipalUrl,
+			imagen_principal_id: blog.imagenPrincipalId,
+			slug: blog.slug,
+			resumen: blog.resumen,
+			estado: blog.estado,
+			created_at: blog.createdAt,
+			updated_at: blog.updatedAt,
+			contenido: blog.contenido
+		}))
+
+		return {
+			blog: mappedBlogs,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
+
+	async getContactMessages(storeID: number, pagination: PaginationDto) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const [messages, total] = await this.mensajesContactoRepository.findAndCount({
+			where: { tiendaId: storeID },
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" }
+		})
+
+		if (messages.length === 0) return []
+
+		const mappedMessages = messages.map((message) => ({
+			id: message.id,
+			mensaje: message.mensaje,
+			nombre: message.nombre,
+			telefono: message.telefono,
+			email: message.email,
+			created_at: message.createdAt
+		}))
+
+		return {
+			messages: mappedMessages,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
+
+	async getStoreSubscribers(storeID: number, pagination: PaginationDto) {
+		const { page, limit } = pagination
+
+		const offset = (page - 1) * limit
+
+		const [subscribers, total] = await this.suscriptoresTiendaRepository.findAndCount({
+			where: { idTienda: storeID },
+			skip: offset,
+			take: limit,
+			order: { createdAt: "DESC" }
+		})
+
+		if (subscribers.length === 0) return []
+
+		const mappedSubscriebrs = subscribers.map((subscriber) => ({
+			id: subscriber.id,
+			email: subscriber.email,
+			created_at: subscriber.createdAt
+		}))
+
+		return {
+			subscribers: mappedSubscriebrs,
+			total,
+			page: +page,
+			last_page: Math.ceil(total / limit),
+			limit: +limit,
+			has_next_page: total > page * limit,
+			has_previous_page: page > 1
+		}
+	}
+
+	async createCustomerAccessCode(
+		storeID: number,
+		data: Omit<ICustomerAccessCode, "id" | "tiendasId" | "createdAt" | "updatedAt">
+	) {
+		const existingCode = await this.customerAccessCode.findOne({
+			where: { accessCode: data.access_code, tiendasId: storeID }
+		})
+
+		if (existingCode) throw new BadRequestException("Access code already exists")
+
+		const newAccessCode = new CustomerAccessCode()
+		newAccessCode.userCode = data.user_code
+		newAccessCode.userName = data.user_name
+		newAccessCode.userEmail = data.user_email
+		newAccessCode.accessCode = data.access_code
+		newAccessCode.status = data.status
+		newAccessCode.tiendasId = storeID
+		newAccessCode.createdAt = new Date()
+		newAccessCode.updatedAt = new Date()
+
+		return this.customerAccessCode.save(newAccessCode)
+	}
+
+	async deleteCustomerAccessCode(storeID: number, codeID: string): Promise<void> {
+		const accessCode = await this.customerAccessCode.findOne({
+			where: { id: codeID, tiendasId: storeID }
+		})
+
+		if (!accessCode) throw new NotFoundException("Access code not found")
+
+		await this.customerAccessCode.remove(accessCode)
+	}
+
+	async updateCustomerAccessCode(
+		storeID: number,
+		codeID: string,
+		data: Partial<Omit<ICustomerAccessCode, "id" | "tiendasId">>
+	) {
+		const accessCode = await this.customerAccessCode.findOne({
+			where: { id: codeID, tiendasId: storeID }
+		})
+
+		if (!accessCode) throw new NotFoundException("Access code not found")
+
+		Object.assign(accessCode, {
+			userCode: data.user_code ?? accessCode.userCode,
+			userName: data.user_name ?? accessCode.userName,
+			userEmail: data.user_email ?? accessCode.userEmail,
+			accessCode: data.access_code ?? accessCode.accessCode,
+			status: data.status ?? accessCode.status,
+			tiendasId: storeID,
+			updatedAt: new Date()
+		})
+
+		return this.customerAccessCode.save(accessCode)
+	}
+
+	async getCustomerAccessCode(storeID: number): Promise<ICustomerAccessCode[]> {
+		const accessCode = await this.customerAccessCode.find({
+			where: { tiendasId: storeID },
+			order: { createdAt: "DESC" }
+		})
+
+		if (!accessCode) throw new NotFoundException("Access code not found")
+
+		return accessCode.map((code) => ({
+			id: code.id,
+			user_code: code.userCode ?? "",
+			user_name: code.userName,
+			user_email: code.userEmail ?? "",
+			access_code: code.accessCode,
+			status: code.status,
+			tiendas_id: code.tiendasId,
+			created_at: code.createdAt ?? new Date(),
+			updated_at: code.updatedAt ?? new Date()
+		}))
+	}
+
+	async updateSecurityModalSettings(
+		storeID: number,
+		data: Partial<Omit<DisenoModal, "tiendasId" | "id">>
+	) {
+		const modal = await this.disenoModalRepository.findOne({
+			where: { tiendasId: storeID }
+		})
+
+		if (!modal) throw new NotFoundException("Security modal not found")
+
+		Object.assign(modal, {
+			...data,
+			updatedAt: new Date()
+		})
+
+		return this.disenoModalRepository.save(modal)
+	}
+
+	async getSecurityModalSettings(storeID: number) {
+		const modal = await this.disenoModalRepository.findOne({
+			where: { tiendasId: storeID }
+		})
+
+		if (!modal) throw new NotFoundException("Security modal not found")
+
+		return modal
+	}
 
 	async deleteDiscount(storeID: number, discountID: string): Promise<void> {
 		const discount = await this.descuentoRangoRepository.findOne({
