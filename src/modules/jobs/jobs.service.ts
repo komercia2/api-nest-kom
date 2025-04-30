@@ -57,72 +57,72 @@ export class JobsService {
 	// 	this.logger.log("[handleMigrateLogo] Finished")
 	// }
 
-	@Cron(CronExpression.EVERY_MINUTE)
-	async handleEvalConatctMessageRisk() {
-		this.logger.log("[handleEvalConatctMessageRisk] Running")
+	// @Cron(CronExpression.EVERY_MINUTE)
+	// async handleEvalConatctMessageRisk() {
+	// 	this.logger.log("[handleEvalConatctMessageRisk] Running")
 
-		const riskContactMessages = await this.mensajesContactoRepository.find({
-			where: [
-				{ mensaje: Like("%http%") },
-				{ mensaje: Like("%https%") },
-				{ mensaje: Like("%www%") },
-				{ mensaje: Like("%@%") },
-				{ posibleFraude: IsNull() }
-			],
-			take: 10,
-			order: { createdAt: "ASC" }
-		})
+	// 	const riskContactMessages = await this.mensajesContactoRepository.find({
+	// 		where: [
+	// 			{ mensaje: Like("%http%") },
+	// 			{ mensaje: Like("%https%") },
+	// 			{ mensaje: Like("%www%") },
+	// 			{ mensaje: Like("%@%") },
+	// 			{ posibleFraude: IsNull() }
+	// 		],
+	// 		take: 10,
+	// 		order: { createdAt: "ASC" }
+	// 	})
 
-		if (riskContactMessages.length === 0) {
-			this.logger.warn("No contact messages with risk found")
-			return
-		}
-		this.logger.log(`Processing ${riskContactMessages.length} potentially risky messages`)
+	// 	if (riskContactMessages.length === 0) {
+	// 		this.logger.warn("No contact messages with risk found")
+	// 		return
+	// 	}
+	// 	this.logger.log(`Processing ${riskContactMessages.length} potentially risky messages`)
 
-		const promises = riskContactMessages.map(async (message) => {
-			const { mensaje, id } = message
+	// 	const promises = riskContactMessages.map(async (message) => {
+	// 		const { mensaje, id } = message
 
-			try {
-				const evaluation = await this.openAI.chat.completions.create({
-					model: "gpt-4o-mini",
-					messages: [
-						{
-							role: "user",
-							content: `
-							"Evaluate whether this message could be spam, fraud, or a threat: '${mensaje}'. Respond only with 'true' if it is risky or 'false' if it seems safe. Consider the following when evaluating:"
-							
-							Criteria to identify risky messages:
-							- Urgency or pressure to act quickly: Messages that insist on immediate action, such as 'respond now!', 'limited offer', 'your account will be blocked if you don't act'.
-							- Requests for personal or financial information: Asking for data like credit card numbers, passwords, verification codes, or banking information.
-							- Suspicious or unknown links: Including URLs that don't match the entity they claim to represent or contain typographical errors.
-							- Offers that are too good to be true: Promises of prizes, gifts, or excessive discounts without clear justification.
-							- Grammatical or spelling errors: Incorrect language usage, poor spelling, or incoherent phrases.
-							- Unknown or unverified senders: Messages from email addresses or phone numbers that are not recognized.
-							- Emails or messages that seem to impersonate a legitimate entity: Phishing attempts that mimic well-known companies.
-							`
-						}
-					],
-					max_tokens: 10
-				})
+	// 		try {
+	// 			const evaluation = await this.openAI.chat.completions.create({
+	// 				model: "gpt-4o-mini",
+	// 				messages: [
+	// 					{
+	// 						role: "user",
+	// 						content: `
+	// 						"Evaluate whether this message could be spam, fraud, or a threat: '${mensaje}'. Respond only with 'true' if it is risky or 'false' if it seems safe. Consider the following when evaluating:"
 
-				const isRisky = evaluation.choices[0]?.message?.content?.trim().toLowerCase() === "true"
+	// 						Criteria to identify risky messages:
+	// 						- Urgency or pressure to act quickly: Messages that insist on immediate action, such as 'respond now!', 'limited offer', 'your account will be blocked if you don't act'.
+	// 						- Requests for personal or financial information: Asking for data like credit card numbers, passwords, verification codes, or banking information.
+	// 						- Suspicious or unknown links: Including URLs that don't match the entity they claim to represent or contain typographical errors.
+	// 						- Offers that are too good to be true: Promises of prizes, gifts, or excessive discounts without clear justification.
+	// 						- Grammatical or spelling errors: Incorrect language usage, poor spelling, or incoherent phrases.
+	// 						- Unknown or unverified senders: Messages from email addresses or phone numbers that are not recognized.
+	// 						- Emails or messages that seem to impersonate a legitimate entity: Phishing attempts that mimic well-known companies.
+	// 						`
+	// 					}
+	// 				],
+	// 				max_tokens: 10
+	// 			})
 
-				await this.mensajesContactoRepository.update(id, {
-					posibleFraude: isRisky ? 1 : 0
-				})
+	// 			const isRisky = evaluation.choices[0]?.message?.content?.trim().toLowerCase() === "true"
 
-				this.logger.log(`Message ${id} evaluated as ${isRisky ? "risky" : "safe"}`)
-				return { id, isRisky }
-			} catch (error) {
-				this.logger.error(`Error evaluating message ${id}: ${error}`)
-				return null
-			}
-		})
+	// 			await this.mensajesContactoRepository.update(id, {
+	// 				posibleFraude: isRisky ? 1 : 0
+	// 			})
 
-		await Promise.all(promises)
+	// 			this.logger.log(`Message ${id} evaluated as ${isRisky ? "risky" : "safe"}`)
+	// 			return { id, isRisky }
+	// 		} catch (error) {
+	// 			this.logger.error(`Error evaluating message ${id}: ${error}`)
+	// 			return null
+	// 		}
+	// 	})
 
-		this.logger.log("[handleEvalConatctMessageRisk] Finished")
-	}
+	// 	await Promise.all(promises)
+
+	// 	this.logger.log("[handleEvalConatctMessageRisk] Finished")
+	// }
 
 	@Cron(CronExpression.EVERY_DAY_AT_5PM)
 	async handleMembershipDiscount() {
