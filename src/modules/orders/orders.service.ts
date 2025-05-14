@@ -114,7 +114,7 @@ export class OrdersService {
 			cart.tienda = createOrderDto.tienda
 			cart.usuario = createOrderDto.usuario
 			cart.resellerId = null
-			cart.fecha = new Date().toISOString()
+			cart.fecha = new Date().toISOString().split("T")[0]
 			cart.total = createOrderDto.total
 			cart.costoEnvio = createOrderDto.costo_envio
 			if (createOrderDto.tipo === true) {
@@ -266,7 +266,7 @@ export class OrdersService {
 							productos,
 							venta: {
 								canal: createOrderDto.canal === 1 ? "WhatsApp" : "Checkout",
-								fecha: new Date().toLocaleString(),
+								fecha: new Date().toISOString().split("T")[0],
 								method_shipping: prettifyShippingMethod(createOrderDto.metodo_pago),
 								id: cart.id.toString(),
 								tienda_venta: {
@@ -678,7 +678,7 @@ export class OrdersService {
 					direccion_entrega: direccion_entrega.value,
 					costo_envio,
 					descuento,
-					fecha: new Date(fecha).toLocaleString(),
+					fecha: new Date(fecha).toISOString().split("T")[0],
 					method_shipping: prettifyShippingMethod(metodoPago),
 					tienda_venta: { ...datosTienda, email_tienda: datosTienda.email_tienda || "" },
 					total: cart.total,
@@ -774,7 +774,7 @@ export class OrdersService {
 		cart.tienda = data.tienda
 		cart.usuario = data.usuario
 		cart.resellerId = data.reseller || null
-		cart.fecha = new Date().toISOString()
+		cart.fecha = new Date().toISOString().split("T")[0]
 		cart.createdAt = new Date()
 		cart.updatedAt = new Date()
 		cart.total = data.total
