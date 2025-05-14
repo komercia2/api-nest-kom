@@ -42,183 +42,201 @@ export class MySQLProductService {
 		return product?.descripcion || null
 	}
 
-	async getPagedProducts(data: IProductFilterDTO) {
-		try {
-			const {
-				storeId,
-				name,
-				page,
-				limit,
-				active,
-				category,
-				freeShipping,
-				maxPrice,
-				minPrice,
-				promotion,
-				subcategory,
-				tagPropertyId,
-				withVariants,
-				topSales,
-				favorite,
-				alphabetic,
-				price
-			} = data
-			const queryBuilder = this.productRepository
-				.createQueryBuilder("productos")
-				.innerJoin("productos.productosInfo", "productos_info")
-				.leftJoinAndSelect("productos.categoriaProducto2", "categoria_producto")
-				.leftJoinAndSelect("productos.productosVariantes", "productos_variantes")
-				.leftJoinAndSelect(
-					"productos_variantes.productosVariantesCombinaciones",
-					"productos_variantes_combinaciones"
-				)
-				.leftJoinAndSelect("productos.tagProducts", "tag_product")
-				.where("productos.tienda = :id", { id: storeId })
-				.andWhere("productos.activo = :activo", { activo: active })
-				.andWhere("productos.deletedAt IS NULL")
-				.select([
-					"productos.id as id",
-					"productos.nombre as nombre",
-					"productos.foto as foto",
-					"productos.precio as precio",
-					"productos.conVariante as con_variante",
-					"productos.slug as slug",
-					"productos_info.sku as sku",
-					"productos_info.marca as marca",
-					"productos_info.descripcionCorta as descripcion",
-					"productos_info.inventario as stock",
-					"productos_info.tipoServicio as tipo_servicio",
-					"productos_info.promocionValor as promocion_valor",
-					"productos_info.descripcionCortaAuxiliar as descripcion_corta_auxiliar",
-					"productos_info.tagPromocion as tag_promocion",
-					"productos_info.dealerWhatsapp as dealer_whatsapp",
-					"productos.fotoCloudinary as foto_cloudinary",
-					"categoria_producto.nombreCategoriaProducto as categoria",
-					"productos.subcategoria as subcategoria",
-					"productos.favorito as favorito",
-					"productos.envioGratis as envio_gratis",
-					"productos.orden as orden",
-					`
-				JSON_OBJECT(
-					'id', productos_variantes.id,
-					'variantes', productos_variantes.variantes,
-					'id_producto', productos_variantes.idProducto2,
-					'combinaciones', JSON_ARRAYAGG(
-						JSON_OBJECT(
-							'id', productos_variantes_combinaciones.id,
-							'combinaciones', productos_variantes_combinaciones.combinaciones,
-							'id_productos_variantes', productos_variantes_combinaciones.id_productos_variantes
-						)
-					)
-				) as variantes`,
-					`
-				CASE
-					WHEN tag_product.id IS NULL THEN JSON_ARRAY()
-				ELSE
-					JSON_ARRAYAGG(
-						JSON_OBJECT(
-							'id', tag_product.id,
-							'tag_property_id', tag_product.tag_property_id,
-							'productos_id', tag_product.productos_id,
-							'created_at', tag_product.created_at,
-							'updated_at', tag_product.updated_at
-						)
-					) 
-				END
-				as tags
+async getPagedProducts(data: IProductFilterDTO) {
+		const {
+			storeId,
+			name,
+			page,
+			limit,
+			active,
+			category,
+			freeShipping,
+			maxPrice,
+			minPrice,
+			promotion,
+			subcategory,
+			tagPropertyId,
+			withVariants,
+			topSales,
+			favorite,
+			alphabetic,
+			price
+		} = data
+		const queryBuilder = this.productRepository
+			.createQueryBuilder("productos")
+			.innerJoin("productos.productosInfo", "productos_info")
+			.leftJoinAndSelect("productos.categoriaProducto2", "categoria_producto")
+			.leftJoinAndSelect("productos.productosVariantes", "productos_variantes")
+			.leftJoinAndSelect(
+				"productos_variantes.productosVariantesCombinaciones",
+				"productos_variantes_combinaciones"
+			)
+			.leftJoinAndSelect("productos.tagProducts", "tag_product")
+			.where("productos.tienda = :id", { id: storeId })
+			.andWhere("productos.activo = :activo", { activo: active })
+			.andWhere("productos.deletedAt IS NULL")
+			.select([
+				"productos.id as id",
+				"productos.nombre as nombre",
+				"productos.foto as foto",
+				"productos.precio as precio",
+				"productos.conVariante as con_variante",
+				"productos.slug as slug",
+				"productos_info.sku as sku",
+				"productos_info.marca as marca",
+				"productos_info.descripcionCorta as descripcion",
+				"productos_info.inventario as stock",
+				"productos_info.tipoServicio as tipo_servicio",
+				"productos_info.promocionValor as promocion_valor",
+				"productos_info.descripcionCortaAuxiliar as descripcion_corta_auxiliar",
+				"productos_info.tagPromocion as tag_promocion",
+				"productos_info.dealerWhatsapp as dealer_whatsapp",
+				"productos.fotoCloudinary as foto_cloudinary",
+				"categoria_producto.nombreCategoriaProducto as categoria",
+				"productos.subcategoria as subcategoria",
+				"productos.favorito as favorito",
+				"productos.envioGratis as envio_gratis",
+				"productos.orden as orden",
 				`
-				])
-				// .groupBy("productos.id")
-				.orderBy("productos.orden", "DESC")
+    JSON_OBJECT(
+      'id', productos_variantes.id,
+      'variantes', productos_variantes.variantes,
+      'id_producto', productos_variantes.idProducto2,
+      'combinaciones', JSON_ARRAYAGG(
+        JSON_OBJECT(
+          'id', productos_variantes_combinaciones.id,
+          'combinaciones', productos_variantes_combinaciones.combinaciones,
+          'id_productos_variantes', productos_variantes_combinaciones.id_productos_variantes
+        )
+      )
+    ) as variantes`,
+				`
+    CASE
+      WHEN tag_product.id IS NULL THEN JSON_ARRAY()
+      ELSE
+        JSON_ARRAYAGG(
+          JSON_OBJECT(
+            'id', tag_product.id,
+            'tag_property_id', tag_product.tag_property_id,
+            'productos_id', tag_product.productos_id,
+            'created_at', tag_product.created_at,
+            'updated_at', tag_product.updated_at
+          )
+        )
+    END as tags`
+			])
+			.groupBy("productos.id")
+			.addGroupBy("productos.nombre")
+			.addGroupBy("productos.foto")
+			.addGroupBy("productos.precio")
+			.addGroupBy("productos.conVariante")
+			.addGroupBy("productos.slug")
+			.addGroupBy("productos.fotoCloudinary")
+			.addGroupBy("productos.subcategoria")
+			.addGroupBy("productos.favorito")
+			.addGroupBy("productos.envioGratis")
+			.addGroupBy("productos.orden")
+			.addGroupBy("productos_info.sku")
+			.addGroupBy("productos_info.marca")
+			.addGroupBy("productos_info.descripcionCorta")
+			.addGroupBy("productos_info.inventario")
+			.addGroupBy("productos_info.tipoServicio")
+			.addGroupBy("productos_info.promocionValor")
+			.addGroupBy("productos_info.descripcionCortaAuxiliar")
+			.addGroupBy("productos_info.tagPromocion")
+			.addGroupBy("productos_info.dealerWhatsapp")
+			.addGroupBy("categoria_producto.nombreCategoriaProducto")
+			.addGroupBy("productos_variantes.id")
+			.addGroupBy("productos_variantes.variantes")
+			.addGroupBy("productos_variantes.idProducto2")
+			.addGroupBy("tag_product.id")
+			.addGroupBy("tag_product.tag_property_id")
+			.addGroupBy("tag_product.productos_id")
+			.addGroupBy("tag_product.created_at")
+			.addGroupBy("tag_product.updated_at")
+			.orderBy("productos.orden", "DESC")
 
-			if (name) {
-				const cleanName = name.toLowerCase().trim()
-				queryBuilder.andWhere("LOWER(productos.nombre) LIKE :name", { name: `%${cleanName}%` })
-			}
-
-			if (category) {
-				queryBuilder.andWhere("categoria_producto.nombreCategoriaProducto = :category", {
-					category
-				})
-			}
-
-			if (subcategory) {
-				queryBuilder.andWhere("productos.subcategoria = :subcategory", { subcategory })
-			}
-
-			if (freeShipping) {
-				queryBuilder.andWhere("productos.envioGratis = :freeShipping", { freeShipping })
-			}
-
-			if (String(promotion) === "1") {
-				queryBuilder.andWhere(
-					"productos_info.promocionValor > 0 AND productos_info.promocionValor IS NOT NULL"
-				)
-			}
-
-			if (maxPrice && minPrice) {
-				queryBuilder.andWhere("productos.precio BETWEEN :minPrice AND :maxPrice", {
-					minPrice,
-					maxPrice
-				})
-			}
-
-			if (tagPropertyId) {
-				queryBuilder.andWhere("tag_product.tag_property_id = :tagPropertyId", { tagPropertyId })
-			}
-
-			if (withVariants) {
-				queryBuilder.andWhere("productos.conVariante = :withVariants", { withVariants })
-			}
-
-			if (String(topSales) === "1") {
-				queryBuilder
-					.leftJoin("productos.productosCarritos", "productos_carritos")
-					.groupBy("productos.id")
-					.orderBy("COUNT(productos_carritos.producto)", "DESC")
-			}
-
-			if (String(favorite) === "1") {
-				queryBuilder.andWhere("productos.favorito = :favorite", { favorite })
-			}
-
-			if (alphabetic) {
-				queryBuilder.orderBy("productos.nombre", alphabetic)
-			}
-
-			if (price) {
-				queryBuilder.orderBy("productos.precio", price)
-			}
-
-			const count = await queryBuilder.getCount()
-
-			const publicProductList = await queryBuilder.getRawMany()
-
-			if (!publicProductList.length) {
-				return { publicProductList: [], count, priceLimit: 0, priceMinimum: 0 }
-			}
-
-			const paginatedProducts = paginateArray(publicProductList, page, limit)
-
-			const priceLimit = publicProductList.reduce((prev, curr) =>
-				prev.precio > curr.precio ? prev : curr
-			).precio
-
-			const priceMinimum = publicProductList.reduce((prev, curr) => {
-				if (prev.precio < curr.precio) {
-					return prev
-				}
-				return curr
-			}).precio
-
-			console.log("🔊", { count, priceLimit, priceMinimum })
-
-			return { publicProductList: paginatedProducts, count, priceLimit, priceMinimum }
-		} catch (error) {
-			console.error("Error fetching products:", error)
-			throw error
+		if (name) {
+			const cleanName = name.toLowerCase().trim()
+			queryBuilder.andWhere("LOWER(productos.nombre) LIKE :name", { name: `%${cleanName}%` })
 		}
+
+		if (category) {
+			queryBuilder.andWhere("categoria_producto.nombreCategoriaProducto = :category", { category })
+		}
+
+		if (subcategory) {
+			queryBuilder.andWhere("productos.subcategoria = :subcategory", { subcategory })
+		}
+
+		if (freeShipping) {
+			queryBuilder.andWhere("productos.envioGratis = :freeShipping", { freeShipping })
+		}
+
+		if (String(promotion) === "1") {
+			queryBuilder.andWhere(
+				"productos_info.promocionValor > 0 AND productos_info.promocionValor IS NOT NULL"
+			)
+		}
+
+		if (maxPrice && minPrice) {
+			queryBuilder.andWhere("productos.precio BETWEEN :minPrice AND :maxPrice", {
+				minPrice,
+				maxPrice
+			})
+		}
+
+		if (tagPropertyId) {
+			queryBuilder.andWhere("tag_product.tag_property_id = :tagPropertyId", { tagPropertyId })
+		}
+
+		if (withVariants) {
+			queryBuilder.andWhere("productos.conVariante = :withVariants", { withVariants })
+		}
+
+		if (String(topSales) === "1") {
+			queryBuilder
+				.leftJoin("productos.productosCarritos", "productos_carritos")
+				.groupBy("productos.id")
+				.orderBy("COUNT(productos_carritos.producto)", "DESC")
+		}
+
+		if (String(favorite) === "1") {
+			queryBuilder.andWhere("productos.favorito = :favorite", { favorite })
+		}
+
+		if (alphabetic) {
+			queryBuilder.orderBy("productos.nombre", alphabetic)
+		}
+
+		if (price) {
+			queryBuilder.orderBy("productos.precio", price)
+		}
+
+		const count = await queryBuilder.getCount()
+
+		const publicProductList = await queryBuilder.getRawMany()
+
+		if (!publicProductList.length) {
+			return { publicProductList: [], count, priceLimit: 0, priceMinimum: 0 }
+		}
+
+		const paginatedProducts = paginateArray(publicProductList, page, limit)
+
+		const priceLimit = publicProductList.reduce((prev, curr) =>
+			prev.precio > curr.precio ? prev : curr
+		).precio
+
+		const priceMinimum = publicProductList.reduce((prev, curr) => {
+			if (prev.precio < curr.precio) {
+				return prev
+			}
+			return curr
+		}).precio
+
+		return { publicProductList: paginatedProducts, count, priceLimit, priceMinimum }
 	}
+
 
 	async getProductBySlug(slug: string) {
 		const { productId } = this.getSlug(slug)
