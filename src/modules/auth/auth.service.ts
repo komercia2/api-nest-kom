@@ -220,6 +220,7 @@ export class AuthService {
 			store.activo = true
 			store.reputacion = 0
 			store.template = 5
+			store.estado = true
 			store.fechaExpiracion = this.getCurrentDayCustomDaysAfter(20).toISOString().split("T")[0]
 			store.checkWhatsapp = false
 			store.numberVerified = dto.number_verified || false
