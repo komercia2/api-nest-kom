@@ -234,7 +234,14 @@ async getPagedProducts(data: IProductFilterDTO) {
 			return curr
 		}).precio
 
-		return { publicProductList: paginatedProducts, count, priceLimit, priceMinimum }
+		const filteredDuplicates = paginatedProducts.filter((item, index) => {
+			const foundIndex = paginatedProducts.findIndex(
+				(item2) => item2.id === item.id && item2.nombre === item.nombre
+			)
+			return foundIndex === index
+		})
+
+		return { publicProductList: filteredDuplicates, count, priceLimit, priceMinimum }
 	}
 
 
